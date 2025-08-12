@@ -92,3 +92,19 @@ def secure_delete(
         req=req,
         db=db
     )
+
+@router.post("/login", status_code=200, response_class=ResponseWithToken)
+def login(
+    db: Session = Depends(get_db_session),
+    data: UserLogin = Body(...),
+    controller: UsersController = Depends(get_controller)
+):
+    """
+    ## Login request
+
+    This endpoint retruns a valid webtoken needed for all requests to secure routes.
+    """
+    return controller.login(
+        db=db, 
+        data=data
+    )
