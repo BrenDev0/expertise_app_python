@@ -5,6 +5,7 @@ from sqlalchemy.dialects.postgresql import UUID
 from src.core.database.database_models import Base 
 import uuid
 from  datetime import datetime
+from src.core.models.http_responses import CommonHttpResponse
 
 
 class User(Base):
@@ -55,8 +56,6 @@ class UserLogin(BaseModel):
 class VerifyEmail(BaseModel):
     email: EmailStr
 
-class LoginResponse(BaseModel):
-    token: str
 
 
 

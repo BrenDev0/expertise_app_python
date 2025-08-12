@@ -2,8 +2,8 @@ from  fastapi import Request, HTTPException
 from sqlalchemy.orm import Session
 from src.core.services.http_service import HttpService
 from src.modules.users.users_service import UsersService
-from src.modules.users.users_models import UserPublic, User, UserCreate, UserLogin, VerifyEmail, UserLogin, LoginResponse
-from src.core.models.http_responses import CommonHttpResponse
+from src.modules.users.users_models import UserPublic, User, UserCreate, UserLogin, VerifyEmail, UserLogin
+from src.core.models.http_responses import CommonHttpResponse, ResponseWithToken
 from src.core.dependencies.container import Container
 from src.core.services.email_service import EmailService
 
@@ -13,11 +13,11 @@ class UsersController:
         self.__http_service = http_service
         self.__users_service = users_service
 
-    async def verify_email(
+    def verify_email(
         self,
         db: Session,
         data: VerifyEmail
-    ) -> CommonHttpResponse:
+    ) -> ResponseWithToken:
         hashed_email = self.__http_service.hashing_service.hash_for_search(data.email)
 
         user_exists = self.__users_service.resource(db=db, key="email_hash", value=hashed_email)
@@ -26,10 +26,11 @@ class UsersController:
             raise HTTPException(status_code=400, detail="Email in use")
         
         email_service: EmailService = Container.resolve("email_service")
-        await email_service.handle_request(email=data.email, type_="NEW", webtoken_service=self.__http_service.webtoken_service)
+        token = email_service.handle_request(email=data.email, type_="NEW", webtoken_service=self.__http_service.webtoken_service)
 
-        return CommonHttpResponse(
-            detail="Email sent"
+        return ResponseWithToken(
+            detail="Email sent",
+            token=token
         )
 
     def create_request(
@@ -42,10 +43,7 @@ class UsersController:
 
         self.__http_service.request_validation_service.validate_action_authorization(verification_code, data.code)
 
-        hashed_email = self.__http_service.hashing_service.hash_for_search(data=data.email)
-        hashed_password = self.__http_service.hashing_service.hash_password(password=data.password)
-
-        self.__users_service.create(db=db, user=data, hashed_email=hashed_email, hashed_password=hashed_password)
+        self.__users_service.create(db=db, user=data)
 
         return CommonHttpResponse(
             detail="User created"
@@ -75,7 +73,7 @@ class UsersController:
         self,
         db: Session,
         data: UserLogin
-    ) -> LoginResponse:
+    ) -> ResponseWithToken:
         hashed_email = self.__http_service.hashing_service.hash_for_search(data=data.email)
 
         user: User = self.__http_service.request_validation_service.verify_resource(
@@ -96,7 +94,8 @@ class UsersController:
             "user_id": user.user_id
         }, "7d")
 
-        return LoginResponse(
+        return ResponseWithToken(
+            detail="Login Successful",
             token=token
         )
 
