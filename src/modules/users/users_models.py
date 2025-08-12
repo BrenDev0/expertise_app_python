@@ -52,6 +52,9 @@ class UserLogin(BaseModel):
     password: str
 
 
+class VerifyEmail(BaseModel):
+    email: EmailStr
+
 class LoginResponse(BaseModel):
     token: str
 

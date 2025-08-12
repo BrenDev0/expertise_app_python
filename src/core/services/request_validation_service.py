@@ -28,6 +28,6 @@ class RequestValidationService:
         
         return result
     
-    def validate_action_authorization(id: uuid.UUID, resource_id: uuid.UUID):
+    def validate_action_authorization(id: uuid.UUID | str | int, resource_id: uuid.UUID | str | int):
         if id != resource_id:
             raise HTTPException(status_code=403, detail="Forbidden")

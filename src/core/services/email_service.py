@@ -1,0 +1,147 @@
+import os
+import smtplib
+from email.message import EmailMessage
+from typing import Dict, Any
+from src.core.services.webtoken_service import WebTokenService
+from fastapi import HTTPException
+
+
+class EmailService:
+    def __init__(self):
+        self.host = os.getenv("MAILER_HOST")
+        self.port = int(os.getenv("MAILER_PORT", 587))
+        self.user = os.getenv("MAILER_USER")
+        self.password = os.getenv("MAILER_PASSWORD")
+        self.from_addr = "postmaster@ginrealestate.mx"
+
+    def send(self, email: Dict[str, Any]) -> None:
+      
+        msg = EmailMessage()
+        msg["From"] = email["from"]
+        msg["To"] = email["to"]
+        msg["Subject"] = email["subject"]
+        msg.set_content(email["html"], subtype="html")
+        msg["X-Mailgun-Track"] = "no"
+
+        try:
+            with smtplib.SMTP(self.host, self.port) as server:
+                server.starttls()
+                server.login(self.user, self.password)
+                server.send_message(msg)
+        except Exception as e:
+            raise HTTPException(status_code=400, detail="Unable to send email")
+
+    def handle_request(self, email: str, type_: str, webtoken_service: WebTokenService) -> str:
+        code = int(1000 + os.urandom(2)[0] % 900000)
+        token = webtoken_service.generate_token(
+            {"verificationCode": code}, "15m"
+        )
+
+        if type_ == "UPDATE":
+            email_payload = self.update_email_builder(email, code)
+        elif type_ == "RECOVERY":
+            email_payload = self.account_recovery_email_builder(email, code)
+        elif type_ == "NEW":
+            email_payload = self.verification_email_builder(email, code)
+
+        self.send(email_payload)
+        return token
+
+    def verification_email_builder(self, email: str, verification_code: int) -> Dict[str, Any]:
+        html = f"""<!DOCTYPE html>
+        <html lang="es">
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>Código de Verificación</title>
+            <style>
+                body {{ font-family: Arial, sans-serif; background-color: #f4f4f4; color: #333; padding: 20px; }}
+                .container {{ max-width: 600px; margin: 0 auto; background-color: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); }}
+                .code {{ font-size: 24px; font-weight: bold; color: #007bff; padding: 10px; margin-top: 10px; border-radius: 5px; background-color: #f4f4f4; }}
+            </style>
+        </head>
+        <body>
+            <div class="container">
+                <h2>Verificación de tu correo electrónico</h2>
+                <p>Hola,</p>
+                <p>Gracias por registrarte en nuestra plataforma. Para verificar tu dirección de correo electrónico, ingresa el siguiente código en la página de verificación:</p>
+                <div class="code">{verification_code}</div>
+                <p>Este código expirará en 15 minutos. Si no solicitaste este código, por favor ignora este correo.</p>
+                <p>Si tienes alguna pregunta, no dudes en contactarnos.</p>
+                <p>¡Esperamos verte pronto!</p>
+                <p>Saludos,<br>El equipo de Expertise</p>
+            </div>
+        </body>
+        </html>"""
+        return {
+            "from": self.from_addr,
+            "to": email,
+            "subject": "Verificar Correo Electrónico",
+            "html": html
+        }
+
+    def account_recovery_email_builder(self, email: str, verification_code: int) -> Dict[str, Any]:
+        html = f"""<!DOCTYPE html>
+        <html lang="es">
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>Recuperación de Cuenta</title>
+            <style>
+                body {{ font-family: Arial, sans-serif; background-color: #f4f4f4; color: #333; padding: 20px; }}
+                .container {{ max-width: 600px; margin: 0 auto; background-color: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); }}
+                .code {{ font-size: 24px; font-weight: bold; color: #007bff; padding: 10px; margin-top: 10px; border-radius: 5px; background-color: #f4f4f4; }}
+            </style>
+        </head>
+        <body>
+            <div class="container">
+                <h2>Recuperación de Cuenta</h2>
+                <p>Hola,</p>
+                <p>Recibimos una solicitud para recuperar tu cuenta. Si fuiste tú quien hizo esta solicitud, ingresa el siguiente código en la página de verificación:</p>
+                <div class="code">{verification_code}</div>
+                <p>Este código expirará en 15 minutos. Si no solicitaste este código, por favor ignora este correo.</p>
+                <p>Si tienes alguna pregunta o problemas, no dudes en contactarnos.</p>
+                <p>¡Gracias por usar nuestra plataforma!</p>
+                <p>Saludos,<br>El equipo de Expertise</p>
+            </div>
+        </body>
+        </html>"""
+        return {
+            "from": self.from_addr,
+            "to": email,
+            "subject": "Recupera tu cuenta de Expertise con este enlace",
+            "html": html
+        }
+
+    def update_email_builder(self, email: str, verification_code: int) -> Dict[str, Any]:
+        html = f"""<!DOCTYPE html>
+        <html lang="es">
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>Código de Verificación</title>
+            <style>
+                body {{ font-family: Arial, sans-serif; background-color: #f4f4f4; color: #333; padding: 20px; }}
+                .container {{ max-width: 600px; margin: 0 auto; background-color: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); }}
+                .code {{ font-size: 24px; font-weight: bold; color: #007bff; padding: 10px; margin-top: 10px; border-radius: 5px; background-color: #f4f4f4; }}
+            </style>
+        </head>
+        <body>
+            <div class="container">
+                <h2>Verificación de tu correo electrónico</h2>
+                <p>Hola,</p>
+                <p>Recibimos una solicitud para cambiar tu dirección de correo electrónico. Para completar este proceso, por favor ingresa el siguiente código en la página de verificación:</p>
+                <div class="code">{verification_code}</div>
+                <p>Este código expirará en 15 minutos. Si no solicitaste este código, por favor ignora este correo.</p>
+                <p>Si tienes alguna pregunta, no dudes en contactarnos.</p>
+                <p>¡Esperamos verte pronto!</p>
+                <p>Saludos,<br>El equipo de Expertise</p>
+            </div>
+        </body>
+        </html>"""
+        return {
+            "from": self.from_addr,
+            "to": email,
+            "subject": "Verificar Correo Electrónico",
+            "html": html
+        }
