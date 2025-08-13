@@ -37,7 +37,7 @@ def verify_email(
     )
 
 
-@router.post("/verified/create", status_code=201, response_model=CommonHttpResponse, dependencies=[Depends(security)])
+@router.post("/verified/create", status_code=201, response_model=ResponseWithToken, dependencies=[Depends(security)])
 def verifies_create(
     req: Request,
     _: None = Depends(verification_middleware),
@@ -50,6 +50,7 @@ def verifies_create(
 
     This endpoint creates a user in the databae.
     A verifcation code from the users email and a verification token are needed to make a request.
+    Will return a valid webtoken with duration of 7 days.
     """
     return controller.create_request(
         req=req, 
@@ -93,7 +94,7 @@ def secure_delete(
         db=db
     )
 
-@router.post("/login", status_code=200, response_class=ResponseWithToken)
+@router.post("/login", status_code=200, response_model=ResponseWithToken)
 def login(
     db: Session = Depends(get_db_session),
     data: UserLogin = Body(...),

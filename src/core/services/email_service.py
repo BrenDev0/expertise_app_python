@@ -34,7 +34,7 @@ class EmailService:
     def handle_request(self, email: str, type_: str, webtoken_service: WebTokenService) -> str:
         code = int(1000 + os.urandom(2)[0] % 900000)
         token = webtoken_service.generate_token(
-            {"verificationCode": code}, "15m"
+            {"verification_code": code}, "15m"
         )
 
         if type_ == "UPDATE":

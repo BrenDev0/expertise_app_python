@@ -26,7 +26,7 @@ class UserPublic(BaseModel):
     name: str
     phone: str
     email: EmailStr
-    is_admin: str
+    is_admin: bool
     created_at: datetime 
 
     model_config = ConfigDict(

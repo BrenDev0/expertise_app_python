@@ -69,7 +69,7 @@ class MiddlewareService:
             
             user = self.http_service.request_validation_service.verify_resource(
                 service_key="users_service",
-                params={"db": db, "where_col": "user_id", "identifier": user_id},
+                params={"db": db, "key": "user_id", "value": user_id},
                 not_found_message="Unauthorized",
                 status_code=403
             )

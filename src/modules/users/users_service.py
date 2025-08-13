@@ -16,16 +16,26 @@ class UsersService:
         self._logger = logger
 
     @service_error_handler(module=f"{__MODULE}.create")
-    def create(self, db: Session, user: UserCreate, ) -> User:
-        hashed_email = self.__data_handler.hashing_service.hash_for_search(data=user.email)
-        hashed_password = self.__data_handler.hashing_service.hash_password(password=user.password)
-
+    def create(self, db: Session, data: UserCreate, is_admin: bool = False) -> User:
+        hashed_email = self.__data_handler.hashing_service.hash_for_search(data=data.email)
+        hashed_password = self.__data_handler.hashing_service.hash_password(password=data.password)
+        
+        encrypted_email = self.__data_handler.encryption_service.encrypt(data.email)
+        encrypted_name = self.__data_handler.encryption_service.encrypt(data.name)
+        encrypted_phone = self.__data_handler.encryption_service.encrypt(data.phone)
+        
         new_user = User(
-            **user.model_dump(by_alias=False, exclude="code"),
-            email_hash = hashed_email
+            name=encrypted_name,
+            email=encrypted_email,
+            phone=encrypted_phone,
+            email_hash=hashed_email,
+            password=hashed_password
         )
 
-        new_user.password = hashed_password
+        
+
+        if is_admin:
+            new_user.is_admin = True
 
         return self.__repository.create(db=db, data=new_user)
     

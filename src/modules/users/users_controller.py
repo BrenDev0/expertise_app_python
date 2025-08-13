@@ -38,15 +38,20 @@ class UsersController:
         req: Request,
         db: Session,
         data: UserCreate
-    ) -> CommonHttpResponse:
+    ) -> ResponseWithToken:
         verification_code = req.state.verification_code
 
         self.__http_service.request_validation_service.validate_action_authorization(verification_code, data.code)
 
-        self.__users_service.create(db=db, user=data)
+        new_user = self.__users_service.create(db=db, data=data, is_admin=True)
 
-        return CommonHttpResponse(
-            detail="User created"
+        token = self.__http_service.webtoken_service.generate_token({
+            "user_id": str(new_user.user_id)
+        }, "7d")
+
+        return ResponseWithToken(
+            detail="User created",
+            token=token
         )
 
 
@@ -68,6 +73,10 @@ class UsersController:
         user: User = req.state.user
 
         self.__users_service.delete(db=db, user_id=user.user_id) 
+
+        return CommonHttpResponse(
+            detail="User deleted"
+        )
 
     def login(
         self,
@@ -91,7 +100,7 @@ class UsersController:
         )
 
         token = self.__http_service.webtoken_service.generate_token({
-            "user_id": user.user_id
+            "user_id": str(user.user_id)
         }, "7d")
 
         return ResponseWithToken(
@@ -101,11 +110,10 @@ class UsersController:
 
 
     def __to_public(self, data: User) ->  UserPublic:
+        data.user_id = str(data.user_id)
+        data.name = self.__http_service.encryption_service.decrypt(data.name)
+        data.email = self.__http_service.encryption_service.decrypt(data.email)
+        data.phone = self.__http_service.encryption_service.decrypt(data.phone)
+
         user = UserPublic.model_validate(data, from_attributes=True)
-
-        user.user_id = str(data.user_id)
-        user.name = self.__http_service.encryption_service.decrypt(data.name)
-        user.email = self.__http_service.encryption_service.decrypt(data.email)
-        user.phone = self.__http_service.encryption_service.decrypt(data.phone)
-
         return user

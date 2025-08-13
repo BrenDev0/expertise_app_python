@@ -5,6 +5,7 @@ from src.core.services.encryption_service import EncryptionService
 from src.core.services.hashing_service import HashingService
 from src.core.services.http_service import HttpService
 from src.core.logs.logger import Logger
+from src.core.middleware.middleware_service import MiddlewareService
 from src.core.services.request_validation_service import RequestValidationService
 from src.core.services.webtoken_service import WebTokenService
 from src.modules.users.users_dependencies import configure_users_dependencies
@@ -48,9 +49,14 @@ def configure_container():
     )
     Container.register("http_service", http_service)
 
-
+    middleware_service = MiddlewareService(
+        http_service=http_service
+    )
+    Container.register("middleware_service", middleware_service)
 
     ## Module # Must configure core dependencies above this line ##
+
+    
 
     configure_users_dependencies(
         logger=logger,
