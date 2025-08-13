@@ -9,6 +9,7 @@ from src.core.middleware.middleware_service import MiddlewareService
 from src.core.services.request_validation_service import RequestValidationService
 from src.core.services.webtoken_service import WebTokenService
 from src.modules.users.users_dependencies import configure_users_dependencies
+from src.modules.companies.companies_dependencies import configure_companies_dependencies
 
 def configure_container():
     ## core ##   
@@ -56,10 +57,11 @@ def configure_container():
 
     ## Module # Must configure core dependencies above this line ##
 
-    
+    configure_companies_dependencies(
+        http_service=http_service
+    )
 
     configure_users_dependencies(
-        logger=logger,
         http_service=http_service,
         data_handling_service=data_handler
     )

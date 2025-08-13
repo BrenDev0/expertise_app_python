@@ -7,12 +7,11 @@ from src.modules.users.users_service import UsersService
 from src.modules.users.users_models import User
 from src.core.dependencies.container import Container
 
-def configure_users_dependencies(logger: Logger, http_service: HttpService, data_handling_service: DataHandlingService):
+def configure_users_dependencies(http_service: HttpService, data_handling_service: DataHandlingService):
     repository = BaseRepository(User)
     service = UsersService(
         respository=repository,
-        data_hanlder=data_handling_service,
-        logger=logger
+        data_hanlder=data_handling_service
     )
 
     controller = UsersController(

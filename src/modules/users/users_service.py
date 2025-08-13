@@ -2,7 +2,6 @@ from sqlalchemy.orm import Session
 from  src.modules.users.users_models import User, UserCreate
 from src.core.repository.base_repository import BaseRepository
 from src.core.services.data_handling_service import DataHandlingService
-from src.core.logs.logger import Logger
 from src.core.decorators.service_error_handler import service_error_handler
 from uuid import UUID
 from typing import Dict, Any
@@ -10,10 +9,9 @@ from typing import Dict, Any
 class UsersService:
     __MODULE = "users.service"
 
-    def __init__(self, respository: BaseRepository, data_hanlder: DataHandlingService, logger: Logger):
+    def __init__(self, respository: BaseRepository, data_hanlder: DataHandlingService):
         self.__repository = respository
         self.__data_handler = data_hanlder
-        self._logger = logger
 
     @service_error_handler(module=f"{__MODULE}.create")
     def create(self, db: Session, data: UserCreate, is_admin: bool = False) -> User:
