@@ -4,6 +4,7 @@ from email.message import EmailMessage
 from typing import Dict, Any
 from src.core.services.webtoken_service import WebTokenService
 from fastapi import HTTPException
+from uuid import UUID
 
 
 class EmailService:
@@ -31,7 +32,15 @@ class EmailService:
         except Exception as e:
             raise HTTPException(status_code=400, detail="Unable to send email")
 
-    def handle_request(self, email: str, type_: str, webtoken_service: WebTokenService) -> str:
+    def handle_request(self, email: str, type_: str, webtoken_service: WebTokenService, invitation_id: UUID = None) -> str:
+        if type_ == "INVITE":
+            token = webtoken_service.generate_token(
+                {"verification_code": invitation_id}, "1d"
+            )
+            email_payload = self.invitation_email_builder(email, invitation_id)
+            self.send(email_payload)
+            return token
+
         code = int(1000 + os.urandom(2)[0] % 900000)
         token = webtoken_service.generate_token(
             {"verification_code": code}, "15m"
@@ -46,6 +55,68 @@ class EmailService:
 
         self.send(email_payload)
         return token
+    
+    def invitation_email_builder(self, email: str, token: str) -> dict:
+        invite_url = f"https://expertise-ai-tan.vercel.app/invitation?token={token}"
+        html = f"""<!DOCTYPE html>
+            <html lang="es">
+            <head>
+                <meta charset="UTF-8">
+                <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                <title>Invitación a Expertise</title>
+                <style>
+                    body {{
+                        font-family: Arial, sans-serif;
+                        background-color: #f4f4f4;
+                        color: #333;
+                        padding: 20px;
+                    }}
+                    .container {{
+                        max-width: 600px;
+                        margin: 0 auto;
+                        background-color: #fff;
+                        padding: 20px;
+                        border-radius: 8px;
+                        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+                    }}
+                    .button {{
+                        display: inline-block;
+                        padding: 10px 20px;
+                        background-color: #007bff;
+                        color: #ffffff;
+                        text-decoration: none;
+                        border-radius: 5px;
+                        margin-top: 20px;
+                    }}
+                    .button:hover {{
+                        background-color: #0056b3;
+                    }}
+                </style>
+            </head>
+            <body>
+                <div class="container">
+                    <h2>¡Te han invitado a Expertise!</h2>
+                    <p>Hola,</p>
+                    <p>Has sido invitado a unirte a Expertise, una plataforma revolucionaria que integra inteligencia
+                    artificial avanzada con acceso a expertos físicos, diseñada para optimizar las
+                    decisiones empresariales y la gestión estratégica de negocios de cualquier
+                    tamaño.
+                    </p>
+                    <p>Para aceptar la invitación y crear tu perfil, haz clic en el siguiente enlace:</p>
+                    <a href="{invite_url}" class="button" style="color: #ffffff; text-decoration: none;">Unirse a Expertise</a>
+                    <p>Si tienes alguna pregunta, no dudes en contactarnos.</p>
+                    <p>¡Esperamos verte pronto en Expertise!</p>
+                    <p>Saludos,<br>El equipo de Expertise</p>
+                </div>
+            </body>
+            </html>
+            """
+        return {
+            "from": self.from_addr,
+            "to": email,
+            "subject": "¡Bienvenido a Expertise! Tu invitación está aquí",
+            "html": html
+        }
 
     def verification_email_builder(self, email: str, verification_code: int) -> Dict[str, Any]:
         html = f"""<!DOCTYPE html>
