@@ -66,6 +66,7 @@ def configure_container():
         data_handling_service=data_handler
     )
 
+    print("Container ready")
 
 
 
