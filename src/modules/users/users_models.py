@@ -20,8 +20,15 @@ class User(Base):
     is_admin = Column(Boolean, nullable=False, default=False)
     created_at = Column(DateTime(timezone=True), nullable=False, server_default=func.now())
 
+class UsersConfig(BaseModel):
+      model_config = ConfigDict(
+        populate_by_name=True,
+        serialize_by_alias=True,
+        alias_generator=to_camel,
+        extra="forbid" 
+    )
 
-class UserPublic(BaseModel):
+class UserPublic(UsersConfig):
     user_id: uuid.UUID
     name: str
     phone: str
@@ -29,24 +36,14 @@ class UserPublic(BaseModel):
     is_admin: bool
     created_at: datetime 
 
-    model_config = ConfigDict(
-        populate_by_name=True,
-        serialize_by_alias=True,
-        alias_generator=to_camel
-    )
+  
 
-class UserCreate(BaseModel):
+class UserCreate(UsersConfig):
     name: str
     phone: str
     email: EmailStr
     password: str
     code: int
-
-    model_config = ConfigDict(
-        populate_by_name=True,
-        serialize_by_alias=True,
-        alias_generator=to_camel
-    )
 
 class UserLogin(BaseModel):
     email: EmailStr

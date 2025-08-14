@@ -31,7 +31,7 @@ auth_header = {
 #     with TestClient(app) as client:
 #         payload = {
 #             "name": "test user",
-#             "email": "testemail@gmail.com",
+#             "email": "testemail_TEST@gmail.com",
 #             "phone": "123456",
 #             "password": "carpincha",
 #             "code": 123456 

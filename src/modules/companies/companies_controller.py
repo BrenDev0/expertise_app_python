@@ -10,7 +10,7 @@ from uuid import UUID
 class CompaniesController:
     def __init__(self, http_service: HttpService, companies_service: CompaniesService):
         self.__https_service = http_service
-        self.__companies_service: CompaniesService
+        self.__companies_service = companies_service
 
     def create_request(
         self,
@@ -113,6 +113,7 @@ class CompaniesController:
             detail="Company deleted"
         )
 
+    @staticmethod
     def __to_public(data: Company) -> CompanyPublic:
         return CompanyPublic.model_validate(data, from_attributes=True)
 

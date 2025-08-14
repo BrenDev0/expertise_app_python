@@ -24,7 +24,8 @@ class CompanyConfig(BaseModel):
     model_config = ConfigDict(
         populate_by_name=True,
         serialize_by_alias=True,
-        alias_generator=to_camel
+        alias_generator=to_camel,
+        extra="forbid" 
     )
 
 class CompanyCreate(CompanyConfig):
@@ -40,4 +41,5 @@ class CompanyUpdate(CompanyConfig):
 class CompanyPublic(CompanyCreate):
     company_id: uuid.UUID
     created_at: datetime
+    user_id: uuid.UUID
 

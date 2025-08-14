@@ -88,6 +88,7 @@ def secure_collection(
 def secure_update(
     company_id: UUID,
     req: Request,
+    data: CompanyUpdate = Body(...),
     db: Session = Depends(get_db_session),
     controller: CompaniesController = Depends(get_controller)
 ):
@@ -100,7 +101,8 @@ def secure_update(
     return controller.update_request(
         company_id=company_id,
         req=req,
-        db=db
+        db=db,
+        data=data
     )
 
 @router.delete("/secure/{company_id}", status_code=200, response_model=CommonHttpResponse)
