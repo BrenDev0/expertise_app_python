@@ -21,10 +21,15 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-@app.get("/health")
+@app.get("/health", tags=["Internal"])
 async def health():
+    """
+    ## Health check 
+    This endpoints verifies server status.
+    """
     return {"status": "ok"}
 
 app.include_router(companies_routes.router)
 app.include_router(users_routes.router)
+
 
