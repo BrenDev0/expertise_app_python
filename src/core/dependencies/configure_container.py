@@ -10,6 +10,7 @@ from src.core.services.request_validation_service import RequestValidationServic
 from src.core.services.webtoken_service import WebTokenService
 from src.modules.users.users_dependencies import configure_users_dependencies
 from src.modules.companies.companies_dependencies import configure_companies_dependencies
+from src.modules.invites.invites_dependencies import configure_invites_dependencies
 
 def configure_container():
     ## core ##   
@@ -59,6 +60,12 @@ def configure_container():
 
     configure_companies_dependencies(
         http_service=http_service
+    )
+
+    configure_invites_dependencies(
+        http_service=http_service,
+        data_handler=data_handler,
+        email_service=email_service
     )
 
     configure_users_dependencies(

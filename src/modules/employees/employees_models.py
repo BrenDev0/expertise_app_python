@@ -1,5 +1,6 @@
 from src.core.database.database_models import Base
-from  sqlalchemy import String, Column, ForeignKey, UUID, UniqueConstraint
+from  sqlalchemy import String, Column, ForeignKey, UniqueConstraint
+from sqlalchemy.dialects.postgresql import UUID
 import uuid
 from pydantic import BaseModel, ConfigDict
 from pydantic.alias_generators import to_camel

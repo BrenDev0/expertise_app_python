@@ -1,7 +1,8 @@
 from src.core.database.database_models import Base
 from pydantic import BaseModel, ConfigDict,EmailStr
 from pydantic.alias_generators import to_camel
-from sqlalchemy import Column, String, DateTime, func, UUID, ForeignKey
+from sqlalchemy import Column, String, DateTime, func, ForeignKey
+from sqlalchemy.dialects.postgresql import UUID
 import uuid
 from typing import Optional
 from  datetime import datetime
@@ -41,5 +42,6 @@ class InviteUpdate(InviteConfig):
     position: Optional[str] = None
 
 class InvitePublic(InviteCreate):
+    company_id: uuid.UUID
     invite_id: uuid.UUID
     created_at: datetime

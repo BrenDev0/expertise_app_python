@@ -1,6 +1,7 @@
 from pydantic import BaseModel, EmailStr, ConfigDict
 from pydantic.alias_generators import to_camel
-from sqlalchemy import Column, String, Boolean, DateTime, func, UUID
+from sqlalchemy import Column, String, Boolean, DateTime, func
+from sqlalchemy.dialects.postgresql import UUID
 from src.core.database.database_models import Base 
 import uuid
 from  datetime import datetime

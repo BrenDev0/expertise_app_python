@@ -28,20 +28,15 @@ class InvitesController:
     ) -> CommonHttpResponse:
         user: User = req.state.user
 
-        company_resource: Company = self.__http_service.request_validation_service.verify_resource(
-            service_key="companies_service",
-            params={
-                "db": db,
-                "company_id": company_id
-            },
-            not_found_message="Company not found"
+        self.__verify_company_user_relation(
+            db=db, 
+            user_id=user.user_id,
+            company_id=company_id
         )
-
-        self.__http_service.request_validation_service.validate_action_authorization(user.user_id, company_resource.user_id)
 
         hashed_email = self.__http_service.hashing_service.hash_for_search(data=data.email)
         
-        user_service: UsersService = Container.resolve("user_service")
+        user_service: UsersService = Container.resolve("users_service")
 
         email_in_use = user_service.resource(db=db, key="email_hash", value=hashed_email)
         if email_in_use:
@@ -77,16 +72,11 @@ class InvitesController:
             not_found_message="Invite not found",
         )
 
-        company_resource: Company = self.__http_service.request_validation_service.verify_resource(
-            service_key="companies_service",
-            params={
-                "db": db,
-                "company_id": invite_resource.company_id
-            },
-            not_found_message="Company not found"
+        self.__verify_company_user_relation(
+            db=db, 
+            user_id=user.user_id,
+            company_id=invite_resource.company_id
         )
-
-        self.__http_service.request_validation_service.validate_action_authorization(user.user_id, company_resource.user_id)
 
         return self.__to_public(invite_resource)
     
@@ -114,8 +104,85 @@ class InvitesController:
         return [
             self.__to_public(invite) for invite in data
         ]
+    
+
+    def update_request(
+        self,
+        invite_id: UUID,
+        req: Request,
+        data: InviteUpdate,
+        db: Session
+    ) -> CommonHttpResponse: 
+        user: User = req.state.user
+
+        invite_resource: Invite = self.__http_service.request_validation_service.verify_resource(
+            service_key="invites_service",
+            params={
+                "db": db,
+                "invite_id": invite_id
+            },
+            not_found_message="Invite not found",
+        )
+
+        self.__verify_company_user_relation(
+            db=db, 
+            user_id=user.user_id,
+            company_id=invite_resource.company_id
+        )
+
+        self.__invites_service.update(db=db, invite_id=invite_id, changes=data)
+
+        return CommonHttpResponse(
+            detail="Invite updated"
+        )
+    
+    def delete_request(
+        self,
+        invite_id: UUID,
+        req: Request,
+        db: Session
+    ) -> CommonHttpResponse: 
+        user: User = req.state.user
+
+        invite_resource: Invite = self.__http_service.request_validation_service.verify_resource(
+            service_key="invites_service",
+            params={
+                "db": db,
+                "invite_id": invite_id
+            },
+            not_found_message="Invite not found",
+        )
+
+        self.__verify_company_user_relation(
+            db=db, 
+            user_id=user.user_id,
+            company_id=invite_resource.company_id
+        )
+
+        self.__invites_service.delete(db=db, invite_id=invite_id)
+
+        return CommonHttpResponse(
+            detail="Invite Deleted"
+        )
         
 
+    def __verify_company_user_relation(
+        self,
+        db: Session,
+        user_id: UUID,
+        company_id: UUID
+    ) -> None:
+        company_resource: Company = self.__http_service.request_validation_service.verify_resource(
+            service_key="companies_service",
+            params={
+                "db": db,
+                "company_id": company_id
+            },
+            not_found_message="Company not found"
+        )
+
+        self.__http_service.request_validation_service.validate_action_authorization(user_id, company_resource.user_id)
+        
     
     def __to_public(self,data: Invite) -> InvitePublic:
         data.invite_id = str(data.invite_id)

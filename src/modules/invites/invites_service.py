@@ -42,7 +42,7 @@ class InvitesService:
     @service_error_handler(module=f"{__MODULE}.update")
     def update(self, db: Session, invite_id: UUID, changes: InviteUpdate) -> Invite:
         return self.__repository.update(
-            db=db, key="employee_id", 
+            db=db, key="invite_id", 
             value=invite_id, 
             changes=changes.model_dump(by_alias=False, exclude_unset=True)
         )

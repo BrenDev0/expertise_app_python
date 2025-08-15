@@ -35,7 +35,7 @@ class EmailService:
     def handle_request(self, email: str, type_: str, webtoken_service: WebTokenService, invitation_id: UUID = None) -> str:
         if type_ == "INVITE":
             token = webtoken_service.generate_token(
-                {"verification_code": invitation_id}, "1d"
+                {"verification_code": str(invitation_id)}, "1d"
             )
             email_payload = self.invitation_email_builder(email, invitation_id)
             self.send(email_payload)

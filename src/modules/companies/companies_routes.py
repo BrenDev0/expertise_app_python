@@ -6,17 +6,11 @@ from src.core.models.http_responses import CommonHttpResponse
 from src.core.database.session import get_db_session
 from sqlalchemy.orm import Session
 from src.modules.users.users_models import User
-from src.core.middleware.auth_middleware import auth_middleware
+from src.core.middleware.permissions import is_owner
 from src.core.middleware.middleware_service import security
 from uuid import UUID
 from typing import List
 
-
-def is_owner(req: Request, _: None = Depends(auth_middleware)):
-    user: User = req.state.user
-
-    if not user.is_admin:
-        raise HTTPException(status_code=403, detail="Forbidden")
 
 router = APIRouter(
     prefix="/companies",
