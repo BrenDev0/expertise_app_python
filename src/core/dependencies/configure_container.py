@@ -58,6 +58,7 @@ def configure_container():
 
     ## Module # Must configure core dependencies above this line ##
 
+    # single domain # 
     configure_companies_dependencies(
         http_service=http_service
     )
@@ -75,7 +76,7 @@ def configure_container():
 
     print("Container ready")
 
-
+    # multi domain # must configure single domain dependencies above this line #
 
     
 
