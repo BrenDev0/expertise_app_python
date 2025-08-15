@@ -2,8 +2,9 @@ import uuid
 from fastapi import HTTPException
 from typing import List, Dict, Any
 from src.core.dependencies.container import Container
+from src.modules.companies.companies_models import Company
 from sqlalchemy.orm import Session
-import uuid
+from uuid import UUID
 
 class RequestValidationService:
     @staticmethod
@@ -30,6 +31,25 @@ class RequestValidationService:
         return result
     
     @staticmethod
-    def validate_action_authorization(id: uuid.UUID | str | int, resource_id: uuid.UUID | str | int):
+    def validate_action_authorization(id: UUID | str | int, resource_id: UUID | str | int):
         if id != resource_id:
             raise HTTPException(status_code=403, detail="Forbidden")
+    
+       
+    def verify_company_user_relation(
+        self,
+        db: Session,
+        user_id: UUID,
+        company_id: UUID
+    ) -> None:
+        
+        company_resource: Company = self.verify_resource(
+            service_key="companies_service",
+            params={
+                "db": db,
+                "company_id": company_id
+            },
+            not_found_message="Company not found"
+        )
+
+        self.validate_action_authorization(user_id, company_resource.user_id)

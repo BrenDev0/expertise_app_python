@@ -13,15 +13,15 @@ class EmployeesService:
 
 
     @service_error_handler(module=f"{__MODULE}.create")
-    def create(self, db: Session, data: EmployeeCreate, user_id: UUID, company_id: UUID) -> Employee:
+    def create(self, db: Session, user_id: UUID, company_id: UUID, position: str) -> Employee:
         employee = Employee(
-            **data.model_dump(by_alias=False),
             user_id=user_id,
-            company_id=company_id
+            company_id=company_id,
+            postiion=position
         )
 
         return self.__repository.create(db=db, data=employee)
-    
+     
     @service_error_handler(module=f"{__MODULE}.resource_by_user_and_company")
     def resource_by_user_and_company(self, db: Session, company_id: UUID, user_id: UUID) -> Employee | None:
         return self.__repository.get_by_user_and_company(db=db, user_id=user_id, company_id=company_id)
