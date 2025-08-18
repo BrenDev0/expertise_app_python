@@ -8,7 +8,7 @@ from uuid import UUID
 from typing import List
 
 class InvitesService:
-    __MODULE = "ivites.service"
+    __MODULE = "invites.service"
     def __init__(self, repository: BaseRepository, data_handler: DataHandlingService):
         self.__repository = repository
         self.__data_handler = data_handler

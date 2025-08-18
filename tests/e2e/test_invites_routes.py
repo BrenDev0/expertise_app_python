@@ -18,9 +18,9 @@ invite_id = ""
 #     with TestClient(app) as client:
 #         payload = {
 #             "name": "Test User",
-#             "email": f"testuser_@example.com",
+#             "email": f"testuser2_@example.com",
 #             "phone": "1234567890",
-#             "position": "manager"
+#             "position": "accountant"
 #         }
 #         res = client.post(
 #             f"/invites/secure/{company_id}",

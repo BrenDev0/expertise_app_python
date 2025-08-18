@@ -1,6 +1,6 @@
 from src.core.dependencies.container import Container
 from src.core.services.http_service import HttpService
-from src.core.repository.base_repository import BaseRepository
+from src.modules.employees.employees_repository import EmployeesRepository
 from src.modules.employees.employees_models import Employee
 from src.modules.employees.employees_service import EmployeesService
 from src.modules.employees.employee_controller import EmployeesController
@@ -8,7 +8,7 @@ from src.modules.invites.invites_service import InvitesService
 from src.modules.users.users_service import UsersService
 
 def configure_emplloyee_dependencies(http_service: HttpService):
-    repository = BaseRepository(Employee)
+    repository = EmployeesRepository()
     service = EmployeesService(
         repository=repository
     )

@@ -30,7 +30,6 @@ class EmployeesController:
         data: EmployeeCreate,
         db: Session
     ) -> ResponseWithToken:
-        user: User = req.state.user
         invite_id = req.state.verification_code
 
         invitation_resource: Invite = self.__http_service.request_validation_service.verify_resource(
@@ -44,6 +43,7 @@ class EmployeesController:
         )
 
         user_data = self.__invites_service.extract_user_data_from_invite(data=invitation_resource, password=data.password)
+        self.__invites_service.delete(db=db, invite_id=invitation_resource.invite_id)
 
         new_user = self.__users_service.create(db=db, data=user_data)
 
@@ -55,7 +55,7 @@ class EmployeesController:
         )
 
         token = self.__http_service.webtoken_service.generate_token({
-            "user_id": new_user.user_id
+            "user_id": str(new_user.user_id)
         }, "7d")
 
         return ResponseWithToken(
@@ -127,7 +127,7 @@ class EmployeesController:
         user: User = req.state.user
 
         employee_resource: Employee = self.__http_service.request_validation_service.verify_resource(
-            service_key="employee_service",
+            service_key="employees_service",
             params={
                 "db": db,
                 "employee_id": employee_id
@@ -162,16 +162,15 @@ class EmployeesController:
             not_found_message="Employee not found"
         )
 
-        self.__http_service.request_validation_service.verify_company_user_relation(db=db, user=user, company_id=employee_resource.employee_id)
+        self.__http_service.request_validation_service.verify_company_user_relation(db=db, user=user, company_id=employee_resource.company_id)
 
-        self.__employees_service.delete(db=db, employee_id=employee_resource.employee_id)
         self.__users_service.delete(db=db, user_id=employee_resource.user_id)
 
         return CommonHttpResponse(
             detail="Employee deleted"
         )
 
-    
+    @staticmethod
     def __to_public(data: Employee) -> EmployeePublic:
         return EmployeePublic.model_validate(data, from_attributes=True)
 

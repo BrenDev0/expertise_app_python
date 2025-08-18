@@ -17,7 +17,7 @@ router = APIRouter(
 )
 
 def get_controller():
-    controller = Container.resolve("employees_service")
+    controller = Container.resolve("employees_controller")
     return controller
 
 @router.post("/verified/create", status_code=201, response_model=ResponseWithToken)

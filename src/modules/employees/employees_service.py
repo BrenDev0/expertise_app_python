@@ -17,7 +17,7 @@ class EmployeesService:
         employee = Employee(
             user_id=user_id,
             company_id=company_id,
-            postiion=position
+            position=position
         )
 
         return self.__repository.create(db=db, data=employee)
@@ -43,7 +43,3 @@ class EmployeesService:
             value=employee_id, 
             changes=changes.model_dump(by_alias=False, exclude_unset=True)
         )
-    
-    @service_error_handler(module=f"{__MODULE}.delete")
-    def delete(self, db: Session, employee_id: UUID) -> Employee:
-        return self.__repository.delete(db=db, key="employee_id", value=employee_id)

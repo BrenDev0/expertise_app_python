@@ -58,12 +58,12 @@ class RequestValidationService:
             self.validate_action_authorization(user.user_id, company_resource.user_id)
             return 
         
-        employees_service: EmployeesService = Container.resolve(employees_service)
+        employees_service: EmployeesService = Container.resolve("employees_service")
         manager: Employee = employees_service.resource_by_user_and_company(
             db=db,
             company_id=company_id,
             user_id=user.user_id
         )
 
-        if not manager or manager.position != "manager":
+        if not manager or manager.position.lower() != "manager":
             raise HTTPException(status_code=403, detail="Forbidden")

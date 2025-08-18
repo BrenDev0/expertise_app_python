@@ -10,7 +10,7 @@ class EmployeesRepository(BaseRepository):
 
     def get_by_user_and_company(self, db: Session, user_id: UUID, company_id: UUID) -> Employee | None :
         stmt = select(self.model).where(
-            (self.model, "company_id" == company_id ) &
-            (self.model, "user_id" == user_id)
+            (self.model.company_id == company_id ) &
+            (self.model.user_id == user_id)
         )
         return db.execute(stmt).scalar_one_or_none()
