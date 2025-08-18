@@ -27,6 +27,10 @@ class BaseRepository(Generic[T]):
         stmt = select(self.model).where(getattr(self.model, key) == value)
         
         return db.execute(stmt).scalars().all()
+    
+    def get_all(self, db: Session) -> List[T]:
+        stmt = select(self.model)
+        return db.execute(stmt).scalars().all()
 
     def update(self, db: Session,  key: str, value: str | uuid.UUID, changes: dict) -> Optional[T]:
         stmt = update(self.model).where(getattr(self.model, key) == value).values(**changes).returning(*self.model.__table__.c)

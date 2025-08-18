@@ -1,5 +1,6 @@
 from fastapi import Request, Depends, APIRouter, Body
-from src.core.database.session import Session, get_db_session
+from src.core.database.session import get_db_session
+from sqlalchemy.orm import Session
 from src.core.models.http_responses import CommonHttpResponse, ResponseWithToken
 from src.modules.employees.employees_models import EmployeePublic, EmployeeCreate, EmployeeUpdate
 from src.modules.employees.employee_controller import EmployeesController
