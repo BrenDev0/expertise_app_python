@@ -5,6 +5,9 @@ from src.core.dependencies.container import Container
 from src.modules.companies.companies_models import Company
 from sqlalchemy.orm import Session
 from uuid import UUID
+from src.modules.users.users_models import User
+from src.modules.employees.employees_models import Employee
+from src.modules.employees.employees_service import EmployeesService
 
 class RequestValidationService:
     @staticmethod
@@ -39,17 +42,28 @@ class RequestValidationService:
     def verify_company_user_relation(
         self,
         db: Session,
-        user_id: UUID,
+        user: User,
         company_id: UUID
     ) -> None:
+        if user.is_admin:
+            company_resource: Company = self.verify_resource(
+                service_key="companies_service",
+                params={
+                    "db": db,
+                    "company_id": company_id
+                },
+                not_found_message="Company not found"
+            )
+
+            self.validate_action_authorization(user.user_id, company_resource.user_id)
+            return 
         
-        company_resource: Company = self.verify_resource(
-            service_key="companies_service",
-            params={
-                "db": db,
-                "company_id": company_id
-            },
-            not_found_message="Company not found"
+        employees_service: EmployeesService = Container.resolve(employees_service)
+        manager: Employee = employees_service.resource_by_user_and_company(
+            db=db,
+            company_id=company_id,
+            user_id=user.user_id
         )
 
-        self.validate_action_authorization(user_id, company_resource.user_id)
+        if not manager or manager.position != "manager":
+            raise HTTPException(status_code=403, detail="Forbidden")

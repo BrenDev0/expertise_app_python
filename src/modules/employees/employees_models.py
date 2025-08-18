@@ -29,11 +29,11 @@ class EmployeeConfig(BaseModel):
 class EmployeeCreate(EmployeeConfig):
     password: str
 
-class EmplyeePublic(EmployeeConfig):
+class EmployeePublic(EmployeeConfig):
     employee_id: uuid.UUID
     user_id: uuid.UUID
     company_id: uuid.UUID
     position: str
 
 class EmployeeUpdate(EmployeeConfig):
-    position: Optional[str] = None
+    position: str 

@@ -1,8 +1,8 @@
 from src.core.services.http_service import HttpService
-from src.modules.employees.employees_models import Employee, EmployeeCreate, EmployeeUpdate, EmplyeePublic
+from src.modules.employees.employees_models import Employee, EmployeeCreate, EmployeeUpdate, EmployeePublic
 from src.modules.employees.employees_service import EmployeesService
 from src.modules.users.users_service import UsersService
-from src.core.models.http_responses import CommonHttpResponse
+from src.core.models.http_responses import CommonHttpResponse, ResponseWithToken
 from src.modules.invites.invites_service import InvitesService
 from src.modules.users.users_models import User, UserCreate
 from src.modules.companies.companies_models import Company
@@ -29,7 +29,7 @@ class EmployeesController:
         req: Request,
         data: EmployeeCreate,
         db: Session
-    ) -> CommonHttpResponse:
+    ) -> ResponseWithToken:
         user: User = req.state.user
         invite_id = req.state.verification_code
 
@@ -54,7 +54,14 @@ class EmployeesController:
             position=invitation_resource.position
         )
 
-        return CommonHttpResponse
+        token = self.__http_service.webtoken_service.generate_token({
+            "user_id": new_user.user_id
+        }, "7d")
+
+        return ResponseWithToken(
+            detail="Employee created",
+            token=token
+        )
     
 
     def resource_request(
@@ -62,7 +69,7 @@ class EmployeesController:
         employee_id: UUID,
         req: Request,
         db: Session
-    ) -> EmplyeePublic:
+    ) -> EmployeePublic:
         user: User = req.state.user
 
         employee_resource: Employee = self.__http_service.request_validation_service.verify_resource(
@@ -74,33 +81,99 @@ class EmployeesController:
             not_found_message="Employee not found"
         )
 
-        if user.is_admin:
-            self.__http_service.request_validation_service.verify_company_user_relation(db=db, user_id=user.user_id, company_id=employee_resource.company_id)
-        else: 
-           self.__verify_manager_company_relation(db=db, company_id=employee_resource.company_id, user_id=user.user_id)
+        
+        self.__http_service.request_validation_service.verify_company_user_relation(db=db, user=user, company_id=employee_resource.company_id)
+
         
         return self.__to_public(employee_resource)
 
 
-    def __verify_manager_company_relation(
+    def collection_request(
         self,
-        db: Session,
         company_id: UUID,
-        user_id: UUID
-    ):
+        req: Request,
+        db: Session,
+    ) -> List[EmployeePublic]:
+        user: User = req.state.user
 
-        manager = self.__employees_service.resource_by_user_and_company(
-            db=db,
-            company_id=company_id,
-            user_id=user_id
+        company_resource: Company = self.__http_service.request_validation_service.verify_resource(
+            service_key="companies_service",
+            params={
+                "db": db,
+                "company_id": company_id
+            },
+            not_found_message="Company not found"
         )
 
-        if not manager:
-            raise HTTPException(status_code=403, detail="Forbidden")
+        self.__http_service.request_validation_service.verify_company_user_relation(
+            db=db,
+            user=user,
+            company_id=company_resource.company_id
+        )
+
+        data = self.__employees_service.collection(db=db, company_id=company_resource.company_id)
+
+        return [
+            self.__to_public(employee) for employee in data
+        ]
     
+    def update_request(
+        self,
+        employee_id: UUID,
+        req: Request,
+        data: EmployeeUpdate,
+        db: Session
+    ) -> CommonHttpResponse:
+        user: User = req.state.user
+
+        employee_resource: Employee = self.__http_service.request_validation_service.verify_resource(
+            service_key="employee_service",
+            params={
+                "db": db,
+                "employee_id": employee_id
+            },
+            not_found_message="Employee not found"
+        )
+
+        self.__http_service.request_validation_service.verify_company_user_relation(db=db, user=user, company_id=employee_resource.company_id)
+
+        self.__employees_service.update(db=db, employee_id=employee_resource.employee_id, changes=data)
+
+        return CommonHttpResponse(
+            detail="Employee updated"
+        ) 
     
-    def __to_public(data: Employee) -> EmplyeePublic:
-        return EmplyeePublic.model_validate(data, from_attributes=True)
+
+
+    def delete_request(
+        self, 
+        employee_id: UUID,
+        req: Request,
+        db: Session
+    ):
+        user: User = req.state.user
+
+        employee_resource: Employee = self.__http_service.request_validation_service.verify_resource(
+            service_key="employees_service",
+            params={
+                "db": db,
+                "employee_id": employee_id
+            },
+            not_found_message="Employee not found"
+        )
+
+        self.__http_service.request_validation_service.verify_company_user_relation(db=db, user=user, company_id=employee_resource.employee_id)
+
+        self.__employees_service.delete(db=db, employee_id=employee_resource.employee_id)
+        self.__users_service.delete(db=db, user_id=employee_resource.user_id)
+
+        return CommonHttpResponse(
+            detail="Employee deleted"
+        )
+
+    
+    def __to_public(data: Employee) -> EmployeePublic:
+        return EmployeePublic.model_validate(data, from_attributes=True)
 
         
 

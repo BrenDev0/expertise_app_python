@@ -11,6 +11,7 @@ from src.core.services.webtoken_service import WebTokenService
 from src.modules.users.users_dependencies import configure_users_dependencies
 from src.modules.companies.companies_dependencies import configure_companies_dependencies
 from src.modules.invites.invites_dependencies import configure_invites_dependencies
+from src.modules.employees.employees_dependencies import configure_emplloyee_dependencies
 
 def configure_container():
     ## core ##   
@@ -74,11 +75,10 @@ def configure_container():
         data_handling_service=data_handler
     )
 
-    print("Container ready")
 
     # multi domain # must configure single domain dependencies above this line #
+    configure_emplloyee_dependencies(http_service=http_service)
 
-    
 
 
 

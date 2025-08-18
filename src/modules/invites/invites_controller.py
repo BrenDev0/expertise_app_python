@@ -30,7 +30,7 @@ class InvitesController:
 
         self.__http_service.request_validation_service.verify_company_user_relation(
             db=db, 
-            user_id=user.user_id,
+            user=user,
             company_id=company_id
         )
 
@@ -74,7 +74,7 @@ class InvitesController:
 
         self.__http_service.request_validation_service.verify_company_user_relation(
             db=db, 
-            user_id=user.user_id,
+            user=user,
             company_id=invite_resource.company_id
         )
 
@@ -88,7 +88,7 @@ class InvitesController:
     ) -> List[InvitePublic]:
         user: User = req.state.user
 
-        self.__http_service.request_validation_service.verify_company_user_relation(db=db, user_id=user.user_id, company_id=company_id)
+        self.__http_service.request_validation_service.verify_company_user_relation(db=db, user=user, company_id=company_id)
 
         data = self.__invites_service.collection(db=db, company_id=company_id)
 
@@ -117,7 +117,7 @@ class InvitesController:
 
         self.__http_service.request_validation_service.verify_company_user_relation(
             db=db, 
-            user_id=user.user_id,
+            user=user,
             company_id=invite_resource.company_id
         )
 
@@ -146,7 +146,7 @@ class InvitesController:
 
         self.__http_service.request_validation_service.verify_company_user_relation(
             db=db, 
-            user_id=user.user_id,
+            user=user,
             company_id=invite_resource.company_id
         )
 
