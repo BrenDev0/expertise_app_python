@@ -9,6 +9,7 @@ from src.core.middleware.middleware_service import MiddlewareService
 from src.core.services.request_validation_service import RequestValidationService
 from src.core.services.webtoken_service import WebTokenService
 from src.modules.users.users_dependencies import configure_users_dependencies
+from src.modules.chats.chats_dependencies import configure_chats_dependencies
 from src.modules.companies.companies_dependencies import configure_companies_dependencies
 from src.modules.invites.invites_dependencies import configure_invites_dependencies
 from src.modules.employees.employees_dependencies import configure_employee_dependencies
@@ -62,6 +63,10 @@ def configure_container():
 
     # single domain # 
     configure_agents_dependencies(
+        http_service=http_service
+    )
+
+    configure_chats_dependencies(
         http_service=http_service
     )
 
