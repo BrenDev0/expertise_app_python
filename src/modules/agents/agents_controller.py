@@ -2,14 +2,15 @@ from src.core.services.http_service import HttpService
 from src.modules.agents.agents_models import Agent, AgentPublic
 from src.modules.users.users_models import User
 from src.modules.agents.agents_service import AgentsService
-from src.modules.agents.employee_agents.employee_agent_models import EmployeeAgentCreate
+from src.modules.agents.employee_agents.employee_agent_models import EmployeeAgentCreate, EmployeeAgentDelete
 from src.modules.agents.employee_agents.employee_agents_service import EmployeeAgentService
 from src.modules.employees.employees_models import Employee
-from src.modules.users.users_models import User
 from src.core.models.http_responses import CommonHttpResponse
 from fastapi import Request
 from sqlalchemy.orm import Session
 from uuid import UUID
+from  typing import List
+
 
 class AgentsController:
     def __init__(self, http_service: HttpService, agents_service: AgentsService, employee_agents_service: EmployeeAgentService):
@@ -37,10 +38,36 @@ class AgentsController:
 
         self.__http_service.request_validation_service.verify_company_user_relation(db=db, user=user, company_id=employee_resource.company_id)
 
-        self.__employee_agents_service.create_many(db=db, data=EmployeeAgentCreate)
+        self.__employee_agents_service.create_many(db=db, data=data, employee_id=employee_resource.employee_id)
 
         return CommonHttpResponse(
             detail="Agent access added to employee"
+        )
+    
+    def remove_access(
+        self,
+        employee_id: UUID,
+        data: EmployeeAgentDelete,
+        req: Request,
+        db: Session
+    ) -> CommonHttpResponse:
+        user: User = req.state.user
+
+        employee_resource: Employee = self.__http_service.request_validation_service.verify_resource(
+            service_key="employees_service",
+            params={
+                "db": db,
+                "employee_id": employee_id
+            },
+            not_found_message="Employee not found"
+        )
+
+        self.__http_service.request_validation_service.verify_company_user_relation(db=db, user=user, company_id=employee_resource.company_id)
+
+        self.__employee_agents_service.remove_many(db=db, data=data, employee_id=employee_resource.employee_id)
+
+        return CommonHttpResponse(
+            detail="Agent access removed from employee"
         )
     
     def resource_request(
@@ -65,11 +92,11 @@ class AgentsController:
         employee_id: UUID,
         req: Request,
         db: Session
-    ):
+    ) -> List[AgentPublic]:
         user = req.state.user
 
         employee_resource: Employee = self.__http_service.request_validation_service.verify_resource(
-            service_key="employee_service",
+            service_key="employees_service",
             params={
                 "db": db,
                 "employee_id": employee_id

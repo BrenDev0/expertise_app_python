@@ -26,8 +26,7 @@ class EmployeeAgentConfig(BaseModel):
     )
 
 class EmployeeAgentCreate(EmployeeAgentConfig):
-    agent_id: List[uuid.UUID]
-    employee_id: uuid.UUID
+    agent_ids: List[uuid.UUID]
 
 class EmployeeAgentDelete(EmployeeAgentCreate):
     pass
