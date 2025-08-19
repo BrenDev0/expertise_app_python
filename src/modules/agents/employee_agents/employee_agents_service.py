@@ -12,23 +12,13 @@ class EmployeeAgentService:
         self.__repository = repository
 
     @service_error_handler(f"{__MODULE}.create_many")
-    def create_many(self, db: Session, data: EmployeeAgentCreate) -> List[EmployeeAgent]:
-        employee_agents =  []
-        for id in data.agent_id:
-            e_a = EmployeeAgent(
-                agent_id=id,
-                employee_id=data.employee_id
-            )
-
-            created = self.__repository.create(db=db, data=e_a)
-            employee_agents.append(created)
-        
-        return employee_agents
+    def create_many(self, db: Session, data: EmployeeAgentCreate, employee_id: UUID) -> List[EmployeeAgent]:
+        return self.__repository.create_many(db=db, employee_id=employee_id, agent_ids=data.agent_ids)
     
     @service_error_handler(f"{__MODULE}.collection")
     def collection(self, db: Session, employee_id: UUID) -> List[Agent]:
         return self.__repository.get_agents_by_employee(db=db, employee_id=employee_id)
 
-    @service_error_handler(f"{__MODULE}.delete_many")
-    def remove_many(self, db: Session, data: EmployeeAgentDelete):
-        self.__repository.delete_by_employee_and_agents(db, data.employee_id, data.agent_id)
+    @service_error_handler(f"{__MODULE}.remove_many")
+    def remove_many(self, db: Session, data: EmployeeAgentDelete, employee_id: UUID):
+        self.__repository.delete_by_employee_and_agents(db, employee_id, data.agent_ids)

@@ -10,6 +10,24 @@ class EmployeeAgentRepository(BaseRepository):
     def __init__(self):
         super().__init__(EmployeeAgent)
 
+    def create_many(self, db: Session, employee_id: UUID, agent_ids: List[UUID]):
+        existing = db.query(EmployeeAgent.agent_id).filter(
+            EmployeeAgent.employee_id == employee_id,
+            EmployeeAgent.agent_id.in_(agent_ids)
+        ).all()
+        existing_ids = {row[0] for row in existing}
+
+    
+        new_agent_ids = [aid for aid in agent_ids if aid not in existing_ids]
+
+        new_links = [
+            EmployeeAgent(agent_id=aid, employee_id=employee_id)
+            for aid in new_agent_ids
+        ]
+        db.add_all(new_links)
+        db.commit()
+        return new_links
+
     def delete_by_employee_and_agents(self, db: Session, employee_id: UUID, agent_ids: List[UUID]):
        
         db.query(EmployeeAgent).filter(

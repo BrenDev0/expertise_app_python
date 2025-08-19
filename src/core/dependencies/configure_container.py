@@ -12,6 +12,7 @@ from src.modules.users.users_dependencies import configure_users_dependencies
 from src.modules.companies.companies_dependencies import configure_companies_dependencies
 from src.modules.invites.invites_dependencies import configure_invites_dependencies
 from src.modules.employees.employees_dependencies import configure_emplloyee_dependencies
+from src.modules.agents.agents_dependencies import configure_agents_dependencies
 
 def configure_container():
     ## core ##   
@@ -60,6 +61,10 @@ def configure_container():
     ## Module # Must configure core dependencies above this line ##
 
     # single domain # 
+    configure_agents_dependencies(
+        http_service=http_service
+    )
+
     configure_companies_dependencies(
         http_service=http_service
     )
