@@ -13,3 +13,4 @@ wheels/
 .env
 
 dev.py
+app_expertise.egg-info

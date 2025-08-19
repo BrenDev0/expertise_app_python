@@ -11,8 +11,13 @@ class ChatsService():
         self._repository: BaseRepository = repository
 
     @service_error_handler(module=_MODULE)
-    def create(self, db: Session,  chat: ChatCreate, agent_id: UUID, employee_id: UUID) -> Chat:
-        return self._repository.create(db=db, data=Chat(**chat.model_dump(by_alias=False)))
+    def create(self, db: Session,  chat: ChatCreate, agent_id: UUID, user_id: UUID) -> Chat:
+        chat = Chat(
+            **chat.model_dump(by_alias=False),
+            agent_id=agent_id,
+            user_id=user_id
+        )
+        return self._repository.create(db=db, data=chat)
 
     @service_error_handler(module=_MODULE)
     def resource(self, db: Session, chat_id: UUID) -> Chat | None:
@@ -24,7 +29,7 @@ class ChatsService():
     
     @service_error_handler(module=_MODULE)
     def update(self, db: Session, chat_id: UUID, changes: ChatUpdate) -> Chat:
-        return self._repository.update(db=db, key="chat_id", value=chat_id, changes=changes.model_dump())
+        return self._repository.update(db=db, key="chat_id", value=chat_id, changes=changes.model_dump(exclude_unset=True))
 
     @service_error_handler(module=_MODULE)
     def delete(self, db: Session, chat_id: UUID)-> Chat:
