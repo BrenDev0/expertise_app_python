@@ -7,7 +7,7 @@ from src.modules.employees.employee_controller import EmployeesController
 from src.modules.invites.invites_service import InvitesService
 from src.modules.users.users_service import UsersService
 
-def configure_emplloyee_dependencies(http_service: HttpService):
+def configure_employee_dependencies(http_service: HttpService):
     repository = EmployeesRepository()
     service = EmployeesService(
         repository=repository
