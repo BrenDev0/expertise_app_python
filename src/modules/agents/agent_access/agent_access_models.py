@@ -8,25 +8,25 @@ import uuid
 from  datetime import datetime
 
 
-class EmployeeAgent(Base):
-    __tablename__ = "employee_agents"
+class AgentAccess(Base):
+    __tablename__ = "agent_access"
 
     agent_id = Column(UUID(as_uuid=True), ForeignKey("agents.agent_id", ondelete="CASCADE"), primary_key=True, nullable=False)
-    employee_id = Column(UUID(as_uuid=True), ForeignKey("employees.employee_id", ondelete="CASCADE"), primary_key=True, nullable=False)
+    user_id = Column(UUID(as_uuid=True), ForeignKey("users.user_id", ondelete="CASCADE"), primary_key=True, nullable=False)
 
     __table_args__ = (
-        UniqueConstraint("agent_id", "employee_id", name="uq_agent_employee"),
+        UniqueConstraint("agent_id", "user_id", name="uq_agent_user"),
     )
 
-class EmployeeAgentConfig(BaseModel):
+class AgentAccessConfig(BaseModel):
     model_config = ConfigDict(
         populate_by_name=True,
         serialize_by_alias=True,
         alias_generator=to_camel
     )
 
-class EmployeeAgentCreate(EmployeeAgentConfig):
+class AgentAccessCreate(AgentAccessConfig):
     agent_ids: List[uuid.UUID]
 
-class EmployeeAgentDelete(EmployeeAgentCreate):
+class AgentAccessDelete(AgentAccessCreate):
     pass

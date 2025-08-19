@@ -2,8 +2,8 @@ from src.core.services.http_service import HttpService
 from src.modules.agents.agents_models import Agent, AgentPublic
 from src.modules.users.users_models import User
 from src.modules.agents.agents_service import AgentsService
-from src.modules.agents.employee_agents.employee_agent_models import EmployeeAgentCreate, EmployeeAgentDelete
-from src.modules.agents.employee_agents.employee_agents_service import EmployeeAgentService
+from src.modules.agents.agent_access.agent_access_models import AgentAccessCreate, AgentAccessDelete
+from src.modules.agents.agent_access.agent_access_service import AgentAccessService
 from src.modules.employees.employees_models import Employee
 from src.core.models.http_responses import CommonHttpResponse
 from fastapi import Request
@@ -13,15 +13,15 @@ from  typing import List
 
 
 class AgentsController:
-    def __init__(self, http_service: HttpService, agents_service: AgentsService, employee_agents_service: EmployeeAgentService):
+    def __init__(self, http_service: HttpService, agents_service: AgentsService, agent_access_service: AgentAccessService):
         self.__http_service = http_service
         self.__agents_service = agents_service
-        self.__employee_agents_service = employee_agents_service
+        self.__agent_access_service = agent_access_service
 
     def add_access(
         self,
         employee_id: UUID,
-        data: EmployeeAgentCreate,
+        data: AgentAccessCreate,
         req: Request,
         db: Session
     ) -> CommonHttpResponse:
@@ -38,7 +38,7 @@ class AgentsController:
 
         self.__http_service.request_validation_service.verify_company_user_relation(db=db, user=user, company_id=employee_resource.company_id)
 
-        self.__employee_agents_service.create_many(db=db, data=data, employee_id=employee_resource.employee_id)
+        self.__agent_access_service.create_many(db=db, data=data, user_id=employee_resource.user_id)
 
         return CommonHttpResponse(
             detail="Agent access added to employee"
@@ -47,7 +47,7 @@ class AgentsController:
     def remove_access(
         self,
         employee_id: UUID,
-        data: EmployeeAgentDelete,
+        data: AgentAccessDelete,
         req: Request,
         db: Session
     ) -> CommonHttpResponse:
@@ -64,7 +64,7 @@ class AgentsController:
 
         self.__http_service.request_validation_service.verify_company_user_relation(db=db, user=user, company_id=employee_resource.company_id)
 
-        self.__employee_agents_service.remove_many(db=db, data=data, employee_id=employee_resource.employee_id)
+        self.__agent_access_service.remove_many(db=db, data=data, user_id=employee_resource.user_id)
 
         return CommonHttpResponse(
             detail="Agent access removed from employee"
@@ -104,7 +104,7 @@ class AgentsController:
             not_found_message="Employee not found"
         )
 
-        data = self.__employee_agents_service.collection(db=db, employee_id=employee_resource.employee_id)
+        data = self.__agent_access_service.collection(db=db, user_id=employee_resource.user_id)
 
         return [
             self.__to_public(data=agent) for agent in data

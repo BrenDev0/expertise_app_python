@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, Request, Body
 from src.core.dependencies.container import Container
 from src.modules.agents.agents_models import AgentPublic
-from src.modules.agents.employee_agents.employee_agent_models import EmployeeAgentCreate, EmployeeAgentDelete
+from src.modules.agents.agent_access.agent_access_models import AgentAccessCreate, AgentAccessDelete
 from src.core.middleware.middleware_service import security
 from src.core.middleware.auth_middleware import auth_middleware
 from src.modules.agents.agents_controller import AgentsController
@@ -26,7 +26,7 @@ def get_controller() -> AgentsController:
 def secure_add_access(
     employee_id: UUID,
     req: Request,
-    data: EmployeeAgentCreate = Body(...),
+    data: AgentAccessCreate = Body(...),
     _: None = Depends(auth_middleware),
     db: Session = Depends(get_db_session),
     controller: AgentsController = Depends(get_controller)
@@ -101,7 +101,7 @@ def secure_read(
 def secure_remove_access(
     employee_id: UUID,
     req: Request,
-    data: EmployeeAgentDelete = Body(...),
+    data: AgentAccessDelete = Body(...),
     _: None = Depends(auth_middleware),
     db: Session = Depends(get_db_session),
     controller: AgentsController = Depends(get_controller)
