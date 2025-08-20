@@ -27,9 +27,15 @@ class AgentAcessRepository(BaseRepository):
         db.add_all(new_links)
         db.commit()
         return new_links
+    
+    def get_access_resource(self, db: Session, user_id: UUID, agent_id: UUID) -> AgentAccess | None:
+        stmt = select(self.model).where(
+            (self.model.user_id == user_id) &
+            (self.model.agent_id == agent_id)
+        )
+        return db.execute(stmt).scalar_one_or_none()
 
     def delete_by_user_and_agents(self, db: Session, user_id: UUID, agent_ids: List[UUID]):
-       
         db.query(AgentAccess).filter(
             AgentAccess.user_id == user_id,
             AgentAccess.agent_id.in_(agent_ids)

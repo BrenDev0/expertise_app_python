@@ -9,13 +9,13 @@ from sqlalchemy.orm import Session
 from typing import List
 from uuid import UUID
 from src.modules.users.users_models import User
+from src.modules.agents.agents_models import Agent
 
 
 class ChatsController:
     def __init__(self, https_service: HttpService, chats_service: ChatsService):
-        self._http_service: HttpService = https_service
-        self._chats_service = chats_service
-        self._module = "chats.controller"
+        self.__http_service: HttpService = https_service
+        self.__chats_service = chats_service
 
     def create_request(
         self, 
@@ -25,14 +25,32 @@ class ChatsController:
         db: Session
     ) -> ChatCreateResponse:
         user: User = request.state.user
-        ## check if user has access to agent before creating chat####
 
+        agent_resource: Agent = self.__http_service.request_validation_service.verify_resource(
+            service_key="agents_service",
+            params={
+                "db": db,
+                "agent_id": agent_id
+            },
+            not_found_message="Agent not found"
+        )
 
-        ###################
-        chat: Chat = self._chats_service.create(
+        ## verify user has access to agent
+        self.__http_service.request_validation_service.verify_resource(
+            service_key="agent_access_service",
+            params={
+                "db": db,
+                "user_id": user.user_id,
+                "agent_id": agent_resource.agent_id
+            },
+            not_found_message="User does not have access to agent",
+            status_code=403
+        )
+
+        chat: Chat = self.__chats_service.create(
             db=db, 
             chat=data, 
-            agent_id=agent_id, 
+            agent_id=agent_resource.agent_id, 
             user_id=user.user_id
         )
 
@@ -47,7 +65,7 @@ class ChatsController:
     ) -> List[ChatPublic]:
         user: User = request.state.user
 
-        data = self._chats_service.collection(db=db, user_id=user.user_id)
+        data = self.__chats_service.collection(db=db, user_id=user.user_id)
         
         return [self.__to_public(chat) for chat in data]
 
@@ -60,13 +78,13 @@ class ChatsController:
     ) -> CommonHttpResponse:
         user: User = request.state.user
 
-        chat_resource: Chat = self._http_service.request_validation_service.verify_resource(
+        chat_resource: Chat = self.__http_service.request_validation_service.verify_resource(
             service_key="chats_service",
             params={"db": db, "chat_id": chat_id},
             not_found_message="Chat not found"
         )  
 
-        self._http_service.request_validation_service.validate_action_authorization(user.user_id, chat_resource.user_id) 
+        self.__http_service.request_validation_service.validate_action_authorization(user.user_id, chat_resource.user_id) 
 
         self._chats_service.update(db=db, chat_id=chat_resource.chat_id, changes=data)
 
