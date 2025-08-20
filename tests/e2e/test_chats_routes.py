@@ -61,9 +61,30 @@ def test_secure_update():
         # Now, update the chat
         update_payload = {"title": "Updated Title"}
         update_res = client.put(
-            f"/chats/secure/update/{chat_id}",
+            f"/chats/secure/{chat_id}",
             headers=auth_header,
             json=update_payload
         )
         assert update_res.status_code == 200
         assert update_res.json()["detail"] == "Chat updated"
+
+def test_secure_delete():
+    with TestClient(app) as client:
+        # First, create a chat to update
+        payload = {"title": "Chat to Update"}
+        create_res = client.post(
+            f"/chats/secure/create/{agent_id}",
+            headers=auth_header,
+            json=payload
+        )
+        assert create_res.status_code == 201
+        chat_id = create_res.json()["chatId"]
+
+        # Now, update the chat
+       
+        delete_res = client.delete(
+            f"/chats/secure/{chat_id}",
+            headers=auth_header,
+        )
+        assert delete_res.status_code == 200
+        assert delete_res.json()["detail"] == "Chat deleted"

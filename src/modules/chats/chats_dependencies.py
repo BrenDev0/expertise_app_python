@@ -9,7 +9,7 @@ from src.core.services.http_service import HttpService
 def configure_chats_dependencies(http_service: HttpService) -> None:
     repository = BaseRepository(Chat)
     service = ChatsService(repository=repository)
-    controller = ChatsController(https_service=http_service, chats_service=service)
+    controller = ChatsController(http_service=http_service, chats_service=service)
 
     Container.register("chats_service", service)
     Container.register("chats_controller", controller)
