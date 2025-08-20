@@ -1,4 +1,4 @@
-from src.modules.agents.agent_access.agent_access_repository import AgentAcessRepository
+from src.modules.agents.agent_access.agent_access_repository import AgentAccessRepository
 from src.core.decorators.service_error_handler import service_error_handler
 from src.modules.agents.agent_access.agent_access_models import AgentAccess, AgentAccessCreate, AgentAccessDelete
 from sqlalchemy.orm import Session
@@ -8,7 +8,7 @@ from uuid import UUID
 
 class AgentAccessService:
     __MODULE = "agent_access.service"
-    def __init__(self, repository: AgentAcessRepository):
+    def __init__(self, repository: AgentAccessRepository):
         self.__repository = repository
 
     @service_error_handler(f"{__MODULE}.create_many")

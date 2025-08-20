@@ -35,7 +35,7 @@ def secure_create(
     This endpoint creates a chat in the database.
     The id returned is needed for all requests to the llm.
     """
-    return controller.create_request(request=request, db=db)
+    return controller.create_request(agent_id=agent_id, request=request, data=data, db=db)
 
 @router.get("/secure/collection", status_code=200, response_model=List[ChatPublic])
 def secure_collection( 
@@ -52,7 +52,7 @@ def secure_collection(
     return controller.collection_request(request=request, db=db)
 
 
-@router.put("/secure/update/{chat_id}", status_code=200, response_model=CommonHttpResponse)
+@router.put("/secure/{chat_id}", status_code=200, response_model=CommonHttpResponse)
 def secure_update(
     chat_id: UUID,
     data: ChatUpdate,
@@ -71,5 +71,24 @@ def secure_update(
         db=db,
         data=data,
         chat_id=chat_id
+    )
+
+@router.delete("/secure/{chat_id}", status_code=200, response_model=CommonHttpResponse)
+def secure_delete(
+    chat_id: UUID,
+    req: Request,
+    _: None = Depends(auth_middleware),
+    db: Session = Depends(get_db_session),
+    controller: ChatsController = Depends(get_controller)
+):
+    """
+    ## Delete request 
+
+    This endpoint deletes a chat by id.
+    """
+    return controller.delete_request(
+        chat_id=chat_id,
+        req=req,
+        db=db
     )
     

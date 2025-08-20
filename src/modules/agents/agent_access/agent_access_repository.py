@@ -6,7 +6,7 @@ from sqlalchemy import select
 from uuid import UUID
 from typing import List
 
-class AgentAcessRepository(BaseRepository):
+class AgentAccessRepository(BaseRepository):
     def __init__(self):
         super().__init__(AgentAccess)
 

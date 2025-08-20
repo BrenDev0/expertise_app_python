@@ -13,8 +13,8 @@ from src.modules.agents.agents_models import Agent
 
 
 class ChatsController:
-    def __init__(self, https_service: HttpService, chats_service: ChatsService):
-        self.__http_service: HttpService = https_service
+    def __init__(self, http_service: HttpService, chats_service: ChatsService):
+        self.__http_service: HttpService = http_service
         self.__chats_service = chats_service
 
     def create_request(
@@ -86,10 +86,33 @@ class ChatsController:
 
         self.__http_service.request_validation_service.validate_action_authorization(user.user_id, chat_resource.user_id) 
 
-        self._chats_service.update(db=db, chat_id=chat_resource.chat_id, changes=data)
+        self.__chats_service.update(db=db, chat_id=chat_resource.chat_id, changes=data)
 
         return CommonHttpResponse(
             detail="Chat updated"
+        )
+    
+
+    def delete_request(
+        self,
+        chat_id: UUID,
+        req: Request,
+        db: Session
+    ):
+        user: User = req.state.user
+
+        chat_resource: Chat = self.__http_service.request_validation_service.verify_resource(
+            service_key="chats_service",
+            params={"db": db, "chat_id": chat_id},
+            not_found_message="Chat not found"
+        )  
+
+        self.__http_service.request_validation_service.validate_action_authorization(user.user_id, chat_resource.user_id) 
+
+        self.__chats_service.delete(db=db, chat_id=chat_resource.chat_id)
+
+        return CommonHttpResponse(
+            detail="Chat deleted"
         )
    
     @staticmethod
