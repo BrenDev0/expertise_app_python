@@ -52,7 +52,7 @@ def secure_collection(
     return controller.collection_request(req=req, db=db)
 
 
-@router.put("/secure/{chat_id}", status_code=200, response_model=CommonHttpResponse)
+@router.patch("/secure/{chat_id}", status_code=200, response_model=CommonHttpResponse)
 def secure_update(
     chat_id: UUID,
     req: Request,
