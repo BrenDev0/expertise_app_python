@@ -23,50 +23,42 @@ class MessagesService():
         return self._repository.get_one(db=db, key="chat_id", value=message_id)
     
     @service_error_handler(f"{__MODULE}.collection")
-    def collection(self, db: Session, chat_id: UUID) -> List[Message]:
-        result = self._repository.get_many(db=db, key="chat_id", value=chat_id)
-        if len(result) != 0:
-            return sorted(result, key=attrgetter("created_at"), reverse=True)
-        return []
+    def collection(self, db: Session, chat_id: UUID, num_of_messages: int = 50) -> List[Message]:
+        return self._repository.get_many(
+            db=db, 
+            key="chat_id", 
+            value=chat_id, 
+            limit=num_of_messages, 
+            order_by="created_at",
+            desc=True
+        )
     
     @service_error_handler(f"{__MODULE}.delete")
     def delete(self, db: Session, message_id: UUID)-> Message:
         return self._repository.delete(db=db, key="message_id", value=message_id)
     
     @service_error_handler(f"{__MODULE}.hanlde_messages")
-    async def handle_messages(self, db: Session, chat_id: UUID, human_message: str, ai_message: str, num_of_messages: int = 12): 
-        redis_service: RedisService = Container.resolve("redis_service")
+    async def handle_messages(self, db: Session, chat_id: UUID, human_message: str, ai_message: str)-> tuple[MessageCreate, MessageCreate]:     
         incoming_message = MessageCreate(
             chat_id=chat_id,
             sender="human",
             text=human_message
         )
 
+        self.create(db=db, message=incoming_message)
+        
         outgoing_message = MessageCreate(
             chat_id=chat_id,
             sender="ai",
             text=ai_message
         )
 
-        session_key = redis_service.get_agent_state_key(chat_id=chat_id)
-        session = await redis_service.get_session(session_key)
-        chat_history = session.get("chat_history", [])
-
-        chat_history.insert(0, incoming_message.model_dump(exclude="chat_id"))
-        if len(chat_history) > num_of_messages:
-            chat_history.pop()  
-        
-        self.create(db=db, message=incoming_message)
-
-        chat_history.insert(0, outgoing_message.model_dump(exclude="chat_id"))
-        if len(chat_history) > num_of_messages:
-            chat_history.pop()  
-        
         self.create(db=db, message=outgoing_message)
         
-        await redis_service.set_session(session_key, {
-            "chat_history": chat_history
-        }, expire_seconds=7200) #2 hours 
+        return incoming_message, outgoing_message
     
-    
+    @service_error_handler(f"{__MODULE}.get_chat_history")
+    def get_chat_history(self, db: Session, chat_id: UUID, num_of_messages: int = 12) -> List[Message]:
+        return self.collection(db=db, chat_id=chat_id, num_of_messages=num_of_messages)
+
     
