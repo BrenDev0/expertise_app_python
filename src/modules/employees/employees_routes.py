@@ -82,7 +82,7 @@ def secure_collection(
         db=db
     )
 
-@router.put("/secure/{employee_id}", status_code=200, response_model=CommonHttpResponse)
+@router.patch("/secure/{employee_id}", status_code=200, response_model=CommonHttpResponse)
 def secure_update(
     employee_id: UUID,
     req: Request,
