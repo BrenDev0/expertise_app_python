@@ -13,11 +13,12 @@ class EmployeesService:
 
 
     @service_error_handler(module=f"{__MODULE}.create")
-    def create(self, db: Session, user_id: UUID, company_id: UUID, position: str) -> Employee:
+    def create(self, db: Session, user_id: UUID, company_id: UUID, position: str, is_manager: bool = False) -> Employee:
         employee = Employee(
             user_id=user_id,
             company_id=company_id,
-            position=position
+            position=position,
+            is_manager=is_manager
         )
 
         return self.__repository.create(db=db, data=employee)
@@ -27,8 +28,8 @@ class EmployeesService:
         return self.__repository.get_by_user_and_company(db=db, user_id=user_id, company_id=company_id)
     
     @service_error_handler(module=f"{__MODULE}.resource")
-    def resource(self, db: Session, employee_id: UUID) -> Employee | None:
-        return self.__repository.get_one(db=db, key="employee_id", value=employee_id)
+    def resource(self, db: Session, key: str, value: UUID) -> Employee | None:
+        return self.__repository.get_one(db=db, key=key, value=value)
     
 
     @service_error_handler(module=f"{__MODULE}.collection")

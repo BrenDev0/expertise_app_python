@@ -1,7 +1,7 @@
 from src.core.database.database_models import Base
 from pydantic import BaseModel, ConfigDict,EmailStr
 from pydantic.alias_generators import to_camel
-from sqlalchemy import Column, String, DateTime, func, ForeignKey
+from sqlalchemy import Column, String, DateTime, func, ForeignKey, Boolean
 from sqlalchemy.dialects.postgresql import UUID
 import uuid
 from typing import Optional
@@ -16,7 +16,8 @@ class Invite(Base):
     email = Column(String, nullable=False, unique=True)
     name = Column(String, nullable=False)
     phone = Column(String, nullable=False)
-    position = Column(String, nullable=False)
+    position = Column(String, nullable=True)
+    is_manager = Column(Boolean, nullable=False, default=False)
     created_at = Column(DateTime(timezone=True), nullable=False, server_default=func.now())
 
 
@@ -32,7 +33,8 @@ class InviteCreate(InviteConfig):
     email: EmailStr
     name: str
     phone: str
-    position: str
+    position: Optional[str] = None
+    is_manager: bool = False
 
 class InviteUpdate(InviteConfig):
     company_id: Optional[uuid.UUID] = None
@@ -40,6 +42,7 @@ class InviteUpdate(InviteConfig):
     name: Optional[str] = None
     phone: Optional[str] = None
     position: Optional[str] = None
+    is_manager: Optional[bool] = None
 
 class InvitePublic(InviteCreate):
     company_id: uuid.UUID

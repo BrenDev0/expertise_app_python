@@ -22,13 +22,14 @@ class RequestValidationService:
         service_key: str,
         params: Dict[str, Any],
         not_found_message: str = "Resource not found" ,
-        status_code: int = 404
+        status_code: int = 404,
+        throw_http_error: bool = True
     ):
         service = Container.resolve(service_key)
 
         result = service.resource(**params)
 
-        if result is None:
+        if result is None and throw_http_error:
             raise HTTPException(status_code=status_code, detail=not_found_message)
         
         return result
@@ -65,5 +66,5 @@ class RequestValidationService:
             user_id=user.user_id
         )
 
-        if not manager or manager.position.lower() != "manager":
+        if not manager or not manager.is_manager:
             raise HTTPException(status_code=403, detail="Forbidden")

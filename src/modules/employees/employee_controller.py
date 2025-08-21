@@ -51,7 +51,8 @@ class EmployeesController:
             db=db, 
             user_id=new_user.user_id, 
             company_id=invitation_resource.company_id, 
-            position=invitation_resource.position
+            position=invitation_resource.position,
+            is_manager=invitation_resource.is_manager
         )
 
         token = self.__http_service.webtoken_service.generate_token({
@@ -73,10 +74,11 @@ class EmployeesController:
         user: User = req.state.user
 
         employee_resource: Employee = self.__http_service.request_validation_service.verify_resource(
-            service_key="employees_service",
+            service_key="employees_service", # employee_service.resource accepts key value parameters
             params={
                 "db": db,
-                "employee_id": employee_id
+                "key": "employee_id",
+                "value": employee_id
             },
             not_found_message="Employee not found"
         )
@@ -129,8 +131,8 @@ class EmployeesController:
         employee_resource: Employee = self.__http_service.request_validation_service.verify_resource(
             service_key="employees_service",
             params={
-                "db": db,
-                "employee_id": employee_id
+                "key": "employee_id",
+                "value": employee_id
             },
             not_found_message="Employee not found"
         )
@@ -157,7 +159,8 @@ class EmployeesController:
             service_key="employees_service",
             params={
                 "db": db,
-                "employee_id": employee_id
+                "key": "employee_id",
+                "value": employee_id
             },
             not_found_message="Employee not found"
         )

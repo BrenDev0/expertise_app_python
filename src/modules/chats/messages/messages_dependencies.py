@@ -9,7 +9,6 @@ from src.core.services.http_service import HttpService
 def configure_messages_dependencies(http_service: HttpService):
     repository = BaseRepository(Message)
     service = MessagesService(repository=repository)
-    controller = MessagesController(https_service=http_service, messages_service=service)
-
+    controller = MessagesController(http_service=http_service, messages_service=service)
     Container.register("messages_service", service)
     Container.register("messages_controller", controller) 
