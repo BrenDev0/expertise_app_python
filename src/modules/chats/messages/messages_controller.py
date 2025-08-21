@@ -9,8 +9,8 @@ import uuid
 
 
 class MessagesController:
-    def __init__(self, https_service: HttpService, messages_service: MessagesService):
-        self._http_service: HttpService = https_service
+    def __init__(self, http_service: HttpService, messages_service: MessagesService):
+        self._http_service: HttpService = http_service
         self._messages_service = messages_service
         self._module = "messages.controller"
  

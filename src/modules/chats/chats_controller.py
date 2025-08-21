@@ -10,6 +10,7 @@ from typing import List
 from uuid import UUID
 from src.modules.users.users_models import User
 from src.modules.agents.agents_models import Agent
+from src.modules.employees.employees_models import Employee
 
 
 class ChatsController:
@@ -36,16 +37,28 @@ class ChatsController:
         )
 
         ## verify user has access to agent
-        self.__http_service.request_validation_service.verify_resource(
-            service_key="agent_access_service",
-            params={
-                "db": db,
-                "user_id": user.user_id,
-                "agent_id": agent_resource.agent_id
-            },
-            not_found_message="User does not have access to agent",
-            status_code=403
-        )
+        if not user.is_admin:
+            employee_resource: Employee = self.__http_service.request_validation_service.verify_resource(
+                service_key="employees_service",
+                params={
+                    "db": db,
+                    "key": "user_id",
+                    "value": user.user_id
+                },
+                not_found_message="Employee profile not found"
+            )
+
+            if not employee_resource.is_manager:
+                self.__http_service.request_validation_service.verify_resource(
+                    service_key="agent_access_service",
+                    params={
+                        "db": db,
+                        "user_id": user.user_id,
+                        "agent_id": agent_resource.agent_id
+                    },
+                    not_found_message="User does not have access to agent",
+                    status_code=403
+                )
 
         chat: Chat = self.__chats_service.create(
             db=db, 

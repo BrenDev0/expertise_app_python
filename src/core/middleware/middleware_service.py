@@ -3,7 +3,7 @@ import jwt
 from typing import Dict
 from fastapi import Request, HTTPException
 from src.core.services.http_service import HttpService
-from src.core.database.session import get_db_session
+from sqlalchemy.orm import Session
 from fastapi.security import HTTPBearer
 
 
@@ -39,11 +39,11 @@ class MiddlewareService:
 
         
     
-    def auth(self, request: Request):
+    def auth(self, request: Request, db: Session):
         token_payload = self.get_token_payload(request)
-        user = self.authorize_user(token_payload)
+        user = self.authorize_user(db=db, token_payload=token_payload)
 
-        return user
+        return user, token_payload
     
     def verify(self, request: Request):
         token_payload = self.get_token_payload(request)
@@ -58,14 +58,13 @@ class MiddlewareService:
 
         
     
-    def authorize_user(self, token_payload: Dict):
+    def authorize_user(self,db: Session, token_payload: Dict):
         try:  
             user_id = token_payload.get("user_id")
 
             if user_id is None:
                 raise HTTPException(status_code=401, detail="Invlalid token")
             
-            db = next(get_db_session())
             
             user = self.http_service.request_validation_service.verify_resource(
                 service_key="users_service",
@@ -73,14 +72,13 @@ class MiddlewareService:
                 not_found_message="Unauthorized",
                 status_code=403
             )
-
-            if user is None:
-                raise HTTPException(status_code=403, detail="Unauthorized")
             
             return user
     
         except ValueError as e:
             raise HTTPException(status_code=401, detail=str(e))
+        
+
 
 
     

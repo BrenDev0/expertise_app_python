@@ -6,6 +6,7 @@ from src.modules.users.users_models import UserPublic, User, UserCreate, UserLog
 from src.core.models.http_responses import CommonHttpResponse, ResponseWithToken
 from src.core.dependencies.container import Container
 from src.core.services.email_service import EmailService
+from src.modules.employees.employees_models import Employee
 
 
 class UsersController:
@@ -99,9 +100,11 @@ class UsersController:
             detail="Incorrect email or password"
         )
 
-        token = self.__http_service.webtoken_service.generate_token({
+        token_payload = {
             "user_id": str(user.user_id)
-        }, "7d")
+        }
+
+        token = self.__http_service.webtoken_service.generate_token(token_payload, "7d")
 
         return ResponseWithToken(
             detail="Login Successful",
