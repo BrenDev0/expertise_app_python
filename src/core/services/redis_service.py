@@ -21,5 +21,5 @@ class RedisService:
         return await self.redis.delete(key) > 0
     
     @staticmethod
-    async def get_agent_state_key(chat_id: UUID):
-        return f"agent_state:{chat_id}"
+    def get_agent_state_key(chat_id: UUID):
+        return f"chat_state:{chat_id}"

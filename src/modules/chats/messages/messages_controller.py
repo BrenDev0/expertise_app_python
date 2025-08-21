@@ -16,11 +16,11 @@ class MessagesController:
  
     def collection_request(
         self, 
-        request: Request, 
+        req: Request, 
         db: Session, 
         chat_id: uuid.UUID
     ):
-        user: User = request.state.user
+        user: User = req.state.user
 
         chat_resource: Chat = self._http_service.request_validation_service.verify_resource(
             "chats_service",

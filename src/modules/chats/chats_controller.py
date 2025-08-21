@@ -21,11 +21,11 @@ class ChatsController:
     def create_request(
         self, 
         agent_id: UUID,
-        request: Request, 
+        req: Request, 
         data: ChatCreate,
         db: Session
     ) -> ChatCreateResponse:
-        user: User = request.state.user
+        user: User = req.state.user
 
         agent_resource: Agent = self.__http_service.request_validation_service.verify_resource(
             service_key="agents_service",
@@ -73,10 +73,10 @@ class ChatsController:
  
     def collection_request(
         self, 
-        request: Request, 
+        req: Request, 
         db: Session
     ) -> List[ChatPublic]:
-        user: User = request.state.user
+        user: User = req.state.user
 
         data = self.__chats_service.collection(db=db, user_id=user.user_id)
         
@@ -85,11 +85,11 @@ class ChatsController:
     def update_request(
         self, 
         chat_id: UUID,
-        request: Request, 
+        req: Request, 
         db: Session, 
         data: ChatUpdate, 
     ) -> CommonHttpResponse:
-        user: User = request.state.user
+        user: User = req.state.user
 
         chat_resource: Chat = self.__http_service.request_validation_service.verify_resource(
             service_key="chats_service",

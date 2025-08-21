@@ -23,7 +23,7 @@ def get_controller() -> ChatsController:
 @router.post("/secure/create/{agent_id}", status_code=201, response_model=ChatCreateResponse)
 def secure_create(
     agent_id: UUID,
-    request: Request,
+    req: Request,
     data: ChatCreate = Body(...),
     _: None = Depends(auth_middleware),
     db: Session = Depends(get_db_session),
@@ -35,11 +35,11 @@ def secure_create(
     This endpoint creates a chat in the database.
     The id returned is needed for all requests to the llm.
     """
-    return controller.create_request(agent_id=agent_id, request=request, data=data, db=db)
+    return controller.create_request(agent_id=agent_id, req=req, data=data, db=db)
 
 @router.get("/secure/collection", status_code=200, response_model=List[ChatPublic])
 def secure_collection( 
-    request: Request,
+    req: Request,
     _: None = Depends(auth_middleware), 
     db: Session = Depends(get_db_session),
     controller: ChatsController = Depends(get_controller)
@@ -49,14 +49,14 @@ def secure_collection(
 
     This endpoint returns a list of chats by the user id in the auth token.
     """
-    return controller.collection_request(request=request, db=db)
+    return controller.collection_request(req=req, db=db)
 
 
 @router.put("/secure/{chat_id}", status_code=200, response_model=CommonHttpResponse)
 def secure_update(
     chat_id: UUID,
+    req: Request,
     data: ChatUpdate,
-    request: Request,
     _: None = Depends(auth_middleware),
     db: Session = Depends(get_db_session),
     controller: ChatsController = Depends(get_controller)
@@ -67,7 +67,7 @@ def secure_update(
     This endpont updates the title of the chat provided in the params
     """
     return controller.update_request(
-        request=request,
+        req=req,
         db=db,
         data=data,
         chat_id=chat_id

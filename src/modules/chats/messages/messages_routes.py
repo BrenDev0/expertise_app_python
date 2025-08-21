@@ -22,7 +22,7 @@ def get_controller():
 @router.get("/secure/collection/{chat_id}", status_code=200, response_model=List[MessagePublic])
 def secure_collection( 
     chat_id: uuid.UUID,
-    request: Request,
+    req: Request,
     _=Depends(auth_middleware), 
     db: Session = Depends(get_db_session),
     controller: MessagesController = Depends(get_controller)
@@ -32,7 +32,7 @@ def secure_collection(
 
     This endpoint returns a list of messages associated with the chat id passed in the params
     """
-    return controller.collection_request(request=request, db=db, chat_id=chat_id)
+    return controller.collection_request(req=req, db=db, chat_id=chat_id)
 
 
     

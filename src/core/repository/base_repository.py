@@ -23,9 +23,24 @@ class BaseRepository(Generic[T]):
         
         return result
 
-    def get_many(self, db: Session, key: str, value: str | uuid.UUID) -> List[T]:
+    def get_many(
+        self, 
+        db: Session, 
+        key: str, 
+        value: str | uuid.UUID, 
+        limit: int = None, 
+        order_by=None, 
+        desc: bool = False
+    ) -> List[T]:
         stmt = select(self.model).where(getattr(self.model, key) == value)
-        
+        if order_by:
+            col = getattr(self.model, order_by)
+            if desc:
+                stmt = stmt.order_by(col.desc())
+            else:
+                stmt = stmt.order_by(col.asc())
+        if limit is not None:
+            stmt = stmt.limit(limit)
         return db.execute(stmt).scalars().all()
     
     def get_all(self, db: Session) -> List[T]:
