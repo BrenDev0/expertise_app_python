@@ -6,7 +6,7 @@ from fastapi import Request
 from src.core.services.http_service import HttpService
 from sqlalchemy.orm import Session
 import uuid
-
+from typing import List
 
 class MessagesController:
     def __init__(self, http_service: HttpService, messages_service: MessagesService):
@@ -19,7 +19,7 @@ class MessagesController:
         req: Request, 
         db: Session, 
         chat_id: uuid.UUID
-    ):
+    ) -> List[MessagePublic] :
         user: User = req.state.user
 
         chat_resource: Chat = self._http_service.request_validation_service.verify_resource(

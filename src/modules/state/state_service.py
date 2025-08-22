@@ -1,6 +1,6 @@
 from src.modules.state.state_models import ChatState
 from src.core.services.redis_service import RedisService
-from src.modules.chats.messages.messages_models import MessageCreate
+from src.modules.chats.messages.messages_models import MessageCreate, MessagePublic
 from src.modules.chats.messages.messages_service import MessagesService
 from  sqlalchemy.orm import Session
 from uuid import UUID
@@ -23,8 +23,15 @@ class StateService:
         num_of_messages: int = __NUM_OF_MESSAGES,
     ):
         session_key = self.__get_chat_state_key(chat_id=chat_id)
-        state: ChatState = await self.__redis_service.get_session(session_key)
+        
+        session_data = await self.__redis_service.get_session(session_key)
+
+        state = ChatState(
+            **session_data
+        )
+        
         chat_history = state.chat_history
+        
         chat_history.insert(0, incoming_message.model_dump(exclude="chat_id"))
         if len(chat_history) > num_of_messages:
             chat_history.pop()  
@@ -49,7 +56,9 @@ class StateService:
         state = ChatState(
             input=input,
             chat_id=chat_id, 
-            chat_history=[msg.model_dump(exclude="chat_id") for msg in chat_history],
+            chat_history=[
+                MessagePublic.model_validate(msg, from_attributes=True).model_dump(exclude="chat_id") for msg in chat_history
+            ],
             user_id=user_id,
             agent_id=agent_id
         )
