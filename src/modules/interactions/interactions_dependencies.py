@@ -8,7 +8,7 @@ from src.core.services.http_service import HttpService
 def configure_interactions_dependencies(http_service):
     service = InteractionsService()
     
-    messaging_service = Container.resolve("messaging_service")
+    messaging_service = Container.resolve("messages_service")
     state_service = Container.resolve("state_service")
     
     controller = InteractionsController(
