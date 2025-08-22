@@ -96,9 +96,7 @@ def configure_container():
         data_handling_service=data_handler
     )
 
-    state_service = StateService(redis_service=redis_service)
-    Container.register("state_service", state_service)
-
+    
     # multi domain # must configure single domain dependencies above this line #
     configure_employee_dependencies(http_service=http_service)
 
