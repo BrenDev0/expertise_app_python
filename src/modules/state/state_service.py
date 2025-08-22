@@ -63,7 +63,7 @@ class StateService:
             agent_id=agent_id
         )
 
-        await self.__redis_service.set_session(session_key, state.model_dump(), expire_seconds=7200)
+        await self.__redis_service.set_session(session_key, state.model_dump(), expire_seconds=7200) #2 hours 
         return state
     
     @staticmethod

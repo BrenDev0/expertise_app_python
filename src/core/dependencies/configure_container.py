@@ -8,6 +8,7 @@ from src.core.logs.logger import Logger
 from src.core.middleware.middleware_service import MiddlewareService
 from src.core.services.request_validation_service import RequestValidationService
 from src.core.services.webtoken_service import WebTokenService
+from src.core.services.redis_service import RedisService
 from src.modules.users.users_dependencies import configure_users_dependencies
 from src.modules.chats.chats_dependencies import configure_chats_dependencies
 from src.modules.companies.companies_dependencies import configure_companies_dependencies
@@ -15,6 +16,8 @@ from src.modules.invites.invites_dependencies import configure_invites_dependenc
 from src.modules.employees.employees_dependencies import configure_employee_dependencies
 from src.modules.agents.agents_dependencies import configure_agents_dependencies
 from src.modules.chats.messages.messages_dependencies import configure_messages_dependencies
+from src.modules.interactions.interactions_dependencies import configure_interactions_dependencies
+from src.modules.state.state_service import StateService
 
 def configure_container():
     ## core ##   
@@ -31,6 +34,9 @@ def configure_container():
 
     logger = Logger()
     Container.register("logger", logger)
+
+    redis_service = RedisService()
+    Container.register("redis_service", redis_service)
 
     request_validation_service = RequestValidationService()
     Container.register("request_validation_service", request_validation_service)
@@ -90,8 +96,13 @@ def configure_container():
         data_handling_service=data_handler
     )
 
+    state_service = StateService(redis_service=redis_service)
+    Container.register("state_service", state_service)
+
     # multi domain # must configure single domain dependencies above this line #
     configure_employee_dependencies(http_service=http_service)
+
+    configure_interactions_dependencies(http_service=http_service)
 
 
 
