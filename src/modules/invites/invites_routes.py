@@ -75,7 +75,7 @@ def secure_collection(
     """
     ## Collection request
 
-    This endpoint returns all unexpired invites send  by a comapny.
+    This endpoint returns all unexpired invites sent by a company.
     Only admin level users have access to this endpoint. 
     """
     return controller.collection_request(
@@ -85,7 +85,7 @@ def secure_collection(
     )
 
 @router.patch("/secure/{invite_id}", status_code=200, response_model=CommonHttpResponse)
-def sucure_update(
+def secure_update(
     invite_id: UUID,
     req: Request,
     data: InviteUpdate = Body(...),
