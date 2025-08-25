@@ -100,11 +100,12 @@ def configure_container():
     # multi domain # must configure single domain dependencies above this line #
     configure_employee_dependencies(http_service=http_service)
 
-    configure_interactions_dependencies(http_service=http_service)
+    
 
     configure_state_dependencies(redis_service=redis_service)
 
 
 
-
+    ## multi server dependencies ##
+    configure_interactions_dependencies(http_service=http_service)
 
