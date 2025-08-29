@@ -1,16 +1,22 @@
-from pydantic import BaseModel, Field, ConfigDict
-from sqlalchemy import Column, String, Text, ForeignKey
+from pydantic import BaseModel, ConfigDict
+from sqlalchemy import Column, String, ForeignKey
+from sqlalchemy.orm import relationship
 from src.core.database.database_models import Base
 import uuid
+from typing import List
 from sqlalchemy.dialects.postgresql import UUID
 from pydantic.alias_generators import to_camel
 
 class Chat(Base):
     __tablename__ = "chats"
     chat_id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, unique=True, nullable=False)
-    agent_id = Column(UUID(as_uuid=True), ForeignKey("agents.agent_id", ondelete="CASCADE"), nullable=False)
     user_id = Column(UUID(as_uuid=True), ForeignKey("users.user_id", ondelete="CASCADE"), nullable=False)
     title = Column(String, nullable=True)
+
+    agents = relationship(
+        "Agent",
+        secondary="participants",
+    )
 
 class ChatConfig(BaseModel):
     model_config = ConfigDict(
@@ -23,14 +29,15 @@ class ChatConfig(BaseModel):
 
 class ChatCreate(ChatConfig):
     title: str
+    agents: List[uuid.UUID]
 
-class ChatUpdate(ChatCreate):
-    pass
+class ChatUpdate(ChatConfig):
+    title: str
 
 class ChatPublic(ChatCreate):
     chat_id: uuid.UUID
     user_id: uuid.UUID
-    agent_id: uuid.UUID
+    
    
 class ChatCreateResponse(ChatConfig):
     chat_id: uuid.UUID

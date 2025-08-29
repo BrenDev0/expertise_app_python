@@ -11,10 +11,9 @@ class ChatsService():
         self._repository: BaseRepository = repository
 
     @service_error_handler(module=_MODULE)
-    def create(self, db: Session,  chat: ChatCreate, agent_id: UUID, user_id: UUID) -> Chat:
+    def create(self, db: Session,  title: str, user_id: UUID) -> Chat:
         chat = Chat(
-            **chat.model_dump(by_alias=False),
-            agent_id=agent_id,
+            title=title,
             user_id=user_id
         )
         return self._repository.create(db=db, data=chat)
