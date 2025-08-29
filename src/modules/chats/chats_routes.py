@@ -20,9 +20,8 @@ router = APIRouter(
 def get_controller() -> ChatsController:
     return Container.resolve("chats_controller")
 
-@router.post("/secure/create/{agent_id}", status_code=201, response_model=ChatCreateResponse)
+@router.post("/secure/create", status_code=201, response_model=ChatCreateResponse)
 def secure_create(
-    agent_id: UUID,
     req: Request,
     data: ChatCreate = Body(...),
     _: None = Depends(auth_middleware),
@@ -35,7 +34,7 @@ def secure_create(
     This endpoint creates a chat in the database.
     The id returned is needed for all requests to the llm.
     """
-    return controller.create_request(agent_id=agent_id, req=req, data=data, db=db)
+    return controller.create_request(req=req, data=data, db=db)
 
 @router.get("/secure/collection", status_code=200, response_model=List[ChatPublic])
 def secure_collection( 
