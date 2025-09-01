@@ -4,6 +4,8 @@ import uuid
 
 from src.modules.chats.chats_service import ChatsService
 from src.modules.chats.chats_models import Chat, ChatCreate, ChatUpdate
+from src.modules.chats.participants.participants_models import Participant  
+from src.modules.agents.agents_models import Agent  
 
 @pytest.fixture
 def mock_repository():
@@ -19,26 +21,26 @@ def chats_service(mock_repository):
 
 chat_id = uuid.uuid4()
 user_id = uuid.uuid4()
-agent_id = uuid.uuid4()
 
 def test_create(mock_db, mock_repository, chats_service):
-    chat_create = ChatCreate(title="Test Chat")
+    title = "Test Chat"
     mock_chat = Mock(spec=Chat)
     mock_repository.create.return_value = mock_chat
 
     result = chats_service.create(
         db=mock_db,
-        chat=chat_create,
-        agent_id=agent_id,
+        title=title,
         user_id=user_id
     )
 
     assert result == mock_chat
     mock_repository.create.assert_called_once()
-    data_passed = mock_repository.create.call_args[1]["data"]
-    assert data_passed.agent_id == agent_id
-    assert data_passed.user_id == user_id
-    assert data_passed.title == chat_create.title
+    # Check that create was called with a Chat instance
+    call_args = mock_repository.create.call_args
+    assert call_args[1]['db'] == mock_db
+    created_chat = call_args[1]['data']
+    assert created_chat.user_id == user_id
+    assert created_chat.title == title
 
 def test_resource(mock_db, mock_repository, chats_service):
     mock_chat = Mock(spec=Chat)

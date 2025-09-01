@@ -13,6 +13,7 @@ from src.modules.users.users_dependencies import configure_users_dependencies
 from src.modules.chats.chats_dependencies import configure_chats_dependencies
 from src.modules.companies.companies_dependencies import configure_companies_dependencies
 from src.modules.invites.invites_dependencies import configure_invites_dependencies
+from src.modules.documents.documents_dependencies import configure_documents_dependencies
 from src.modules.employees.employees_dependencies import configure_employee_dependencies
 from src.modules.agents.agents_dependencies import configure_agents_dependencies
 from src.modules.interactions.interactions_dependencies import configure_interactions_dependencies
@@ -79,6 +80,8 @@ def configure_container():
     configure_companies_dependencies(
         http_service=http_service
     )
+
+    configure_documents_dependencies(http_service=http_service, data_handler=data_handler)
 
     configure_invites_dependencies(
         http_service=http_service,
