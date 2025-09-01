@@ -16,7 +16,7 @@ class ParticipantsController:
         self.__http_service = http_service
         self.__participants_service = participants_service
 
-    def invite(
+    def add_to_chat(
         self, 
         chat_id: UUID,
         req: Request,
@@ -70,3 +70,46 @@ class ParticipantsController:
                     )
 
             self.__participants_service.create(db=db, agent_id=agent_id, chat_id=chat_id)
+
+
+    def remove_from_chat(
+        self,
+        chat_id: UUID,
+        req: Request,
+        data: RemoveFromChat,
+        db: Session
+    ):
+        user: User = req.state.user
+
+        chat_resource: Chat = self.__http_service.request_validation_service.verify_resource(
+            service_key="chats_service",
+            params={
+                "db": db,
+                "chat_id": chat_id
+            },
+            not_found_message="Chat not found"
+        )
+
+        self.__http_service.request_validation_service.validate_action_authorization(user.user_id, chat_resource.user_id)
+
+        for agent_id in data.agents:
+            participant_resource = self.__http_service.request_validation_service.verify_resource(
+                service_key="participants_service",
+                params={
+                    "db": db,
+                    "chat_id": chat_resource.chat_id,
+                    "agent_id": agent_id 
+                },
+                throw_http_error=False
+            )
+
+            if participant_resource:
+                self.__participants_service.delete(
+                    db=db, 
+                    chat_id=chat_resource.chat_id,
+                    agent_id=agent_id
+                )
+        
+        return CommonHttpResponse(
+            detail="Agents removed from chat"
+        )
