@@ -9,6 +9,11 @@ from src.core.middleware.middleware_service import MiddlewareService
 from src.core.services.request_validation_service import RequestValidationService
 from src.core.services.webtoken_service import WebTokenService
 from src.core.services.redis_service import RedisService
+import boto3
+import os
+from src.modules.documents.s3_service import S3Service
+from qdrant_client import QdrantClient
+from src.modules.documents.embeddings_service import EmbeddingService
 from src.modules.users.users_dependencies import configure_users_dependencies
 from src.modules.chats.chats_dependencies import configure_chats_dependencies
 from src.modules.companies.companies_dependencies import configure_companies_dependencies
@@ -26,6 +31,14 @@ def configure_container():
     email_service = EmailService()
     Container.register("email_service", email_service)
 
+    qdrant_client = QdrantClient(
+        url=os.getenv("QDRANT_URL"),
+        api_key=os.getenv("QDRANT_API_KEY")
+    )
+
+    embeddings_service = EmbeddingService(client=qdrant_client)
+    Container.register("embeddings_service", embeddings_service)
+
     encryption_service = EncryptionService()
     Container.register("encryption_service", encryption_service)
 
@@ -40,6 +53,21 @@ def configure_container():
 
     request_validation_service = RequestValidationService()
     Container.register("request_validation_service", request_validation_service)
+
+    s3_client = boto3.client(
+            's3',
+            aws_access_key_id=os.getenv('AWS_ACCESS_KEY_ID'),
+            aws_secret_access_key=os.getenv('AWS_SECRET_ACCESS_KEY'),
+            region_name=os.getenv('AWS_REGION', 'us-east-1')
+        )
+    
+    bucket_name = os.getenv('S3_BUCKET_NAME')
+
+    s3_service = S3Service(
+        client=s3_client,
+        bucket_name=bucket_name
+    )
+    Container.register("s3_service", s3_service)
 
     webtoken_service = WebTokenService()
     Container.register("webtoken_service", webtoken_service)
@@ -81,7 +109,12 @@ def configure_container():
         http_service=http_service
     )
 
-    configure_documents_dependencies(http_service=http_service, data_handler=data_handler)
+    configure_documents_dependencies(
+        http_service=http_service,
+        data_handler=data_handler,
+        s3_service=s3_service,
+        embeddings_service=embeddings_service  
+    )
 
     configure_invites_dependencies(
         http_service=http_service,
