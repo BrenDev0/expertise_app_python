@@ -59,3 +59,20 @@ def secure_collection(
     Only admin level users have access to this endpoint. 
     """
     return controller.collection_request(company_id=company_id, req=req, db=db)
+
+@router.delete("/secure/{document_id}", status_code=200, response_model=CommonHttpResponse)
+def secure_delete(
+    document_id: UUID,
+    req: Request,
+    _: None = Depends(is_owner),
+    db: Session = Depends(get_db_session),
+    controller: DocumentsController = Depends(get_controller)
+):
+    """
+    ## Delete request
+
+    This endpoint will delete an uploaded document.
+    Only admin level users have access to this endpoint.
+
+    """
+    return controller.delete_request(document_id=document_id, req=req, db=db)
