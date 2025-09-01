@@ -8,6 +8,7 @@ from src.modules.employees import employees_routes
 from src.modules.interactions import interactions_routes
 from src.modules.invites import invites_routes
 from src.modules.chats.messages import messages_routes
+from src.modules.chats.participants import participants_routes
 from src.modules.users import users_routes
 from src.core.dependencies.configure_container import configure_container
 
@@ -42,6 +43,7 @@ app.include_router(employees_routes.router)
 app.include_router(interactions_routes.router)
 app.include_router(invites_routes.router)
 app.include_router(messages_routes.router)
+app.include_router(participants_routes.router)
 app.include_router(users_routes.router)
 
 
