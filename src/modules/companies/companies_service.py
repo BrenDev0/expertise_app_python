@@ -1,5 +1,4 @@
 from src.core.repository.base_repository import BaseRepository
-from src.core.logs.logger import Logger
 from src.core.decorators.service_error_handler import service_error_handler
 from src.modules.companies.companies_models import Company, CompanyCreate, CompanyUpdate
 from sqlalchemy.orm import Session

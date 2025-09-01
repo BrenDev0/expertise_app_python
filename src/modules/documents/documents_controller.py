@@ -8,13 +8,15 @@ from sqlalchemy.orm import Session
 from src.modules.companies.companies_models import Company
 from src.core.models.http_responses import CommonHttpResponse
 from src.modules.documents.documents_service import DocumentsService
+from src.modules.documents.embeddings_service import EmbeddingService
 
 
 class DocumentsController:
-    def __init__(self, http_service: HttpService, s3_service: S3Service, documents_service: DocumentsService):
+    def __init__(self, http_service: HttpService, s3_service: S3Service, documents_service: DocumentsService, embeddings_service: EmbeddingService):
         self.__http_service = http_service
         self.__s3_service = s3_service
         self.__documents_service = documents_service
+        self.__embeddings_service = embeddings_service
 
     def upload_request(
         self,
@@ -39,6 +41,13 @@ class DocumentsController:
         s3_url = self.__s3_service.upload(file=file, company_id=company_resource.company_id, user_id=company_resource.user_id)
 
         self.__documents_service.create(db=db, company_id=company_resource.company_id, filename=file.filename, url=s3_url)
+
+        self.__embeddings_service.add_document(
+            s3_url=s3_url, 
+            filename=file.filename, 
+            user_id=user.user_id, 
+            company_id=company_resource.company_id
+        )
 
         return CommonHttpResponse(
             detail="file uploaded"
@@ -89,7 +98,13 @@ class DocumentsController:
 
         self.__http_service.request_validation_service.validate_action_authorization(user.user_id, document_resource.company.user_id)
 
-        self.__s3_service.delete(user_id=document_resource.company.user_id, company_id=document_resource.company_id, filename=document_resource.filename)
+        self.__s3_service.delete_document_data(user_id=document_resource.company.user_id, company_id=document_resource.company_id, filename=document_resource.filename)
+
+        self.__embeddings_service.delete_document_data(
+            user_id=user.user_id,
+            company_id=document_resource.company_id,
+            filename=document_resource.filename
+        )
 
         return CommonHttpResponse(
             detail="Document deleted"
