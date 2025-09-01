@@ -2,12 +2,12 @@ import pytest
 from unittest.mock import Mock, patch
 import uuid
 
-with patch("src.core.decorators.service_error_handler.service_error_handler", lambda *a, **kw: (lambda f: f)):
 
-    from src.core.repository.base_repository import BaseRepository
-    from src.core.logs.logger import Logger
-    from src.modules.companies.companies_service import CompaniesService
-    from src.modules.companies.companies_models import CompanyCreate, Company, CompanyUpdate
+
+from src.core.repository.base_repository import BaseRepository
+
+from src.modules.companies.companies_service import CompaniesService
+from src.modules.companies.companies_models import CompanyCreate, Company, CompanyUpdate
 
 @pytest.fixture
 def mock_repository():
