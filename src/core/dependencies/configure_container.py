@@ -15,7 +15,6 @@ from src.modules.companies.companies_dependencies import configure_companies_dep
 from src.modules.invites.invites_dependencies import configure_invites_dependencies
 from src.modules.employees.employees_dependencies import configure_employee_dependencies
 from src.modules.agents.agents_dependencies import configure_agents_dependencies
-from src.modules.chats.messages.messages_dependencies import configure_messages_dependencies
 from src.modules.interactions.interactions_dependencies import configure_interactions_dependencies
 from src.modules.state.state_dependencies  import configure_state_dependencies
 
@@ -87,9 +86,6 @@ def configure_container():
         email_service=email_service
     )
 
-    configure_messages_dependencies(
-        http_service=http_service
-    )
 
     configure_users_dependencies(
         http_service=http_service,
@@ -100,11 +96,7 @@ def configure_container():
     # multi domain # must configure single domain dependencies above this line #
     configure_employee_dependencies(http_service=http_service)
 
-    
-
     configure_state_dependencies(redis_service=redis_service)
-
-
 
     ## multi server dependencies ##
     configure_interactions_dependencies(http_service=http_service)
