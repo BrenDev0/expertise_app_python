@@ -37,7 +37,7 @@ async def internal_incomming_interaction(
         db=db
     )
 
-@router.post("/internal/outgoing/{chat_id}", status_code=202, response_model=CommonHttpResponse)
+@router.post("/internal/outgoing/{chat_id}", status_code=202, response_model=CommonHttpResponse, dependencies=[Depends(security)])
 def internal_receive(
     background_tasks: BackgroundTasks,
     chat_id: UUID,
