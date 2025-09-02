@@ -2,7 +2,7 @@ from src.core.services.http_service import HttpService
 from src.modules.users.users_models import User
 from src.modules.companies.companies_service import CompaniesService
 from src.modules.companies.companies_models import Company, CompanyCreate, CompanyPublic, CompanyUpdate
-from src.core.models.http_responses import CommonHttpResponse
+from src.core.models.http_responses import CommonHttpResponse, ResponseWithToken
 from fastapi import Request
 from sqlalchemy.orm import Session
 from uuid import UUID
@@ -112,6 +112,39 @@ class CompaniesController:
         return CommonHttpResponse(
             detail="Company deleted"
         )
+    
+
+    def login(
+        self,
+        company_id: UUID,
+        req: Request,
+        db: Session
+    ) -> ResponseWithToken:
+        user: User = req.state.user
+
+        company_resource: Company = self.__https_service.request_validation_service.verify_resource(
+            service_key="companies_service",
+            params={
+                "db": db,
+                "company_id": company_id
+            },
+            not_found_message="Company not found"
+        )
+
+        self.__https_service.request_validation_service.validate_action_authorization(user.user_id, company_resource.user_id)
+
+        token_payload = {
+            "user_id": user.user_id,
+            "company_id": company_resource.company_id
+        }
+
+        token = self.__https_service.webtoken_service.generate_token(token_payload, "7d")
+
+        return ResponseWithToken(
+            detail="Login successful",
+            token=token
+        )
+
 
     @staticmethod
     def __to_public(data: Company) -> CompanyPublic:

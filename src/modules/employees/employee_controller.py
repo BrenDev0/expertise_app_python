@@ -55,9 +55,12 @@ class EmployeesController:
             is_manager=invitation_resource.is_manager
         )
 
-        token = self.__http_service.webtoken_service.generate_token({
-            "user_id": str(new_user.user_id)
-        }, "7d")
+        token_payload = {
+            "user_id": str(new_user.user_id), 
+            "company_id": str(invitation_resource.company_id)
+        }
+
+        token = self.__http_service.webtoken_service.generate_token(token_payload, "7d")
 
         return ResponseWithToken(
             detail="Employee created",
