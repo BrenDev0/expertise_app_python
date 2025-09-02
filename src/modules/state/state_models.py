@@ -1,11 +1,10 @@
 from pydantic import BaseModel
-from typing import List
-from src.modules.chats.messages.messages_models import MessagePublic
+from typing import List, Dict, Any
 from uuid import UUID
 
-class ChatState(BaseModel):
+class WorkerState(BaseModel):
     input: str
     chat_id: UUID
-    chat_history: List[MessagePublic]
+    company_id: UUID
+    chat_history: List[Dict[str, Any]]
     user_id: UUID
-    agent_id: UUID
