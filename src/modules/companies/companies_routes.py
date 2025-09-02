@@ -49,9 +49,9 @@ def secure_login(
     controller: CompaniesController = Depends(get_controller)
 ):
     """
-    ## Get company token
+    ## Exchange login token for company marked token
 
-    This endpoint is used by admin users to receive a company_specific token used for company specific business, 
+    This endpoint is used by admin users to receive a company specific token used for company specific business, 
     such as agent interactions, employee managment, ect..
     Due to admin users alternative dashboad after login the token must be exchanged using this endpoint before any editorial actions can be made.
 
