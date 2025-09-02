@@ -1,8 +1,7 @@
-from src.modules.state.state_models import ChatState
+from src.modules.state.state_models import WorkerState
 from src.core.models.http_responses import CommonHttpResponse
 from src.core.services.http_service import HttpService
 from src.modules.interactions.interactions_models import HumanToAgentRequest, AgentToHumanRequest
-from src.modules.interactions.interactions_service import InteractionsService
 from src.modules.chats.messages.messages_service import MessagesService
 from src.modules.state.state_service import StateService
 from fastapi import Request, BackgroundTasks
@@ -15,12 +14,10 @@ class InteractionsController:
     def __init__(
         self, 
         http_service: HttpService,
-        interactions_service: InteractionsService,
         messaging_service: MessagesService,
         state_service: StateService
     ):
         self.__http_service = http_service
-        self.__interactions_service = interactions_service
         self.__messages_service = messaging_service
         self.__state_service = state_service
 
@@ -29,7 +26,7 @@ class InteractionsController:
         chat_id: UUID,
         data: HumanToAgentRequest,
         db: Session
-    )-> ChatState: 
+    )-> WorkerState: 
 
         chat_resource: Chat = self.__http_service.request_validation_service.verify_resource(
             service_key="chats_service",
@@ -42,7 +39,7 @@ class InteractionsController:
 
         self.__http_service.request_validation_service.validate_action_authorization(data.user_id, chat_resource.user_id)
         
-        chat_state: ChatState = await self.__state_service.ensure_chat_state(
+        chat_state: WorkerState = await self.__state_service.ensure_chat_state(
             db=db,
             chat_id=chat_resource.chat_id,
             input=data.input,

@@ -1,4 +1,4 @@
-from src.modules.state.state_models import ChatState
+from src.modules.state.state_models import WorkerState
 from src.core.services.redis_service import RedisService
 from src.modules.chats.messages.messages_models import MessageCreate, MessagePublic
 from src.modules.chats.messages.messages_service import MessagesService
@@ -26,7 +26,7 @@ class StateService:
         
         session_data = await self.__redis_service.get_session(session_key)
 
-        state = ChatState(
+        state = WorkerState(
             **session_data
         )
         
@@ -43,17 +43,17 @@ class StateService:
         await self.__redis_service.set_session(session_key, state.model_dump(), expire_seconds=7200) #2 hours 
 
     @service_error_handler(f"{__MODULE}.ensure_chat_state")
-    async def ensure_chat_state(self, db: Session, chat_id: UUID, input: str, user_id: UUID, company_id: UUID) -> ChatState:
+    async def ensure_chat_state(self, db: Session, chat_id: UUID, input: str, user_id: UUID, company_id: UUID) -> WorkerState:
         session_key = self.__get_chat_state_key(chat_id=chat_id)
         session = await self.__redis_service.get_session(session_key)
         if session:
-            state = ChatState(**session)
+            state = WorkerState(**session)
             state.input = input
             return state
         
         # Not found: build from DB
         chat_history = self.__messages_service.collection(db, chat_id, num_of_messages=self.__NUM_OF_MESSAGES)
-        state = ChatState(
+        state = WorkerState(
             input=input,
             chat_id=chat_id, 
             chat_history=[

@@ -3,8 +3,8 @@ from src.modules.interactions.interactions_controller import InteractionsControl
 from  src.modules.interactions.interactions_models import HumanToAgentRequest, AgentToHumanRequest
 from src.core.dependencies.container import Container
 from sqlalchemy.orm import Session
-from  src.core.database.session import get_db_session
-from src.core.middleware.auth_middleware import auth_middleware
+from src.core.database.session import get_db_session
+from src.modules.state.state_models import WorkerState
 from src.core.middleware.hmac_verification import verify_hmac
 from src.core.models.http_responses import CommonHttpResponse
 from uuid import UUID
@@ -20,7 +20,7 @@ def get_controller() -> InteractionsController:
     return controller
 
 
-@router.post("/internal/incomming/{chat_id}", status_code=202, response_model=CommonHttpResponse, dependencies=[Depends(security)])
+@router.post("/internal/incomming/{chat_id}", status_code=202, response_model=WorkerState, dependencies=[Depends(security)])
 async def internal_incomming_interaction(
     chat_id: UUID,
     data: HumanToAgentRequest = Body(...),
