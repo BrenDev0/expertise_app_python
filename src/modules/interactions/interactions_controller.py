@@ -27,11 +27,9 @@ class InteractionsController:
     async def incoming_interaction(
         self,
         chat_id: UUID,
-        req: Request,
         data: HumanToAgentRequest,
         db: Session
-    ): 
-        user: User = req.state.user
+    )-> ChatState: 
 
         chat_resource: Chat = self.__http_service.request_validation_service.verify_resource(
             service_key="chats_service",
@@ -42,26 +40,21 @@ class InteractionsController:
             not_found_message="Chat not found"
         )
 
-        self.__http_service.request_validation_service.validate_action_authorization(user.user_id, chat_resource.user_id)
+        self.__http_service.request_validation_service.validate_action_authorization(data.user_id, chat_resource.user_id)
         
-        chat_state = await self.__state_service.ensure_chat_state(
+        chat_state: ChatState = await self.__state_service.ensure_chat_state(
             db=db,
             chat_id=chat_resource.chat_id,
             input=data.input,
-            user_id=user.user_id,
-            agent_id=chat_resource.agent_id
+            user_id=data.user_id,
+            company_id=data.company_id
         )
 
-        self.__interactions_service.send_to_agent(state=chat_state)
-
-        return CommonHttpResponse(
-            detail="Request sent to agent"
-        )
+        return chat_state
 
     def outgoing_interaction(
         self,
         chat_id: UUID,
-        req: Request,
         data: AgentToHumanRequest,
         db: Session,
         background_tasks: BackgroundTasks
@@ -75,12 +68,8 @@ class InteractionsController:
             not_found_message="Chat not found"
         )
 
-        incoming_message, outgoing_message = self.__messages_service.handle_messages(
-            db=db, 
-            chat_id=chat_id, 
-            human_message=data.human_message, 
-            ai_message=data.ai_message
-        )
+        incoming_message = self.__messages_service.create(db=db, sender_id=chat_resource.user_id, message_type="human", text=data.human_message)
+        outgoing_message = self.__messages_service.create(db=db, chat_id=chat_id, sender_id=data.agent_id, message_type="ai", text=data.ai_message)
 
         background_tasks.add_task(
             self.__state_service.update_chat_state_history, 
