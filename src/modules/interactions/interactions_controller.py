@@ -39,7 +39,7 @@ class InteractionsController:
 
         self.__http_service.request_validation_service.validate_action_authorization(data.user_id, chat_resource.user_id)
         
-        chat_state: WorkerState = await self.__state_service.ensure_chat_state(
+        worker_state: WorkerState = await self.__state_service.ensure_chat_state(
             db=db,
             chat_id=chat_resource.chat_id,
             input=data.input,
@@ -47,7 +47,7 @@ class InteractionsController:
             company_id=data.company_id
         )
 
-        return chat_state
+        return worker_state
 
     def outgoing_interaction(
         self,
