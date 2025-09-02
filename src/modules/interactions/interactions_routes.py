@@ -20,27 +20,24 @@ def get_controller() -> InteractionsController:
     return controller
 
 
-@router.post("/secure/send/{chat_id}", status_code=202, response_model=CommonHttpResponse, dependencies=[Depends(security)])
+@router.post("/internal/incomming/{chat_id}", status_code=202, response_model=CommonHttpResponse, dependencies=[Depends(security)])
 async def secure_send(
     chat_id: UUID,
-    req: Request,
     data: HumanToAgentRequest = Body(...),
-    _: None = Depends(auth_middleware),
+    _: None = Depends(verify_hmac),
     db: Session = Depends(get_db_session),
     controller: InteractionsController = Depends(get_controller)
 ):
     return await controller.incoming_interaction(
         chat_id=chat_id,
-        req=req,
         data=data,
         db=db
     )
 
-@router.post("/internal/receive/{chat_id}", status_code=202, response_model=CommonHttpResponse)
+@router.post("/internal/outgoing/{chat_id}", status_code=202, response_model=CommonHttpResponse)
 def internal_receive(
     background_tasks: BackgroundTasks,
     chat_id: UUID,
-    req: Request,
     data: AgentToHumanRequest = Body(...),
     _: None = Depends(verify_hmac),
     db: Session = Depends(get_db_session),
@@ -49,7 +46,6 @@ def internal_receive(
  
     return controller.outgoing_interaction(
         chat_id=chat_id,
-        req=req,
         data=data,
         db=db,
         background_tasks=background_tasks
