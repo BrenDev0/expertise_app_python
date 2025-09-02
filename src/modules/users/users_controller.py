@@ -104,6 +104,19 @@ class UsersController:
             "user_id": str(user.user_id)
         }
 
+        if not user.is_admin:
+            employee_resource: Employee = self.__http_service.request_validation_service.verify_resource(
+                service_key="employees_service",
+                params={
+                    "db": db,
+                    "key": "user_id",
+                    "value": user.user_id
+                },
+                not_found_message="Employee profile not found"
+            )
+
+            token_payload["company_id"] = employee_resource.company_id
+
         token = self.__http_service.webtoken_service.generate_token(token_payload, "7d")
 
         return ResponseWithToken(

@@ -2,7 +2,7 @@ from fastapi import APIRouter, Request, Body, HTTPException, Depends
 from src.core.dependencies.container import Container
 from src.modules.companies.companies_controller import CompaniesController
 from src.modules.companies.companies_models import CompanyPublic, CompanyCreate, CompanyUpdate
-from src.core.models.http_responses import CommonHttpResponse
+from src.core.models.http_responses import CommonHttpResponse, ResponseWithToken
 from src.core.database.session import get_db_session
 from sqlalchemy.orm import Session
 from src.modules.users.users_models import User
@@ -15,7 +15,7 @@ from typing import List
 router = APIRouter(
     prefix="/companies",
     tags=["Companies"],
-    dependencies=[Depends(security), Depends(is_owner)]
+    dependencies=[Depends(security), Depends(is_owner)] # applied to all routes
 )
 
 def get_controller() -> CompaniesController:
@@ -39,6 +39,27 @@ def secure_create(
         req=req,
         db=db,
         data=data
+    )
+
+@router.get("/secure/login", status_code=200, response_model=ResponseWithToken)
+def secure_login(
+    company_id: UUID,
+    req: Request,
+    db: Session = Depends(get_db_session),
+    controller: CompaniesController = Depends(get_controller)
+):
+    """
+    ## Get company token
+
+    This endpoint is used by admin users to receive a company_specific token used for company specific business, 
+    such as agent interactions, employee managment, ect..
+    Due to admin users alternative dashboad after login the token must be exchanged using this endpoint before any editorial actions can be made.
+
+    """
+    return controller.login(
+        company_id=company_id,
+        req=req,
+        db=db
     )
 
 @router.get("/secure/resource/{company_id}", status_code=200, response_model=CompanyPublic)
