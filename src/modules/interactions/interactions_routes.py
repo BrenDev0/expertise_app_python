@@ -21,13 +21,16 @@ def get_controller() -> InteractionsController:
 
 
 @router.post("/internal/incomming/{chat_id}", status_code=202, response_model=CommonHttpResponse, dependencies=[Depends(security)])
-async def secure_send(
+async def internal_incomming_interaction(
     chat_id: UUID,
     data: HumanToAgentRequest = Body(...),
     _: None = Depends(verify_hmac),
     db: Session = Depends(get_db_session),
     controller: InteractionsController = Depends(get_controller)
 ):
+    """
+    ## HMAC protected for internal use only
+    """
     return await controller.incoming_interaction(
         chat_id=chat_id,
         data=data,
@@ -43,7 +46,9 @@ def internal_receive(
     db: Session = Depends(get_db_session),
     controller: InteractionsController = Depends(get_controller)
 ):
- 
+    """
+    ## HMAC protected for internal use only
+    """
     return controller.outgoing_interaction(
         chat_id=chat_id,
         data=data,
