@@ -125,7 +125,7 @@ class UsersController:
         )
 
         if not user.is_admin:
-            response.company_id = employee_resource.company_id
+            response.company_id = str(employee_resource.company_id)
         
         return  response
 
