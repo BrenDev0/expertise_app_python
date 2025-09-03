@@ -44,7 +44,8 @@ class InteractionsController:
             chat_id=chat_resource.chat_id,
             input=data.input,
             user_id=data.user_id,
-            company_id=data.company_id
+            company_id=data.company_id,
+            agents=chat_resource.agents
         )
 
         return worker_state

@@ -40,6 +40,7 @@ def test_secure_collection():
             "/chats/secure/collection",
             headers=auth_header
         )
+        print(res.json(), ":::::::::COLLECTION")
         assert res.status_code == 200
         assert isinstance(res.json(), list)
        
