@@ -64,7 +64,8 @@ class EmployeesController:
 
         return ResponseWithToken(
             detail="Employee created",
-            token=token
+            token=token,
+            company_id=str(invitation_resource.company_id)
         )
     
 
