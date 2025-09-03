@@ -115,7 +115,7 @@ class UsersController:
                 not_found_message="Employee profile not found"
             )
 
-            token_payload["company_id"] = employee_resource.company_id
+            token_payload["company_id"] = str(employee_resource.company_id)
 
         token = self.__http_service.webtoken_service.generate_token(token_payload, "7d")
 
