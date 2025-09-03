@@ -119,10 +119,15 @@ class UsersController:
 
         token = self.__http_service.webtoken_service.generate_token(token_payload, "7d")
 
-        return ResponseWithToken(
+        response = ResponseWithToken(
             detail="Login Successful",
             token=token
         )
+
+        if not user.is_admin:
+            response.company_id = employee_resource.company_id
+        
+        return  response
 
 
     def __to_public(self, data: User) ->  UserPublic:
