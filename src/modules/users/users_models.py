@@ -5,7 +5,7 @@ from sqlalchemy.dialects.postgresql import UUID
 from src.core.database.database_models import Base 
 import uuid
 from  datetime import datetime
-from src.core.models.http_responses import CommonHttpResponse
+from typing import Optional
 
 
 class User(Base):
@@ -36,7 +36,11 @@ class UserPublic(UsersConfig):
     is_admin: bool
     created_at: datetime 
 
-  
+class UserUpdate(UsersConfig):
+    name: Optional[str] = None
+    phone: Optional[str] = None
+    password: Optional[str] = None
+    old_password: Optional[str] = None
 
 class UserCreate(UsersConfig):
     name: str

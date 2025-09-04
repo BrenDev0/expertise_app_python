@@ -1,5 +1,5 @@
 from sqlalchemy.orm import Session
-from  src.modules.users.users_models import User, UserCreate
+from  src.modules.users.users_models import User, UserCreate, UserUpdate
 from src.core.repository.base_repository import BaseRepository
 from src.core.services.data_handling_service import DataHandlingService
 from src.core.decorators.service_error_handler import service_error_handler
@@ -43,8 +43,12 @@ class UsersService:
         return self.__repository.get_one(db=db, key=key, value=value)
     
     @service_error_handler(module=f"{__MODULE}.update")
-    def update(self, db: Session, user_id: UUID, changes: Dict[str, Any]) -> User:
-        return self.__repository.update(db=db, key="agent_id", value=user_id, changes=changes.model_dump(by_alias=False, exclude_unset=True))
+    def update(self, db: Session, user_id: UUID, changes: UserUpdate) -> User:
+        data = changes.model_dump(exlude={"old_password"}, by_alias=False, exclude_unset=True)
+        if changes.password:
+            hashed_password = self.__data_handler.hashing_service.hash_password(changes.password)
+            data["password"] = hashed_password
+        return self.__repository.update(db=db, key="user_id", value=user_id, changes=data)
     
     @service_error_handler(module=f"{__MODULE}.delete")
     def delete(self, db: Session, user_id: UUID) -> User:

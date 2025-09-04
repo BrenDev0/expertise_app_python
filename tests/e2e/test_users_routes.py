@@ -139,6 +139,34 @@ def test_login_incorrect_password():
         assert res.status_code == 400
         assert res.json()["detail"] == "Incorrect email or password"
 
+
+def test_update_user_profile_success():
+    with TestClient(app) as client:
+        payload = {
+            "name": "Updated Name",
+            "phone": "987654321"
+        }
+        res = client.patch(
+            "/users/secure/update",
+            headers=auth_header,
+            json=payload
+        )
+        assert res.status_code == 200
+        assert res.json()["detail"] == "User profile updated"
+
+def test_update_user_password_requires_old_password():
+    with TestClient(app) as client:
+        payload = {
+            "password": "newpassword123"
+        }
+        res = client.patch(
+            "/users/secure/update",
+            headers=auth_header,
+            json=payload
+        )
+        assert res.status_code == 400
+        assert res.json()["detail"] == "Previous password required to update password"
+
 # def test_delete_user():
 #     delete_token = ""
 
