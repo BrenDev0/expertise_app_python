@@ -10,11 +10,11 @@ from uuid import UUID
 from sqlalchemy.orm import Session
 from src.core.database.session import get_db_session
 from src.core.models.http_responses import CommonHttpResponse
-
+from src.core.middleware.hmac_verification import verify_hmac
 router = APIRouter(
     prefix="/agents",
     tags=["Agents"],
-    dependencies=[Depends(security)]
+    dependencies=[Depends(security), Depends(verify_hmac)]
 )
 
 def get_controller() -> AgentsController:

@@ -8,13 +8,14 @@ from src.modules.chats.chats_controller import ChatsController
 from src.modules.chats.chats_models import ChatPublic, ChatCreateResponse, ChatUpdate, ChatCreate
 from src.core.models.http_responses import CommonHttpResponse
 from src.core.middleware.middleware_service import security
+from src.core.middleware.hmac_verification import verify_hmac
 from uuid import UUID
 
 
 router = APIRouter(
     prefix="/chats",
     tags=["Chats"],
-    dependencies=[Depends(security)] 
+    dependencies=[Depends(security), Depends(verify_hmac)] 
 )
 
 def get_controller() -> ChatsController:
