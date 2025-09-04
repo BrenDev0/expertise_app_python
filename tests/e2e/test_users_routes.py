@@ -1,11 +1,16 @@
 from dotenv import load_dotenv
 load_dotenv()
 
+
 import os
+import hmac
+import hashlib
+import time
 
 import pytest
 from fastapi.testclient import TestClient
 from src.server import app
+
 
 
 
@@ -100,16 +105,38 @@ def test_resource_request_success():
         assert "isAdmin" in res.json()
         assert "password" not in res.json()
 
+
+
+def generate_hmac_headers():
+    secret = os.getenv("HMAC_SECRET")
+    if not secret:
+        raise ValueError("Missing HMAC_SECRET environment variable")
+    
+    # Use current timestamp in milliseconds as payload
+    payload = str(int(time.time() * 1000))
+    signature = hmac.new(
+        secret.encode('utf-8'),
+        payload.encode('utf-8'),
+        hashlib.sha256
+    ).hexdigest()
+    
+    return {
+        "x-payload": payload,
+        "x-signature": signature
+    }
 def test_login_success():
     with TestClient(app) as client:
+        headers = generate_hmac_headers()
         res = client.post(
             "/users/login",
+            headers=headers,
             json={
-                "email": "testemail@gmail.com",
+                "email": "testemail_TEST@gmail.com",
                 "password": "carpincha"
             }
         )
 
+        print(res, "RESPONSE")
         assert res.status_code == 200
         assert "token" in res.json()
 
