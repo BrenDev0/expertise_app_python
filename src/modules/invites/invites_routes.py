@@ -10,12 +10,13 @@ from src.core.middleware.middleware_service import security
 from src.core.middleware.permissions import is_owner
 from uuid import UUID
 from typing import List
+from src.core.middleware.hmac_verification import verify_hmac
 
 
 router = APIRouter(
     prefix="/invites",
     tags=["Invites"],
-    dependencies=[Depends(security), Depends(is_owner)]
+    dependencies=[Depends(security), Depends(verify_hmac), Depends(is_owner)]
 )
 
 

@@ -10,11 +10,12 @@ from src.core.middleware.auth_middleware import auth_middleware
 from src.core.middleware.middleware_service import security
 from uuid import UUID
 from typing import List
+from src.core.middleware.hmac_verification import verify_hmac
 
 router = APIRouter(
     prefix="/employees",
     tags=["Employees"],
-    dependencies=[Depends(security)]
+    dependencies=[Depends(security), Depends(verify_hmac)]
 )
 
 def get_controller():

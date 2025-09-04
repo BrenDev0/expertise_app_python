@@ -8,11 +8,12 @@ from src.core.middleware.middleware_service import security
 from src.core.middleware.auth_middleware import auth_middleware
 from src.core.dependencies.container import Container
 from uuid import UUID
+from src.core.middleware.hmac_verification import verify_hmac
 
 router = APIRouter(
     prefix="/chat-participants",
     tags=["Chat Participants"],
-    dependencies=[Depends(security)]
+    dependencies=[Depends(security), Depends(verify_hmac)]
 )
 
 def get_controller() -> ParticipantsController:

@@ -10,12 +10,12 @@ from src.core.database.session import get_db_session
 from sqlalchemy.orm import Session
 from src.modules.documents.documents_models import DocumentPublic
 from typing import List
-
+from src.core.middleware.hmac_verification import verify_hmac
 
 router = APIRouter(
     prefix="/documents",
     tags=["Documents"],
-    dependencies=[Depends(security)]
+    dependencies=[Depends(security), Depends(verify_hmac)]
 )
 
 def get_controller() -> DocumentsController:
