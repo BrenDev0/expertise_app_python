@@ -41,7 +41,7 @@ class RequestValidationService:
     
     @staticmethod
     def verify_company_in_request_state(req: Request):
-        company_id = req.state.company_id
+        company_id = company_id = getattr(req.state, "company_id", None)
 
         if not company_id:
             raise HTTPException(status_code=403, detail="Invalid credential")
