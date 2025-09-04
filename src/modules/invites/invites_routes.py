@@ -25,9 +25,8 @@ def get_controller() -> InvitesController:
     return controller
 
 
-@router.post("/secure/{company_id}", status_code=201, response_model=CommonHttpResponse)
+@router.post("/secure", status_code=201, response_model=CommonHttpResponse)
 def secure_create(
-    company_id: UUID,
     req: Request,
     data: InviteCreate = Body(...),
     db: Session = Depends(get_db_session),
@@ -40,7 +39,6 @@ def secure_create(
     Only admin level users have access to this endpoint. 
     """
     return controller.create_request(
-        company_id=company_id,
         req=req,
         data=data,
         db=db

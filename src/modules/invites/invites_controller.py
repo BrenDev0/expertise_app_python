@@ -12,27 +12,21 @@ from fastapi import Request, HTTPException
 from sqlalchemy.orm import Session
 from uuid import UUID
 
-class InvitesController:
-    def __init__(self, http_service: HttpService, invites_service: InvitesService, email_service: EmailService):
-        self.__http_service = http_service
-        self.__invites_service = invites_service
-        self.__email_service = email_service
+# class InvitesController:
+#     def __init__(self, http_service: HttpService, invites_service: InvitesService, email_service: EmailService):
+#         self.__http_service = http_service
+#         self.__invites_service = invites_service
+#         self.__email_service = email_service
 
     
     def create_request(
         self,
-        company_id: UUID,
         req: Request,
         data: InviteCreate,
         db: Session
     ) -> CommonHttpResponse:
         user: User = req.state.user
-
-        self.__http_service.request_validation_service.verify_company_user_relation(
-            db=db, 
-            user=user,
-            company_id=company_id
-        )
+        company_id  = self.__http_service.request_validation_service.verify_company_in_request_state(req=req)
 
         hashed_email = self.__http_service.hashing_service.hash_for_search(data=data.email)
         
