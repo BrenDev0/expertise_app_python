@@ -107,36 +107,20 @@ def test_resource_request_success():
 
 
 
-def generate_hmac_headers():
-    secret = os.getenv("HMAC_SECRET")
-    if not secret:
-        raise ValueError("Missing HMAC_SECRET environment variable")
-    
-    # Use current timestamp in milliseconds as payload
-    payload = str(int(time.time() * 1000))
-    signature = hmac.new(
-        secret.encode('utf-8'),
-        payload.encode('utf-8'),
-        hashlib.sha256
-    ).hexdigest()
-    
-    return {
-        "x-payload": payload,
-        "x-signature": signature
-    }
+
 def test_login_success():
     with TestClient(app) as client:
-        headers = generate_hmac_headers()
+        
         res = client.post(
             "/users/login",
-            headers=headers,
+           
             json={
                 "email": "testemail_TEST@gmail.com",
                 "password": "carpincha"
             }
         )
 
-        print(res, "RESPONSE")
+        print(res.json(), "RESPONSE")
         assert res.status_code == 200
         assert "token" in res.json()
 
