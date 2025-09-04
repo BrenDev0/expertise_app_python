@@ -61,7 +61,7 @@ def configure_container():
             region_name=os.getenv('AWS_REGION', 'us-east-1')
         )
     
-    bucket_name = os.getenv('S3_BUCKET_NAME')
+    bucket_name = os.getenv('AWS_BUCKET_NAME')
 
     s3_service = S3Service(
         client=s3_client,
