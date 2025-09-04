@@ -19,7 +19,6 @@ class S3Service:
     ) -> str:
         s3_key = self.__build_key(user_id=user_id, company_id=company_id, filename=file.filename)
         
-        # Read file content synchronously and wrap in BytesIO
         file_content = file.file.read()
         file_obj = io.BytesIO(file_content)
         

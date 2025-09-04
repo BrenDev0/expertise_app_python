@@ -58,7 +58,7 @@ def secure_collection(
     return controller.collection_request(req=req, db=db)
 
 @router.delete("/secure/{document_id}", status_code=200, response_model=CommonHttpResponse)
-def secure_delete(
+async def secure_delete(
     document_id: UUID,
     req: Request,
     _: None = Depends(is_owner),
@@ -72,4 +72,4 @@ def secure_delete(
     Only admin level users have access to this endpoint.
 
     """
-    return controller.delete_request(document_id=document_id, req=req, db=db)
+    return await controller.delete_request(document_id=document_id, req=req, db=db)
