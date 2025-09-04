@@ -12,6 +12,7 @@ from src.modules.chats.messages import messages_routes
 from src.modules.chats.participants import participants_routes
 from src.modules.users import users_routes
 from src.core.dependencies.configure_container import configure_container
+from src.core.middleware.hmac_verification import verify_hmac
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -36,6 +37,8 @@ async def health():
     This endpoints verifies server status.
     """
     return {"status": "ok"}
+
+app.add_middleware(verify_hmac)
 
 app.include_router(agents_routes.router)
 app.include_router(chats_routes.router)
