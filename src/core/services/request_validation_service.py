@@ -39,7 +39,7 @@ class RequestValidationService:
         if id != resource_id:
             raise HTTPException(status_code=403, detail="Forbidden")
     
-    
+    @staticmethod
     def verify_company_in_request_state(req: Request):
         company_id = req.state.company_id
 
