@@ -63,9 +63,8 @@ def secure_resource(
         db=db
     )
 
-@router.get("/secure/collection/{company_id}", status_code=200, response_model=List[InvitePublic])
+@router.get("/secure/collection", status_code=200, response_model=List[InvitePublic])
 def secure_collection(
-    company_id: UUID,
     req: Request,
     db: Session = Depends(get_db_session),
     controller: InvitesController = Depends(get_controller)
@@ -77,7 +76,6 @@ def secure_collection(
     Only admin level users have access to this endpoint. 
     """
     return controller.collection_request(
-        company_id=company_id,
         req=req,
         db=db
     )
