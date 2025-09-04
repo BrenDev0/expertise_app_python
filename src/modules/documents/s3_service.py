@@ -16,7 +16,7 @@ class S3Service:
         company_id: UUID,
         user_id: UUID
     ) -> str:
-        s3_key = self.__get_key(user_id=user_id, company_id=company_id, filename=file.filename)
+        s3_key = self.__build_key(user_id=user_id, company_id=company_id, filename=file.filename)
         self.s3_client.upload_fileobj(file, self.bucket_name, s3_key)
 
         file_url = f"https://{self.bucket_name}.s3.amazonaws.com/{s3_key}"
