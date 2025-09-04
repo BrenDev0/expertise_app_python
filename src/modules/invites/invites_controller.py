@@ -12,11 +12,11 @@ from fastapi import Request, HTTPException
 from sqlalchemy.orm import Session
 from uuid import UUID
 
-# class InvitesController:
-#     def __init__(self, http_service: HttpService, invites_service: InvitesService, email_service: EmailService):
-#         self.__http_service = http_service
-#         self.__invites_service = invites_service
-#         self.__email_service = email_service
+class InvitesController:
+    def __init__(self, http_service: HttpService, invites_service: InvitesService, email_service: EmailService):
+        self.__http_service = http_service
+        self.__invites_service = invites_service
+        self.__email_service = email_service
 
     
     def create_request(
