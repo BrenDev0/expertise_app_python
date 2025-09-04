@@ -2,6 +2,7 @@ from fastapi import UploadFile
 from src.core.decorators.service_error_handler import service_error_handler
 from uuid import UUID
 from typing import Optional
+import io
 
 class S3Service:
     __MODULE = "s3.service"
@@ -17,7 +18,12 @@ class S3Service:
         user_id: UUID
     ) -> str:
         s3_key = self.__build_key(user_id=user_id, company_id=company_id, filename=file.filename)
-        self.s3_client.upload_fileobj(file, self.bucket_name, s3_key)
+        
+        # Read file content synchronously and wrap in BytesIO
+        file_content = file.file.read()
+        file_obj = io.BytesIO(file_content)
+        
+        self.s3_client.upload_fileobj(file_obj, self.bucket_name, s3_key)
 
         file_url = f"https://{self.bucket_name}.s3.amazonaws.com/{s3_key}"
 
