@@ -96,11 +96,11 @@ class EmployeesController:
 
     def collection_request(
         self,
-        company_id: UUID,
         req: Request,
         db: Session,
     ) -> List[EmployeePublic]:
         user: User = req.state.user
+        company_id = self.__http_service.request_validation_service.verify_company_in_request_state(req=req)
 
         company_resource: Company = self.__http_service.request_validation_service.verify_resource(
             service_key="companies_service",
