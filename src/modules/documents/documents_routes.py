@@ -22,9 +22,8 @@ def get_controller() -> DocumentsController:
     controller =  Container.resolve("documents_controller")
     return controller
 
-@router.post("/secure/upload/{company_id}", status_code=201, response_model=CommonHttpResponse)
+@router.post("/secure/upload", status_code=201, response_model=CommonHttpResponse)
 def secure_upload(
-    company_id: UUID,
     req: Request,
     file: UploadFile = File(...),
     _: None = Depends(is_owner),
@@ -38,15 +37,13 @@ def secure_upload(
     Only admin level users have access to this endpoint. 
     """
     return controller.upload_request(
-        company_id=company_id,
         req=req,
         db=db,
         file=file
     )
 
-@router.get("/secure/collection/{company_id}", status_code=200, response_model=List[DocumentPublic])
+@router.get("/secure/collection", status_code=200, response_model=List[DocumentPublic])
 def secure_collection(
-    company_id: UUID,
     req: Request,
     _: None = Depends(is_owner),
     db: Session = Depends(get_db_session),
@@ -58,7 +55,7 @@ def secure_collection(
     This endpoint gets all documents uploaded by a company.
     Only admin level users have access to this endpoint. 
     """
-    return controller.collection_request(company_id=company_id, req=req, db=db)
+    return controller.collection_request(req=req, db=db)
 
 @router.delete("/secure/{document_id}", status_code=200, response_model=CommonHttpResponse)
 def secure_delete(
