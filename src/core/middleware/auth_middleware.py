@@ -24,6 +24,7 @@ async def auth_middleware(request: Request, db: Session = Depends(get_db_session
             status_code=403
         )
 
+        print(company_resource, "REsource::::::::::")
         request.state.company_id = company_id
 
    
