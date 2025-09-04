@@ -11,6 +11,11 @@ async def auth_middleware(request: Request, db: Session = Depends(get_db_session
     user, token_payload = middleware_service.auth(request=request, db=db)
 
     request.state.user = user
+
+    company_id = token_payload.get("company_id")
+    if company_id:
+        request.state.company_id = company_id
+
    
     return user
     

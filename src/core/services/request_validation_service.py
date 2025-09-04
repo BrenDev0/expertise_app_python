@@ -1,5 +1,5 @@
 import uuid
-from fastapi import HTTPException
+from fastapi import HTTPException, Request
 from typing import List, Dict, Any
 from src.core.dependencies.container import Container
 from src.modules.companies.companies_models import Company
@@ -39,7 +39,15 @@ class RequestValidationService:
         if id != resource_id:
             raise HTTPException(status_code=403, detail="Forbidden")
     
-       
+    
+    def verify_company_in_request_state(req: Request):
+        company_id = req.state.company_id
+
+        if not company_id:
+            raise HTTPException(status_code=403, detail="Invalid credential")
+        
+        return company_id
+
     def verify_company_user_relation(
         self,
         db: Session,
