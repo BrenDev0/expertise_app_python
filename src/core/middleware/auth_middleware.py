@@ -12,7 +12,7 @@ async def auth_middleware(request: Request, db: Session = Depends(get_db_session
 
     request.state.user = user
 
-    company_id = token_payload.get("company_id")
+    company_id = token_payload.get("company_id", None)
     if company_id:
         company_resource = middleware_service.http_service.request_validation_service.verify_resource(
             service_key="companies_service",
@@ -28,5 +28,5 @@ async def auth_middleware(request: Request, db: Session = Depends(get_db_session
         request.state.company_id = company_id
 
    
-    return user, company_resource
+    return user
     
