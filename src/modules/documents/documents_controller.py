@@ -18,7 +18,7 @@ class DocumentsController:
         self.__documents_service = documents_service
         self.__embeddings_service = embeddings_service
 
-    def upload_request(
+    async def upload_request(
         self,
         req: Request,
         db: Session,
@@ -42,7 +42,7 @@ class DocumentsController:
 
         self.__documents_service.create(db=db, company_id=company_resource.company_id, filename=file.filename, url=s3_url)
 
-        self.__embeddings_service.add_document(
+        await self.__embeddings_service.add_document(
             s3_url=s3_url, 
             filename=file.filename, 
             user_id=user.user_id, 
