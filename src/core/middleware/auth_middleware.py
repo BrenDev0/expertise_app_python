@@ -14,8 +14,18 @@ async def auth_middleware(request: Request, db: Session = Depends(get_db_session
 
     company_id = token_payload.get("company_id")
     if company_id:
+        company_resource = middleware_service.http_service.request_validation_service.verify_resource(
+            service_key="companies_service",
+            params={
+                "db": db,
+                "company_id": company_id
+            },
+            not_found_message="Invalid credentials",
+            status_code=403
+        )
+
         request.state.company_id = company_id
 
    
-    return user
+    return user, company_resource
     
