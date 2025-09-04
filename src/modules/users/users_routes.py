@@ -8,10 +8,12 @@ from src.core.dependencies.container import Container
 from src.core.middleware.middleware_service import security
 from src.core.middleware.auth_middleware import auth_middleware
 from src.core.middleware.verification_middleware import verification_middleware
+from src.core.middleware.hmac_verification import verify_hmac
 
 router = APIRouter(
     prefix="/users",
-    tags=["users"]
+    tags=["users"],
+    dependencies=([Depends(verify_hmac)])
 )
 
 def get_controller() -> UsersController:
