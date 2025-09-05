@@ -176,7 +176,7 @@ def login(
     )
 
 
-@router.post("/account-recovery", status_code=200, response_model=CommonHttpResponse)
+@router.post("/account-recovery", status_code=200, response_model=ResponseWithToken)
 def account_recovery(
     req: Request,
     data: VerifyEmail = Body(...),
