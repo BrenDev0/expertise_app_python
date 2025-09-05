@@ -176,7 +176,7 @@ def login(
     )
 
 
-@router.post("/account-recovery", status_code=200, response_model=CommonHttpResponse)
+@router.post("/account-recovery", status_code=200, response_model=ResponseWithToken)
 def account_recovery(
     req: Request,
     data: VerifyEmail = Body(...),
@@ -187,7 +187,7 @@ def account_recovery(
     ## Acount recovery request
 
     This endpoint will send a link to the users email to change password.
-    This link will have a parameter 'token', this token is needed for the verified update request.
+    Will recive a verification token needed for verified update request.
     """
     return controller.account_recovery_request(
         req=req,

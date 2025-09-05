@@ -59,7 +59,7 @@ class UsersController:
         req: Request,
         data: VerifyEmail,
         db: Session
-    ) -> CommonHttpResponse:
+    ) -> ResponseWithToken:
         email_hash = self.__http_service.hashing_service.hash_for_search(data.email)
 
         user_exists: User =  self.__http_service.request_validation_service.verify_resource(
