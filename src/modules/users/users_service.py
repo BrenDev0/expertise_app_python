@@ -1,5 +1,5 @@
 from sqlalchemy.orm import Session
-from  src.modules.users.users_models import User, UserCreate, UserUpdate
+from  src.modules.users.users_models import User, UserCreate, UserUpdate, VerifiedUserUpdate
 from src.core.repository.base_repository import BaseRepository
 from src.core.services.data_handling_service import DataHandlingService
 from src.core.decorators.service_error_handler import service_error_handler
@@ -39,19 +39,24 @@ class UsersService:
         return self.__repository.get_one(db=db, key=key, value=value)
     
     @service_error_handler(module=f"{__MODULE}.update")
-    def update(self, db: Session, user_id: UUID, changes: UserUpdate) -> User:
-        data = changes.model_dump(exclude={"old_password"}, by_alias=False, exclude_unset=True)
-        if changes.password:
+    def update(self, db: Session, user_id: UUID, changes: UserUpdate | VerifiedUserUpdate) -> User:
+        data = changes.model_dump(exclude={"old_password", "code"}, by_alias=False, exclude_unset=True)
+
+        fields_to_encrypt = ["name", "email", "phone"]
+        for key in fields_to_encrypt:
+            value = getattr(changes, key, None)
+            if value not in (None, ""):
+                data[key] = self.__data_handler.encryption_service.encrypt(value)
+
+        if changes.email:
+            email_hash = self.__data_handler.hashing_service.hash_for_search(changes.email)
+            data["email_hash"] = email_hash
+        
+        if getattr(changes, "password"):
             hashed_password = self.__data_handler.hashing_service.hash_password(changes.password)
             data["password"] = hashed_password
 
-        if changes.name:
-            encrypted_name = self.__data_handler.encryption_service.encrypt(changes.name)
-            data["name"] = encrypted_name
-
-        if changes.phone:
-            encrypted_phone = self.__data_handler.encryption_service.encrypt(changes.phone)
-            data["phone"] = encrypted_phone
+       
             
         return self.__repository.update(db=db, key="user_id", value=user_id, changes=data)
     

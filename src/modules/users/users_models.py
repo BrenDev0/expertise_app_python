@@ -42,6 +42,11 @@ class UserUpdate(UsersConfig):
     password: Optional[str] = None
     old_password: Optional[str] = None
 
+class VerifiedUserUpdate(UsersConfig):
+    email: Optional[EmailStr] = None
+    password: Optional[str] = None
+    code: int
+
 class UserCreate(UsersConfig):
     name: str
     phone: str

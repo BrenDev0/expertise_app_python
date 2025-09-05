@@ -1,8 +1,7 @@
 import os
 import smtplib
 from email.message import EmailMessage
-from typing import Dict, Any
-from src.core.services.webtoken_service import WebTokenService
+from typing import Dict, Any, Union
 from fastapi import HTTPException
 from uuid import UUID
 from src.core.decorators.service_error_handler import service_error_handler
@@ -36,29 +35,20 @@ class EmailService:
 
 
     @service_error_handler(module=__MODULE)
-    def handle_request(self, email: str, type_: str, webtoken_service: WebTokenService, invitation_id: UUID = None) -> str:
-        if type_ == "INVITE":
-            token = webtoken_service.generate_token(
-                {"verification_code": str(invitation_id)}, "1d"
-            )
-            email_payload = self.invitation_email_builder(email, invitation_id)
-            self.send(email_payload)
-            return token
-
-        code = int(1000 + os.urandom(2)[0] % 900000)
-        token = webtoken_service.generate_token(
-            {"verification_code": code}, "15m"
-        )
-
+    def handle_request(self, email: str, type_: int, custom_code: Union[str, UUID] = None) -> str:
+        code = int(1000 + os.urandom(2)[0] % 900000) 
+        
         if type_ == "UPDATE":
             email_payload = self.update_email_builder(email, code)
         elif type_ == "RECOVERY":
             email_payload = self.account_recovery_email_builder(email, code)
+        elif type_ == "INVITE":
+            email_payload = self.invitation_email_builder(email, str(custom_code))
         elif type_ == "NEW":
             email_payload = self.verification_email_builder(email, code)
 
         self.send(email_payload)
-        return token
+        return code 
     
     def invitation_email_builder(self, email: str, token: str) -> dict:
         invite_url = f"https://expertise-ai-tan.vercel.app/invitation?token={token}"
