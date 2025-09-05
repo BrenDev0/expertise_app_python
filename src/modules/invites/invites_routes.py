@@ -19,8 +19,6 @@ router = APIRouter(
     dependencies=[Depends(security), Depends(verify_hmac), Depends(is_owner)]
 )
 
-
-
 def get_controller() -> InvitesController:
     controller = Container.resolve("invites_controller")
     return controller
@@ -37,6 +35,7 @@ def secure_create(
     ## Create request
 
     This endpoint will send an account invite email.
+    The email sent will have a link with the token attached as a parameter, token is needed fro next step.
     Only admin level users have access to this endpoint. 
     """
     return controller.create_request(
