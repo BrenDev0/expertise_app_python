@@ -63,7 +63,8 @@ class UsersController:
         req: Request,
         db: Session
     ) -> UserPublic:
-        data = self.__to_public(data=req.state.user)
+        user: User = req.state.user
+        data = self.__to_public(data=user)
 
         return data
 
@@ -76,8 +77,16 @@ class UsersController:
     ) -> CommonHttpResponse:
         user: User = req.state.user
 
-        if data.password and not data.old_password:
-            raise HTTPException(status_code=400, detail="Previous password required to update password")
+        if data.password:
+            if not data.old_password:
+                raise HTTPException(status_code=400, detail="Previous password required to update password")
+            
+            self.__http_service.hashing_service.compare_password(data.old_password, user.password)
+
+            requested_same_password = self.__http_service.hashing_service.compare_password(data.password, user.password, throw_error=False)
+            if requested_same_password:
+                raise HTTPException(status_code=400, detail="New password must not match current password")
+        
         
         self.__users_service.update(db=db, user_id=user.user_id, changes=data)
 

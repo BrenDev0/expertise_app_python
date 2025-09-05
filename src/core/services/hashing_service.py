@@ -16,7 +16,10 @@ class HashingService:
         return hashed.decode('utf-8')
 
     @staticmethod
-    def compare_password(password: str, hashed_password: str, status_code: int = 400, detail: str = "Incorrect_password") -> bool:
+    def compare_password(password: str, hashed_password: str, status_code: int = 400, detail: str = "Incorrect password", throw_error: bool = True) -> bool:
         if not bcrypt.checkpw(password.encode('utf-8'), hashed_password.encode('utf-8')):
-            raise HTTPException(status_code=status_code, detail=detail)
+            if throw_error:
+                raise HTTPException(status_code=status_code, detail=detail)
+            else:
+                return False
         return True
