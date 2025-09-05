@@ -2,7 +2,7 @@ from  fastapi import Request, HTTPException
 from sqlalchemy.orm import Session
 from src.core.services.http_service import HttpService
 from src.modules.users.users_service import UsersService
-from src.modules.users.users_models import UserPublic, User, UserCreate, UserLogin, VerifyEmail, UserLogin, UserUpdate
+from src.modules.users.users_models import UserPublic, User, UserCreate, UserLogin, VerifyEmail, UserLogin, UserUpdate, VerifiedUserUpdate
 from src.core.models.http_responses import CommonHttpResponse, ResponseWithToken
 from src.core.dependencies.container import Container
 from src.core.services.email_service import EmailService
@@ -18,23 +18,75 @@ class UsersController:
 
     def verify_email(
         self,
+        req: Request,
+        data: VerifyEmail,
         db: Session,
-        data: VerifyEmail
+        is_update: bool = False
     ) -> ResponseWithToken:
-        hashed_email = self.__http_service.hashing_service.hash_for_search(data.email)
+        token_payload = {}
 
+        if is_update:
+            user:User = getattr(req.state, "user", None)
+
+            if not user:
+                raise HTTPException(status_code=403, detail="forbidden")
+            
+            token_payload["user_id"] = str(user.user_id)
+
+        hashed_email = self.__http_service.hashing_service.hash_for_search(data.email)
+        email_type = "NEW" if not is_update else "UPDATE"
         user_exists = self.__users_service.resource(db=db, key="email_hash", value=hashed_email)
 
         if user_exists:
             raise HTTPException(status_code=400, detail="Email in use")
         
         email_service: EmailService = Container.resolve("email_service")
-        token = email_service.handle_request(email=data.email, type_="NEW", webtoken_service=self.__http_service.webtoken_service)
+
+        verification_code = email_service.handle_request(email=data.email, type_=email_type)
+
+        token_payload["verification_code"] = verification_code
+
+        token = self.__http_service.webtoken_service.generate_token(token_payload, "15m")
+
+       
+        return ResponseWithToken(
+            detail="Email sent",
+            token=token
+        ) 
+    
+    def account_recovery_request(
+        self,
+        req: Request,
+        data: VerifyEmail,
+        db: Session
+    ) -> CommonHttpResponse:
+        email_hash = self.__http_service.hashing_service.hash_for_search(data.email)
+
+        user_exists: User =  self.__http_service.request_validation_service.verify_resource(
+            service_key="users_service",
+            params={
+                "db": db,
+                "key": "email_hash",
+                "value": email_hash
+            },
+            not_found_message="User profile not found"
+        )
+
+        email_service: EmailService = Container.resolve("email_service")
+        verification_code = email_service.handle_request(email=data.email, type_="RECOVERY")
+
+        token = self.__http_service.webtoken_service.generate_token({
+            "verification_code": verification_code,
+            "user_id": str(user_exists.user_id)
+        }, "15m")
 
         return ResponseWithToken(
             detail="Email sent",
             token=token
-        )
+        ) 
+
+        
+        
 
     def create_request(
         self,
@@ -68,6 +120,28 @@ class UsersController:
 
         return data
 
+
+    def verified_update_request(
+        self,
+        req: Request,
+        data: VerifiedUserUpdate,
+        db: Session
+    ) -> CommonHttpResponse:
+        verification_code = req.state.verification_code
+        user: User = getattr(req.state, "user", None)
+
+        if not user or data.code != verification_code: 
+            raise HTTPException(status_code=403, detail="Unauthorized")
+
+        requested_same_password = self.__http_service.hashing_service.compare_password(data.password, user.password, throw_error=False)
+        if requested_same_password:
+            raise HTTPException(status_code=400, detail="New password must not match current password")
+        
+        self.__users_service.update(db=db, user_id=user.user_id, changes=data)
+
+        return CommonHttpResponse(
+            detail="User profile updated"
+        )
 
     def update_request(
         self,

@@ -24,6 +24,7 @@ def get_controller() -> UsersController:
 
 @router.post("/verify-email", status_code=200, response_model=ResponseWithToken)
 def verify_email(
+    req: Request,
     data: VerifyEmail = Body(...),
     db: Session = Depends(get_db_session),
     controller: UsersController = Depends(get_controller)
@@ -36,10 +37,31 @@ def verify_email(
     """
 
     return controller.verify_email(
+        req=req,
+        data=data,
         db=db,
-        data=data
     )
 
+@router.post("/secure/verify-email", status_code=200, response_model=ResponseWithToken)
+def secure_verify_email(
+    req: Request,
+    data: VerifyEmail = Body(...),
+    _: None = Depends(auth_middleware),
+    db: Session = Depends(get_db_session),
+    controller: UsersController = Depends(get_controller)
+):
+    """
+    ## Verify email for Update email request
+
+    This endpoint will send a verification code to the email.
+    Auth headers required for request.
+    """
+    return controller.verify_email(
+        req=req,
+        data=data,
+        db=db,
+        is_update=True
+    )
 
 @router.post("/verified/create", status_code=201, response_model=ResponseWithToken, dependencies=[Depends(security)])
 def verifies_create(
@@ -132,4 +154,24 @@ def login(
     return controller.login(
         db=db, 
         data=data
+    )
+
+
+@router.post("/account-recovery", status_code=200, response_model=CommonHttpResponse)
+def account_recovery(
+    req: Request,
+    data: VerifyEmail = Body(...),
+    db: Session = Depends(get_db_session),
+    controller: UsersController = Depends(get_controller)
+):
+    """
+    ## Acount recovery request
+
+    This endpoint will send a link to the users email to change password.
+    This link will have a parameter 'token', this token is needed for the verified update request.
+    """
+    return controller.account_recovery_request(
+        req=req,
+        data=data,
+        db=db
     )

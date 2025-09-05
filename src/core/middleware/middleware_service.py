@@ -53,7 +53,7 @@ class MiddlewareService:
         if verification_code is None:
             raise HTTPException(status_code=403, detail="Unauthorized")
         
-        return verification_code
+        return verification_code, token_payload
 
 
         

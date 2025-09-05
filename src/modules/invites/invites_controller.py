@@ -38,11 +38,14 @@ class InvitesController:
 
         invite = self.__invites_service.create(db=db, data=data, company_id=company_id)
 
+        token = self.__http_service.webtoken_service.generate_token({
+            "verification_code": str(invite.invite_id) 
+        }, "24h")
+
         self.__email_service.handle_request(
             email=data.email,
             type_="INVITE", 
-            webtoken_service=self.__http_service.webtoken_service,
-            invitation_id=invite.invite_id
+            custom_code=token
         )
 
         return CommonHttpResponse(
