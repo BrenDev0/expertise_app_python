@@ -106,8 +106,6 @@ def test_resource_request_success():
         assert "password" not in res.json()
 
 
-
-
 def test_login_success():
     with TestClient(app) as client:
         
@@ -115,12 +113,11 @@ def test_login_success():
             "/users/login",
            
             json={
-                "email": "testemail_TEST@gmail.com",
+                "email": "testemail@gmail.com",
                 "password": "carpincha"
             }
         )
 
-        print(res.json(), "RESPONSE")
         assert res.status_code == 200
         assert "token" in res.json()
 
@@ -138,6 +135,80 @@ def test_login_incorrect_password():
 
         assert res.status_code == 400
         assert res.json()["detail"] == "Incorrect email or password"
+
+
+def test_update_user_profile_success():
+    with TestClient(app) as client:
+        payload = {
+            "name": "Updated Name",
+            "phone": "987654321"
+        }
+        res = client.patch(
+            "/users/secure/update",
+            headers=auth_header,
+            json=payload
+        )
+        assert res.status_code == 200
+        assert res.json()["detail"] == "User profile updated"
+
+def test_update_user_password_requires_old_password():
+    with TestClient(app) as client:
+        payload = {
+            "password": "newpassword123"
+        }
+        res = client.patch(
+            "/users/secure/update",
+            headers=auth_header,
+            json=payload
+        )
+        assert res.status_code == 400
+        assert res.json()["detail"] == "Previous password required to update password"
+
+
+
+# def test_update_user_password_same_as_current():
+#     with TestClient(app) as client:
+#         payload = {
+#             "password": "carpincha",      
+#             "old_password": "carpincha"
+#         }
+#         res = client.patch(
+#             "/users/secure/update",
+#             headers=auth_header,
+#             json=payload
+#         )
+#         assert res.status_code == 400
+#         assert res.json()["detail"] == "New password must not match current password"
+
+def test_update_user_password_incorrect_current_password():
+    with TestClient(app) as client:
+        payload = {
+            "password": "carpinchaloaca",      
+            "old_password": "carpinchasssssssssss"
+        }
+        res = client.patch(
+            "/users/secure/update",
+            headers=auth_header,
+            json=payload
+        )
+        assert res.status_code == 400
+        assert res.json()["detail"] == "Incorrect password"
+
+# def test_update_user_password_success():
+#     with TestClient(app) as client:
+#         payload = {
+#             "password": "carpincha",
+#             "old_password": "lacarpinchaloca"  
+#         }
+#         res = client.patch(
+#             "/users/secure/update",
+#             headers=auth_header,
+#             json=payload
+#         )
+#         assert res.status_code == 200
+#         assert res.json()["detail"] == "User profile updated"
+
+
 
 # def test_delete_user():
 #     delete_token = ""

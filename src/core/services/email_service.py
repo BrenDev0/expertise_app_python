@@ -5,9 +5,11 @@ from typing import Dict, Any
 from src.core.services.webtoken_service import WebTokenService
 from fastapi import HTTPException
 from uuid import UUID
+from src.core.decorators.service_error_handler import service_error_handler
 
 
 class EmailService:
+    __MODULE = "email.service"
     def __init__(self):
         self.host = os.getenv("MAILER_HOST")
         self.port = int(os.getenv("MAILER_PORT", 587))
@@ -32,6 +34,8 @@ class EmailService:
         except Exception as e:
             raise HTTPException(status_code=400, detail="Unable to send email")
 
+
+    @service_error_handler(module=__MODULE)
     def handle_request(self, email: str, type_: str, webtoken_service: WebTokenService, invitation_id: UUID = None) -> str:
         if type_ == "INVITE":
             token = webtoken_service.generate_token(

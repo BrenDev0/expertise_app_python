@@ -2,7 +2,7 @@ from  fastapi import Request, HTTPException
 from sqlalchemy.orm import Session
 from src.core.services.http_service import HttpService
 from src.modules.users.users_service import UsersService
-from src.modules.users.users_models import UserPublic, User, UserCreate, UserLogin, VerifyEmail, UserLogin
+from src.modules.users.users_models import UserPublic, User, UserCreate, UserLogin, VerifyEmail, UserLogin, UserUpdate
 from src.core.models.http_responses import CommonHttpResponse, ResponseWithToken
 from src.core.dependencies.container import Container
 from src.core.services.email_service import EmailService
@@ -63,10 +63,36 @@ class UsersController:
         req: Request,
         db: Session
     ) -> UserPublic:
-        data = self.__to_public(data=req.state.user)
+        user: User = req.state.user
+        data = self.__to_public(data=user)
 
         return data
 
+
+    def update_request(
+        self,
+        req: Request,
+        data: UserUpdate,
+        db: Session,
+    ) -> CommonHttpResponse:
+        user: User = req.state.user
+
+        if data.password:
+            if not data.old_password:
+                raise HTTPException(status_code=400, detail="Previous password required to update password")
+            
+            self.__http_service.hashing_service.compare_password(data.old_password, user.password)
+
+            requested_same_password = self.__http_service.hashing_service.compare_password(data.password, user.password, throw_error=False)
+            if requested_same_password:
+                raise HTTPException(status_code=400, detail="New password must not match current password")
+        
+        
+        self.__users_service.update(db=db, user_id=user.user_id, changes=data)
+
+        return CommonHttpResponse(
+            detail="User profile updated"
+        )
 
     def delete_request(
         self,

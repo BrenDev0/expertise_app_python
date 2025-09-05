@@ -4,6 +4,7 @@ from src.core.dependencies.container import Container
 from src.core.middleware.middleware_service import MiddlewareService
 from   src.core.database.session import get_db_session
 from sqlalchemy.orm import Session
+from src.modules.companies.companies_models import Company
 
 
 async def auth_middleware(request: Request, db: Session = Depends(get_db_session)):
@@ -14,7 +15,7 @@ async def auth_middleware(request: Request, db: Session = Depends(get_db_session
 
     company_id = token_payload.get("company_id", None)
     if company_id:
-        company_resource = middleware_service.http_service.request_validation_service.verify_resource(
+        company_resource: Company = middleware_service.http_service.request_validation_service.verify_resource(
             service_key="companies_service",
             params={
                 "db": db,
@@ -24,8 +25,7 @@ async def auth_middleware(request: Request, db: Session = Depends(get_db_session
             status_code=403
         )
 
-        print(company_resource, "REsource::::::::::")
-        request.state.company_id = company_id
+        request.state.company_id = company_resource.company_id
 
    
     return user

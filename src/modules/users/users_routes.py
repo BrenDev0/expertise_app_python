@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, Body, Request
 from src.modules.users.users_controller import UsersController
 from src.core.models.http_responses import CommonHttpResponse, ResponseWithToken
-from src.modules.users.users_models import UserCreate, UserPublic, UserLogin, VerifyEmail
+from src.modules.users.users_models import UserCreate, UserPublic, UserLogin, VerifyEmail, UserUpdate
 from src.core.database.session import get_db_session
 from sqlalchemy.orm import Session
 from src.core.dependencies.container import Container
@@ -77,6 +77,26 @@ def secure_resource(
     """
     return controller.resource_request(
         req=req,
+        db=db
+    )
+
+@router.patch("/secure/update", status_code=200, response_model=CommonHttpResponse)
+def secure_update(
+    req: Request,
+    data: UserUpdate,
+    _: None = Depends(auth_middleware),
+    db: Session = Depends(get_db_session),
+    controller: UsersController = Depends(get_controller)
+):
+    """
+    ## Update request 
+
+    This endpoint will update a users profile info.
+    If updating password, previous password must be provided.
+    """
+    return controller.update_request(
+        req=req,
+        data=data,
         db=db
     )
 

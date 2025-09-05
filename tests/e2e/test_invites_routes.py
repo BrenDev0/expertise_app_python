@@ -11,22 +11,22 @@ auth_header = {
     "Authorization": f"Bearer {token}"
 }
 
-company_id = ""
 invite_id = ""
 
 # def test_create_invite_success():
 #     with TestClient(app) as client:
 #         payload = {
-#             "name": "Test User",
-#             "email": f"testuser2_@example.com",
+#             "name": "jose dev",
+#             "email": f"brendan.soullens@gmail.com",
 #             "phone": "1234567890",
 #             "position": "accountant"
 #         }
 #         res = client.post(
-#             f"/invites/secure/{company_id}",
+#             f"/invites/secure",
 #             headers=auth_header,
 #             json=payload
 #         )
+
 #         assert res.status_code == 201
 #         assert res.json()["detail"].lower().startswith("invita")
 
@@ -36,7 +36,7 @@ def test_create_invite_email_in_use():
 def test_invite_collection():
     with TestClient(app) as client:
         res = client.get(
-            f"/invites/secure/collection/{company_id}",
+            f"/invites/secure/collection",
             headers=auth_header
         )
         assert res.status_code == 200
