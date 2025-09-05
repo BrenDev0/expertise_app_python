@@ -42,7 +42,7 @@ def verify_email(
         db=db,
     )
 
-@router.post("/secure/verify-email", status_code=200, response_model=ResponseWithToken)
+@router.post("/secure/verify-email", status_code=200, response_model=ResponseWithToken, dependencies=[Depends(security)])
 def secure_verify_email(
     req: Request,
     data: VerifyEmail = Body(...),
@@ -102,7 +102,7 @@ def secure_resource(
         db=db
     )
 
-@router.patch("/secure/update", status_code=200, response_model=CommonHttpResponse)
+@router.patch("/secure/update", status_code=200, response_model=CommonHttpResponse, dependencies=[Depends(security)])
 def secure_update(
     req: Request,
     data: UserUpdate,
@@ -122,7 +122,7 @@ def secure_update(
         db=db
     )
 
-@router.patch("/verified/update", status_code=200, response_model=CommonHttpResponse)
+@router.patch("/verified/update", status_code=200, response_model=CommonHttpResponse, dependencies=[Depends(security)])
 def verified_update(
     req: Request,
     data: VerifiedUserUpdate = Body(...),
