@@ -12,7 +12,7 @@ class MessagesService():
 
     @service_error_handler(f"{__MODULE}.create")
     def create(self, db: Session, chat_id: UUID, sender_id: UUID, message_type: UUID, text: str)-> Message:     
-        message = MessageCreate(
+        message = Message(
             chat_id=chat_id,
             sender=sender_id,
             message_type=message_type,
