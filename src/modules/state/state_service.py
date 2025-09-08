@@ -41,7 +41,7 @@ class StateService:
         if len(chat_history) > num_of_messages:
             chat_history.pop()  
         
-        await self.__redis_service.set_session(session_key, state.model_dump(), expire_seconds=7200) #2 hours 
+        await self.__redis_service.set_session(session_key, state.model_dump_json(), expire_seconds=7200) #2 hours 
 
     @service_error_handler(f"{__MODULE}.ensure_chat_state")
     async def ensure_chat_state(self, db: Session, chat_id: UUID, input: str, user_id: UUID, company_id: UUID, agents: List[str]) -> WorkerState:
@@ -65,7 +65,7 @@ class StateService:
             company_id=str(company_id)
         )
 
-        await self.__redis_service.set_session(session_key, state.model_dump(), expire_seconds=7200) #2 hours 
+        await self.__redis_service.set_session(session_key, state.model_dump_json(), expire_seconds=7200) #2 hours 
         return state
     
     @staticmethod
