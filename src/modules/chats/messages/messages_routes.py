@@ -13,8 +13,7 @@ from src.core.models.http_responses import CommonHttpResponse
 
 router = APIRouter(
     prefix="/messages",
-    tags=["Messages"],
-    dependencies=[Depends(security)] 
+    tags=["Messages"]
 )
 
 def get_controller():
@@ -34,7 +33,7 @@ def internal_create(
     """
     return controller.create_request(chat_id=chat_id, data=data, db=db)
 
-@router.get("/secure/collection/{chat_id}", status_code=200, response_model=List[MessagePublic])
+@router.get("/secure/collection/{chat_id}", status_code=200, response_model=List[MessagePublic], dependencies=[Depends(security)] )
 def secure_collection( 
     chat_id: UUID,
     req: Request,
