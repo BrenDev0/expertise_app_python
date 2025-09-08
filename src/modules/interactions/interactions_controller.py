@@ -40,11 +40,11 @@ class InteractionsController:
         
         worker_state: WorkerState = await self.__state_service.ensure_chat_state(
             db=db,
-            chat_id=chat_resource.chat_id,
+            chat_id=str(chat_resource.chat_id),
             input=data.input,
             user_id=data.user_id,
             company_id=data.company_id,
-            agents=[agent.agent_id for agent in chat_resource.agents]
+            agents=[str(agent.agent_id) for agent in chat_resource.agents]
         )
 
         return worker_state
