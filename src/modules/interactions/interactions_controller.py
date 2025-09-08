@@ -65,7 +65,7 @@ class InteractionsController:
             not_found_message="Chat not found"
         )
 
-        incoming_message = self.__messages_service.create(db=db, sender_id=chat_resource.user_id, message_type="human", text=data.human_message)
+        incoming_message = self.__messages_service.create(db=db, chat_id=chat_id, sender_id=chat_resource.user_id, message_type="human", text=data.human_message)
         outgoing_message = self.__messages_service.create(db=db, chat_id=chat_id, sender_id=data.agent_id, message_type="ai", text=data.ai_message)
 
         background_tasks.add_task(
