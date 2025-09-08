@@ -33,11 +33,11 @@ class StateService:
         
         chat_history = state.chat_history
         
-        chat_history.insert(0, incoming_message.model_dump(exclude="chat_id"))
+        chat_history.insert(0, incoming_message.model_dump(exclude={"chat_id", "sender"}))
         if len(chat_history) > num_of_messages:
             chat_history.pop()  
 
-        chat_history.insert(0, outgoing_message.model_dump(exclude="chat_id"))
+        chat_history.insert(0, outgoing_message.model_dump(exclude={"chat_id", "sender"}))
         if len(chat_history) > num_of_messages:
             chat_history.pop()  
         
@@ -59,13 +59,13 @@ class StateService:
             agents=agents,
             chat_id=str(chat_id), 
             chat_history=[
-                MessagePublic.model_validate(msg, from_attributes=True).model_dump(exclude="chat_id") for msg in chat_history
+                MessagePublic.model_validate(msg, from_attributes=True).model_dump(exclude={"chat_id", "sender"}) for msg in chat_history
             ],
             user_id=str(user_id),
             company_id=str(company_id)
         )
 
-        await self.__redis_service.set_session(session_key, state.model_dump_json(), expire_seconds=7200) #2 hours 
+        await self.__redis_service.set_session(session_key, state.model_dump(), expire_seconds=7200) #2 hours 
         return state
     
     @staticmethod
