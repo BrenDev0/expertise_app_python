@@ -27,7 +27,6 @@ class InteractionsController:
         data: HumanToAgentRequest,
         db: Session
     )-> WorkerState: 
-        print("IN CONTROLLER")
         chat_resource: Chat = self.__http_service.request_validation_service.verify_resource(
             service_key="chats_service",
             params={
@@ -37,8 +36,6 @@ class InteractionsController:
             not_found_message="Chat not found"
         )
 
-        print(data.user_id, ";;;;;;;;USER:::::", ":::::::::company", chat_resource.user_id)
-
         self.__http_service.request_validation_service.validate_action_authorization(str(data.user_id), str(chat_resource.user_id))
         
         worker_state: WorkerState = await self.__state_service.ensure_chat_state(
@@ -47,7 +44,7 @@ class InteractionsController:
             input=data.input,
             user_id=data.user_id,
             company_id=data.company_id,
-            agents=chat_resource.agents
+            agents=[agent.agent_id for agent in chat_resource.agents]
         )
 
         return worker_state
