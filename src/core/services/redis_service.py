@@ -10,8 +10,8 @@ class RedisService:
     def __init__(self):
         self.redis = redis.from_url(os.getenv("REDIS_URL"))
 
-    async def set_session(self, key: str, value: dict, expire_seconds: Optional[int] = 3600) -> None:
-        await self.redis.set(key, json.dumps(value), ex=expire_seconds)
+    async def set_session(self, key: str, value: str, expire_seconds: Optional[int] = 3600) -> None:
+        await self.redis.set(key, value, ex=expire_seconds)
 
     async def get_session(self, key: str) -> Optional[dict]:
         data = await self.redis.get(key)
