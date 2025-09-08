@@ -27,7 +27,7 @@ class InteractionsController:
         data: HumanToAgentRequest,
         db: Session
     )-> WorkerState: 
-
+        print("IN CONTROLLER")
         chat_resource: Chat = self.__http_service.request_validation_service.verify_resource(
             service_key="chats_service",
             params={
