@@ -65,7 +65,7 @@ class StateService:
             company_id=str(company_id)
         )
 
-        await self.__redis_service.set_session(session_key, state.model_dump(), expire_seconds=7200) #2 hours 
+        await self.__redis_service.set_session(session_key, state.model_dump_json(), expire_seconds=7200) #2 hours 
         return state
     
     @staticmethod
