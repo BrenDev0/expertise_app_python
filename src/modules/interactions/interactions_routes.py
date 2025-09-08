@@ -39,7 +39,7 @@ async def internal_incomming_interaction(
     )
 
 @router.post("/internal/outgoing/{chat_id}", status_code=202, response_model=CommonHttpResponse)
-def internal_receive(
+async def internal_receive(
     background_tasks: BackgroundTasks,
     chat_id: UUID,
     data: AgentToHumanRequest = Body(...),
