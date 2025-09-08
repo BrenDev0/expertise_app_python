@@ -35,7 +35,7 @@ def secure_create(
     ## Create request
 
     This endpoint will send an account invite email.
-    The email sent will have a link with the token attached as a parameter, token is needed fro next step.
+    The email sent will have a link with the token attached as a parameter, token is needed for next step.
     Only admin level users have access to this endpoint. 
     """
     return controller.create_request(
