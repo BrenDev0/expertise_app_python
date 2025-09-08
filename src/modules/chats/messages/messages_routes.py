@@ -21,7 +21,7 @@ def get_controller():
 
 
 @router.post("/internal/{chat_id}", status_code=201, response_model=CommonHttpResponse)
-def internal_create(
+async def internal_create(
     chat_id: UUID,
     data: MessageCreate = Body(...),
     _: None = Depends(verify_hmac), # server to server verification
@@ -31,7 +31,7 @@ def internal_create(
     """
     ## HMAC protected  for internal use only 
     """
-    return controller.create_request(chat_id=chat_id, data=data, db=db)
+    return await controller.create_request(chat_id=chat_id, data=data, db=db)
 
 @router.get("/secure/collection/{chat_id}", status_code=200, response_model=List[MessagePublic], dependencies=[Depends(security)] )
 def secure_collection( 
