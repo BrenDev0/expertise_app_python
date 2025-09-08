@@ -37,6 +37,8 @@ class MessagesController:
         
         message = self.__messages_service.create(db=db, chat_id=chat_resource.chat_id, sender_id=data.sender, message_type=data.message_type, text=data.text)
 
+
+        ## handle state if exists
         state_service: StateService = Container.resolve("state_service")
         asyncio.create_task(
         state_service.update_chat_state_history(
