@@ -25,12 +25,12 @@ class MessageConfig(BaseModel):
     )
 
 class MessageCreate(MessageConfig):
-    chat_id: uuid.UUID
     sender: uuid.UUID
     message_type: str
     text: str
 
 class MessagePublic(MessageCreate):
+    chat_id: uuid.UUID
     message_id: uuid.UUID
     created_at: datetime
 
