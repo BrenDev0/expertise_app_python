@@ -21,8 +21,8 @@ def get_controller():
     return Container.resolve("messages_controller")
 
 
-@router.post("/secure/{chat_id}", status_code=201, response_model=CommonHttpResponse)
-def secure_create(
+@router.post("/internal/{chat_id}", status_code=201, response_model=CommonHttpResponse)
+def internal_create(
     chat_id: UUID,
     data: MessageCreate = Body(...),
     _: None = Depends(verify_hmac), # server to server verification
