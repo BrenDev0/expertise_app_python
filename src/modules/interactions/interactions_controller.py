@@ -49,7 +49,7 @@ class InteractionsController:
 
         return worker_state
 
-    def outgoing_interaction(
+    async def outgoing_interaction(
         self,
         chat_id: UUID,
         data: AgentToHumanRequest,
