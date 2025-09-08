@@ -37,6 +37,8 @@ class InteractionsController:
             not_found_message="Chat not found"
         )
 
+        print(data.user_id, ";;;;;;;;USER:::::", ":::::::::company", chat_resource.user_id)
+
         self.__http_service.request_validation_service.validate_action_authorization(str(data.user_id), str(chat_resource.user_id))
         
         worker_state: WorkerState = await self.__state_service.ensure_chat_state(
