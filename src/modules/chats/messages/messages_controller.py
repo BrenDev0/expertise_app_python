@@ -8,13 +8,16 @@ from src.core.services.http_service import HttpService
 from sqlalchemy.orm import Session
 from uuid import UUID
 from typing import List
+from src.core.dependencies.container import Container
+from src.modules.state.state_service import StateService
+import asyncio
 
 class MessagesController:
     def __init__(self, http_service: HttpService, messages_service: MessagesService):
         self.__http_service: HttpService = http_service
         self.__messages_service = messages_service
  
-    def create_request(
+    async def create_request(
         self,
         chat_id: UUID,
         data: MessageCreate,
@@ -32,7 +35,16 @@ class MessagesController:
         if data.message_type == "human":
             self.__http_service.request_validation_service.validate_action_authorization(chat_resource.user_id, data.sender)
         
-        self.__messages_service.create(db=db, chat_id=chat_resource.chat_id, sender_id=data.sender, message_type=data.message_type, text=data.text)
+        message = self.__messages_service.create(db=db, chat_id=chat_resource.chat_id, sender_id=data.sender, message_type=data.message_type, text=data.text)
+
+        state_service: StateService = Container.resolve("state_service")
+        asyncio.create_task(
+        state_service.update_chat_state_history(
+            chat_resource.chat_id, 
+            self.__to_public(message),
+            16
+        )
+    )
 
         return CommonHttpResponse(
             detail="Message created"

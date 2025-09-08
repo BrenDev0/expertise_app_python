@@ -1,14 +1,12 @@
-from fastapi import APIRouter, Request, BackgroundTasks, Body, Depends
+from fastapi import APIRouter, Body, Depends
 from src.modules.interactions.interactions_controller import InteractionsController
-from  src.modules.interactions.interactions_models import HumanToAgentRequest, AgentToHumanRequest
+from  src.modules.interactions.interactions_models import HumanToAgentRequest
 from src.core.dependencies.container import Container
 from sqlalchemy.orm import Session
 from src.core.database.session import get_db_session
 from src.modules.state.state_models import WorkerState
 from src.core.middleware.hmac_verification import verify_hmac
-from src.core.models.http_responses import CommonHttpResponse
 from uuid import UUID
-from src.core.middleware.middleware_service import security
 
 router = APIRouter(
     prefix="/interactions",
@@ -31,25 +29,8 @@ async def internal_incomming_interaction(
     """
     ## HMAC protected for internal use only
     """
-    print("IN ROUTE")
-    return await controller.incoming_interaction(
-        chat_id=chat_id,
-        data=data,
-        db=db
-    )
 
-@router.post("/internal/outgoing/{chat_id}", status_code=202, response_model=CommonHttpResponse)
-async def internal_outgoing_interaction(
-    chat_id: UUID,
-    data: AgentToHumanRequest = Body(...),
-    _: None = Depends(verify_hmac),
-    db: Session = Depends(get_db_session),
-    controller: InteractionsController = Depends(get_controller)
-):
-    """
-    ## HMAC protected for internal use only
-    """
-    return await controller.outgoing_interaction(
+    return await controller.incoming_interaction(
         chat_id=chat_id,
         data=data,
         db=db
