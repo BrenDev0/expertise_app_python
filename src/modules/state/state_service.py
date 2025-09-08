@@ -44,7 +44,7 @@ class StateService:
         await self.__redis_service.set_session(session_key, state.model_dump(), expire_seconds=7200) #2 hours 
 
     @service_error_handler(f"{__MODULE}.ensure_chat_state")
-    async def ensure_chat_state(self, db: Session, chat_id: UUID, input: str, user_id: UUID, company_id: UUID, agents: List[UUID]) -> WorkerState:
+    async def ensure_chat_state(self, db: Session, chat_id: UUID, input: str, user_id: UUID, company_id: UUID, agents: List[str]) -> WorkerState:
         session_key = self.__get_chat_state_key(chat_id=chat_id)
         session = await self.__redis_service.get_session(session_key)
         if session:
@@ -57,12 +57,12 @@ class StateService:
         state = WorkerState(
             input=input,
             agents=agents,
-            chat_id=chat_id, 
+            chat_id=str(chat_id), 
             chat_history=[
                 MessagePublic.model_validate(msg, from_attributes=True).model_dump(exclude="chat_id") for msg in chat_history
             ],
-            user_id=user_id,
-            company_id=company_id
+            user_id=str(user_id),
+            company_id=str(company_id)
         )
 
         await self.__redis_service.set_session(session_key, state.model_dump(), expire_seconds=7200) #2 hours 
