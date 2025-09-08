@@ -5,12 +5,10 @@ from src.core.services.http_service import HttpService
 
 
 def configure_interactions_dependencies(http_service: HttpService):
-    messaging_service = Container.resolve("messages_service")
     state_service = Container.resolve("state_service")
     
     controller = InteractionsController(
         http_service=http_service,
-        messaging_service=messaging_service,
         state_service=state_service
     )
 
