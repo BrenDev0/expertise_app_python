@@ -39,8 +39,7 @@ async def internal_incomming_interaction(
     )
 
 @router.post("/internal/outgoing/{chat_id}", status_code=202, response_model=CommonHttpResponse)
-async def internal_receive(
-    background_tasks: BackgroundTasks,
+async def internal_outgoing_interaction(
     chat_id: UUID,
     data: AgentToHumanRequest = Body(...),
     _: None = Depends(verify_hmac),
@@ -53,6 +52,5 @@ async def internal_receive(
     return await controller.outgoing_interaction(
         chat_id=chat_id,
         data=data,
-        db=db,
-        background_tasks=background_tasks
+        db=db
     )
