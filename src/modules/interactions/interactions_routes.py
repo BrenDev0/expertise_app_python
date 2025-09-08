@@ -50,7 +50,7 @@ async def internal_receive(
     """
     ## HMAC protected for internal use only
     """
-    return controller.outgoing_interaction(
+    return await controller.outgoing_interaction(
         chat_id=chat_id,
         data=data,
         db=db,
