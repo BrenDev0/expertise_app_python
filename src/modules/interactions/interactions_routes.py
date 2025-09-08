@@ -31,6 +31,7 @@ async def internal_incomming_interaction(
     """
     ## HMAC protected for internal use only
     """
+    print("IN ROUTE")
     return await controller.incoming_interaction(
         chat_id=chat_id,
         data=data,
