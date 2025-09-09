@@ -1,6 +1,6 @@
 from src.modules.state.state_models import WorkerState
 from src.core.services.redis_service import RedisService
-from src.modules.chats.messages.messages_models import MessagePublic
+from src.modules.chats.messages.messages_models import MessagePublic, Message
 from src.modules.chats.messages.messages_service import MessagesService
 from  sqlalchemy.orm import Session
 from uuid import UUID
@@ -19,7 +19,7 @@ class StateService:
     async def update_chat_state_history(
         self,
         chat_id: UUID,
-        message: MessagePublic,
+        message: Message,
         num_of_messages: int = __NUM_OF_MESSAGES,
     ):
         session_key = self.__get_chat_state_key(chat_id=chat_id)
@@ -33,7 +33,7 @@ class StateService:
             
             chat_history = state.chat_history
             
-            chat_history.insert(0, message.model_dump(exclude={"chat_id", "sender", "message_id"}, by_alias=False))
+            chat_history.insert(0,  MessagePublic.model_validate(message, from_attributes=True, by_name=True).model_dump(exclude={"chat_id", "sender", "message_id"}, by_alias=False))
             if len(chat_history) > num_of_messages:
                 chat_history.pop()  
 
@@ -56,7 +56,7 @@ class StateService:
             agents=agents,
             chat_id=str(chat_id), 
             chat_history=[
-                MessagePublic.model_validate(msg, from_attributes=True, by_alias=False).model_dump(exclude={"chat_id", "sender", "message_id"}, by_alias=False) for msg in chat_history
+                MessagePublic.model_validate(msg, from_attributes=True, by_name=True).model_dump(exclude={"chat_id", "sender", "message_id"}, by_alias=False) for msg in chat_history
             ],
             user_id=str(user_id),
             company_id=str(company_id)
