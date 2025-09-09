@@ -43,7 +43,7 @@ class MessagesController:
         asyncio.create_task(
         state_service.update_chat_state_history(
             chat_resource.chat_id, 
-            self.__to_public(message),
+            message,
             16
         )
     )
