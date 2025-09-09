@@ -33,7 +33,7 @@ class StateService:
             
             chat_history = state.chat_history
             
-            chat_history.insert(0, message.model_dump(exclude={"chat_id", "sender", "message_id"}))
+            chat_history.insert(0, message.model_dump(exclude={"chat_id", "sender", "message_id"}, by_alias=False))
             if len(chat_history) > num_of_messages:
                 chat_history.pop()  
 
@@ -56,7 +56,7 @@ class StateService:
             agents=agents,
             chat_id=str(chat_id), 
             chat_history=[
-                MessagePublic.model_validate(msg, from_attributes=True).model_dump(exclude={"chat_id", "sender", "message_id"}) for msg in chat_history
+                MessagePublic.model_validate(msg, from_attributes=True).model_dump(exclude={"chat_id", "sender", "message_id"}, by_alias=False) for msg in chat_history
             ],
             user_id=str(user_id),
             company_id=str(company_id)
