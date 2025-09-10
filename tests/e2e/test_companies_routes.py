@@ -169,3 +169,16 @@ def test_delete_company_not_found():
 
         assert res.status_code == 404
         assert res.json()["detail"] == "Company not found"
+
+def test_company_login_success():
+    with TestClient(app) as client:
+        res = client.get(
+            f"/companies/secure/login/{company_id}",
+            headers=auth_header
+        )
+        assert res.status_code == 200
+        data = res.json()
+        assert "detail" in data
+        assert data["detail"] == "Login successful"
+        assert "token" in data
+        assert isinstance(data["token"], str)
