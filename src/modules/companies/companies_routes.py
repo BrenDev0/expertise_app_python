@@ -23,7 +23,7 @@ def get_controller() -> CompaniesController:
     controller = Container.resolve("companies_controller")
     return controller
 
-@router.post("/secure/create", status_code=201, response_model=CommonHttpResponse)
+@router.post("/secure/create", status_code=201, response_model=CompanyPublic)
 def secure_create(
     req: Request,
     data: CompanyCreate = Body(...),

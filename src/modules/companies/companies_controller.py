@@ -20,21 +20,19 @@ class CompaniesController:
         req: Request,
         db: Session,
         data: CompanyCreate
-    ): 
+    ) -> CompanyPublic: 
         user: User = req.state.user
 
-        self.__companies_service.create(db=db, data=data, user_id=user.user_id)
+        new_company = self.__companies_service.create(db=db, data=data, user_id=user.user_id)
 
-        return CommonHttpResponse(
-            detail="Company created"
-        )
+        return self.__to_public(new_company)
     
     def resource_request(
         self,
         company_id: UUID,
         req: Request,
         db: Session
-    ):
+    ) -> CompanyPublic:
         user: User = req.state.user
 
         company_resource: Company = self.__https_service.request_validation_service.verify_resource(
@@ -71,7 +69,7 @@ class CompaniesController:
         req: Request,
         db: Session,
         data: CompanyUpdate
-    ):
+    ) -> CommonHttpResponse:
         user: User = req.state.user
 
         company_resource: Company = self.__https_service.request_validation_service.verify_resource(
@@ -96,7 +94,7 @@ class CompaniesController:
         company_id: UUID,
         req: Request,
         db: Session
-    ):
+    ) -> CommonHttpResponse:
         user: User = req.state.user
 
         company_resource: Company = self.__https_service.request_validation_service.verify_resource(
