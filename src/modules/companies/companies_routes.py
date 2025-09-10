@@ -42,7 +42,7 @@ def secure_create(
         data=data
     )
 
-@router.get("/secure/login", status_code=200, response_model=ResponseWithToken)
+@router.get("/secure/login/{company_id}", status_code=200, response_model=ResponseWithToken)
 def secure_login(
     company_id: UUID,
     req: Request,
