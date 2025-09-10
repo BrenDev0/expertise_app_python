@@ -142,8 +142,8 @@ class CompaniesController:
         self.__https_service.request_validation_service.validate_action_authorization(user.user_id, company_resource.user_id)
 
         token_payload = {
-            "user_id": user.user_id,
-            "company_id": company_resource.company_id
+            "user_id": str(user.user_id),
+            "company_id": str(company_resource.company_id)
         }
 
         token = self.__https_service.webtoken_service.generate_token(token_payload, "7d")
