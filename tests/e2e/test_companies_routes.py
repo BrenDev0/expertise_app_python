@@ -79,9 +79,10 @@ def test_company_collection():
 def test_company_update_success():
     with TestClient(app) as client:
         res = client.patch(
-            f"/companies/secure/{company_id}",
+            f"/companies/secure",
             headers=auth_header,
             json={
+                "companyId": company_id,
                 "companyName": "Updated name",
                 "companySubscription": "free"
             }
