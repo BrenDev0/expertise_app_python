@@ -34,6 +34,7 @@ class CompanyCreate(CompanyConfig):
     company_subscription: Optional[str] = "Free"
 
 class CompanyUpdate(CompanyConfig):
+    company_id: UUID
     company_name: Optional[str] = None
     company_location: Optional[str] = None
     company_subscription: Optional[str] = None

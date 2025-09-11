@@ -100,9 +100,8 @@ def secure_collection(
         db=db
     )
 
-@router.patch("/secure/{company_id}", status_code=200, response_model=CommonHttpResponse)
+@router.patch("/secure", status_code=200, response_model=CommonHttpResponse)
 def secure_update(
-    company_id: UUID,
     req: Request,
     data: CompanyUpdate = Body(...),
     db: Session = Depends(get_db_session),
@@ -115,7 +114,7 @@ def secure_update(
     Only admin level users have access to this endpoint.
     """
     return controller.update_request(
-        company_id=company_id,
+        company_id=data.company_id,
         req=req,
         db=db,
         data=data
