@@ -86,7 +86,7 @@ def test_company_update_success():
                 "companySubscription": "free"
             }
         )
-        print("UPDSTE RES:::::::::", res.json())
+       
         assert res.status_code == 200
         assert res.json()["detail"] == "Company updated"
 
