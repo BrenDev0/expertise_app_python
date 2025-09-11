@@ -89,14 +89,17 @@ def test_company_update_success():
         )
        
         assert res.status_code == 200
-        assert res.json()["detail"] == "Company updated"
+        assert "companyId" in res.json()
+        assert "companyName" in res.json()
+        assert "companySubscription" in res.json()
 
 def test_company_update_not_found():
     with TestClient(app) as client:
         res = client.patch(
-            f"/companies/secure/{uuid.uuid4()}",
+            f"/companies/secure",
             headers=auth_header,
             json={
+                "companyId": str(uuid.uuid4()),
                 "companyName": "Updated name",
                 "companySubscription": "free"
             }
@@ -126,9 +129,10 @@ def test_company_update_not_found():
 def test_company_update_restricted_fields():
     with TestClient(app) as client:
         res = client.patch(
-            f"/companies/secure/{company_id}",
+            f"/companies/secure",
             headers=auth_header,
             json={
+                "companyId": str(uuid.uuid4()),
                 "s3Path": "Updated path",
                 
             }
