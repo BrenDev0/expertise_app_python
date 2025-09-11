@@ -78,7 +78,7 @@ def test_company_collection():
 
 def test_company_update_success():
     with TestClient(app) as client:
-        res = client.put(
+        res = client.patch(
             f"/companies/secure/{company_id}",
             headers=auth_header,
             json={
@@ -86,13 +86,13 @@ def test_company_update_success():
                 "companySubscription": "free"
             }
         )
-
+        print("UPDSTE RES:::::::::", res.json())
         assert res.status_code == 200
         assert res.json()["detail"] == "Company updated"
 
 def test_company_update_not_found():
     with TestClient(app) as client:
-        res = client.put(
+        res = client.patch(
             f"/companies/secure/{uuid.uuid4()}",
             headers=auth_header,
             json={
@@ -124,7 +124,7 @@ def test_company_update_not_found():
 
 def test_company_update_restricted_fields():
     with TestClient(app) as client:
-        res = client.put(
+        res = client.patch(
             f"/companies/secure/{company_id}",
             headers=auth_header,
             json={
