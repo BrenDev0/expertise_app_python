@@ -114,7 +114,6 @@ def secure_update(
     Only admin level users have access to this endpoint.
     """
     return controller.update_request(
-        company_id=data.company_id,
         req=req,
         db=db,
         data=data
