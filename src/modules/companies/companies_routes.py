@@ -100,7 +100,7 @@ def secure_collection(
         db=db
     )
 
-@router.patch("/secure", status_code=200, response_model=CommonHttpResponse)
+@router.patch("/secure", status_code=200, response_model=CompanyPublic)
 def secure_update(
     req: Request,
     data: CompanyUpdate = Body(...),

@@ -68,7 +68,7 @@ class CompaniesController:
         req: Request,
         db: Session,
         data: CompanyUpdate
-    ) -> CommonHttpResponse:
+    ) -> CompanyPublic:
         user: User = req.state.user
 
         company_resource: Company = self.__https_service.request_validation_service.verify_resource(
@@ -82,11 +82,9 @@ class CompaniesController:
 
         self.__https_service.request_validation_service.validate_action_authorization(user.user_id, company_resource.user_id)
 
-        self.__companies_service.update(db=db, company_id=company_resource.company_id, changes=data)
+        updated_company = self.__companies_service.update(db=db, company_id=company_resource.company_id, changes=data)
 
-        return CommonHttpResponse(
-            detail="Company updated"
-        )
+        return self.__to_public(updated_company)
     
     def delete_request(
         self,
