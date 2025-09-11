@@ -1,7 +1,7 @@
 from src.core.services.http_service import HttpService
 from src.modules.documents.s3_service import S3Service
 from uuid import UUID
-from fastapi import Request, File, UploadFile
+from fastapi import Request, UploadFile
 from src.modules.documents.documents_models import Document, DocumentPublic
 from src.modules.users.users_models import User
 from sqlalchemy.orm import Session
@@ -9,6 +9,7 @@ from src.modules.companies.companies_models import Company
 from src.core.models.http_responses import CommonHttpResponse
 from src.modules.documents.documents_service import DocumentsService
 from src.modules.documents.embeddings_service import EmbeddingService
+import asyncio
 
 
 class DocumentsController:
@@ -37,17 +38,22 @@ class DocumentsController:
         )
 
         self.__http_service.request_validation_service.validate_action_authorization(user.user_id, company_resource.user_id)
+        
+        file_bytes = await self.__documents_service.read_file(file=file)
 
-        s3_url = self.__s3_service.upload(file=file, company_id=company_resource.company_id, user_id=company_resource.user_id)
+        s3_url = await self.__s3_service.upload(file_bytes=file_bytes, filename=file.filename, company_id=company_resource.company_id, user_id=company_resource.user_id)
 
         self.__documents_service.create(db=db, company_id=company_resource.company_id, filename=file.filename, url=s3_url)
 
-        await self.__embeddings_service.add_document(
-            s3_url=s3_url, 
-            filename=file.filename, 
-            user_id=user.user_id, 
-            company_id=company_resource.company_id
+        asyncio.create_task(
+            self.__embeddings_service.add_document(
+                file_bytes=file_bytes,
+                filename=file.filename, 
+                user_id=user.user_id, 
+                company_id=company_resource.company_id
+            )
         )
+        
 
         return CommonHttpResponse(
             detail="file uploaded"

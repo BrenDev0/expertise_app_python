@@ -1,4 +1,7 @@
-from langchain_community.document_loaders import PyPDFLoader, TextLoader, CSVLoader
+from fastapi import UploadFile
+import io
+import pandas as pd
+from langchain_core.documents import Document
 from qdrant_client import QdrantClient
 from qdrant_client.http.models import Distance, VectorParams, Filter, FieldCondition, MatchValue
 from langchain.text_splitter import RecursiveCharacterTextSplitter
@@ -7,7 +10,7 @@ from src.core.decorators.service_error_handler import service_error_handler
 import os
 import uuid
 from typing import Dict, Any
-from uuid import UUID
+import PyPDF2
 
 class EmbeddingService:
     __MODULE = "embeddings.service"
@@ -48,7 +51,7 @@ class EmbeddingService:
     @service_error_handler(__MODULE)
     async def add_document(
         self,
-        s3_url: str,
+        file_bytes: bytes,
         filename: str,
         user_id: str,
         company_id: str
@@ -57,17 +60,24 @@ class EmbeddingService:
         collection_name = self.get_collection_name(user_id, company_id)
 
         if filename.endswith('.pdf'):
-            loader = PyPDFLoader(s3_url)
+            pdf_reader = PyPDF2.PdfReader(io.BytesIO(file_bytes))
+            text = ""
+            for page in pdf_reader.pages:
+                text += page.extract_text() or ""
+            documents = [Document(page_content=text)]
         elif filename.endswith('.txt'):
-            loader = TextLoader(s3_url)
+            text = file_bytes.decode("utf-8")
+            documents = [Document(page_content=text)]
         elif filename.endswith('.csv'):
-            loader = CSVLoader(s3_url)
+            df = pd.read_csv(io.BytesIO(file_bytes))
+            documents = [
+                Document(page_content=row.to_json(), metadata={"row_index": idx})
+                for idx, row in df.iterrows()
+            ]
         else:
             raise ValueError(f"Unsupported file type: {filename}")
 
-        documents = loader.load()
         chunks = self.text_splitter.split_documents(documents)
-
         texts = [chunk.page_content for chunk in chunks]
         embeddings = await self.embedding_model.aembed_documents(texts)
 
