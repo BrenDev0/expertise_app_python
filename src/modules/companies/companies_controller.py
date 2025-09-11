@@ -65,7 +65,6 @@ class CompaniesController:
 
     def update_request(
         self,
-        company_id: UUID,
         req: Request,
         db: Session,
         data: CompanyUpdate
@@ -76,14 +75,14 @@ class CompaniesController:
             service_key="companies_service",
             params={
                 "db": db,
-                "company_id": company_id
+                "company_id": data.company_id
             },
             not_found_message="Company not found"
         )
 
         self.__https_service.request_validation_service.validate_action_authorization(user.user_id, company_resource.user_id)
 
-        self.__companies_service.update(db=db, company_id=company_id, changes=data)
+        self.__companies_service.update(db=db, company_id=company_resource.company_id, changes=data)
 
         return CommonHttpResponse(
             detail="Company updated"
