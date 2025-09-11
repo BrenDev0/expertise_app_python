@@ -181,4 +181,5 @@ def test_company_login_success():
         assert "detail" in data
         assert data["detail"] == "Login successful"
         assert "token" in data
+        assert "companyId" in data
         assert isinstance(data["token"], str)

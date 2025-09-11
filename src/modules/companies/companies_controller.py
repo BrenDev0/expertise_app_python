@@ -150,7 +150,8 @@ class CompaniesController:
 
         return ResponseWithToken(
             detail="Login successful",
-            token=token
+            token=token,
+            company_id=str(company_resource.company_id)
         )
 
 
