@@ -16,7 +16,7 @@ token = os.getenv("TEST_TOKEN")
 
 
 verification_header = {
-    "Authorization": f"Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ2ZXJpZmljYXRpb25fY29kZSI6IjlmYTliNDU4LTNjZjItNDVkNC1hNTJlLWNmNzUwZWRkZjYwZCIsImV4cCI6MTc4OTI0MzU5NX0.-1h4q-GaI4-gkZoACpMil2GyjPSb6enu122jD1eKWv8"
+    "Authorization": f"Bearer {invite_token}"
 }
 
 auth_header = {
