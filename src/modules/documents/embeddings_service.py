@@ -16,14 +16,14 @@ class EmbeddingService:
     __MODULE = "embeddings.service"
     
     def __init__(self, client: QdrantClient):
-        self.client = client
+        self.__client = client
         
-        self.embedding_model = OpenAIEmbeddings(
+        self.__embedding_model = OpenAIEmbeddings(
             model="text-embedding-3-large",
             openai_api_key=os.getenv("OPENAI_API_KEY")
         )
         
-        self.text_splitter = RecursiveCharacterTextSplitter(
+        self.__text_splitter = RecursiveCharacterTextSplitter(
             chunk_size=1000,
             chunk_overlap=200
         )
@@ -37,16 +37,16 @@ class EmbeddingService:
         collection_name = self.get_collection_name(user_id, company_id)
         
         try:
-            self.client.get_collection(collection_name)
+            self.__client.get_collection(collection_name)
         except Exception:
-            self.client.create_collection(
+            self.__client.create_collection(
                 collection_name=collection_name,
                 vectors_config=VectorParams(size=3072, distance=Distance.COSINE)
             )
 
-            self.client.create_payload_index(collection_name=collection_name, field_name="filename", field_schema="keyword")
-            self.client.create_payload_index(collection_name=collection_name, field_name="user_id", field_schema="keyword")
-            self.client.create_payload_index(collection_name=collection_name, field_name="agent_id", field_schema="keyword")
+            self.__client.create_payload_index(collection_name=collection_name, field_name="filename", field_schema="keyword")
+            self.__client.create_payload_index(collection_name=collection_name, field_name="user_id", field_schema="keyword")
+            self.__client.create_payload_index(collection_name=collection_name, field_name="agent_id", field_schema="keyword")
 
     @service_error_handler(__MODULE)
     async def add_document(
@@ -77,9 +77,9 @@ class EmbeddingService:
         else:
             raise ValueError(f"Unsupported file type: {filename}")
 
-        chunks = self.text_splitter.split_documents(documents)
+        chunks = self.__text_splitter.split_documents(documents)
         texts = [chunk.page_content for chunk in chunks]
-        embeddings = await self.embedding_model.aembed_documents(texts)
+        embeddings = await self.__embedding_model.aembed_documents(texts)
 
         points = []
         for chunk, embedding in zip(chunks, embeddings):
@@ -94,7 +94,10 @@ class EmbeddingService:
                 }
             })
 
-        self.client.upsert(collection_name=collection_name, points=points)
+        batch_size = 50
+        for i in range(0, len(points), batch_size):
+            batch = points[i:i+batch_size]
+            self.__client.upsert(collection_name=collection_name, points=batch)
 
         return {
             "status": "success",
@@ -115,7 +118,7 @@ class EmbeddingService:
             ]
         )
         
-        result = self.client.delete(
+        result = self.__client.delete(
             collection_name=collection_name,
             points_selector=points_filter
         )
@@ -132,7 +135,7 @@ class EmbeddingService:
         """Delete entire collection for a company (all documents)"""
         collection_name = self.get_collection_name(user_id, company_id)
         
-        self.client.delete_collection(collection_name)
+        self.__client.delete_collection(collection_name)
         return {
             "status": "success",
             "operation": "delete_company",
@@ -142,13 +145,13 @@ class EmbeddingService:
     @service_error_handler(__MODULE)
     def delete_user_data(self, user_id: str) -> Dict[str, Any]:
         """Delete all collections for a user (across all companies)"""
-        collections = self.client.get_collections()
+        collections = self.__client.get_collections()
         user_prefix = f"user_{user_id}_company_"
         deleted_collections = []
         
         for collection in collections.collections:
             if collection.name.startswith(user_prefix):
-                self.client.delete_collection(collection.name)
+                self.__client.delete_collection(collection.name)
                 deleted_collections.append(collection.name)
         
         return {
