@@ -54,7 +54,7 @@ class DocumentsController:
 
         new_document = self.__documents_service.create(db=db, company_id=company_resource.company_id, filename=file.filename, url=s3_url)
 
-        if file.filename.endswith(".xlsx", ".xls", ".xlsm", ".xlsb", ".csv"):
+        if file.filename.endswith((".xlsx", ".xls", ".xlsm", ".xlsb", ".csv")):
             self.__tenant_data_service.create_table_from_file(
                 db=db,
                 company_id=company_resource.company_id,
