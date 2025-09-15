@@ -41,12 +41,12 @@ class MessagesController:
         ## handle state if exists
         state_service: StateService = Container.resolve("state_service")
         asyncio.create_task(
-        state_service.update_chat_state_history(
-            chat_resource.chat_id, 
-            message,
-            16
+            state_service.update_chat_state_history(
+                chat_resource.chat_id, 
+                message,
+                16
+            )
         )
-    )
 
         return CommonHttpResponse(
             detail="Message created"

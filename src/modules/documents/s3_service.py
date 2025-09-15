@@ -11,16 +11,16 @@ class S3Service:
         self.bucket_name = bucket_name
 
     @service_error_handler(__MODULE)
-    def upload(
+    async def upload(
         self, 
-        file: UploadFile,
+        file_bytes: bytes,
+        filename: str,
         company_id: UUID,
         user_id: UUID
     ) -> str:
-        s3_key = self.__build_key(user_id=user_id, company_id=company_id, filename=file.filename)
+        s3_key = self.__build_key(user_id=user_id, company_id=company_id, filename=filename)
         
-        file_content = file.file.read()
-        file_obj = io.BytesIO(file_content)
+        file_obj = io.BytesIO(file_bytes)
         
         self.s3_client.upload_fileobj(file_obj, self.bucket_name, s3_key)
 

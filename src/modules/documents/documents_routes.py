@@ -23,7 +23,7 @@ def get_controller() -> DocumentsController:
     return controller
 
 @router.post("/secure/upload", status_code=201, response_model=CommonHttpResponse)
-def secure_upload(
+async def secure_upload(
     req: Request,
     file: UploadFile = File(...),
     _: None = Depends(is_owner),
@@ -36,7 +36,7 @@ def secure_upload(
     This endpoint will uplad a document to the s3 bucket.
     Only admin level users have access to this endpoint. 
     """
-    return controller.upload_request(
+    return await controller.upload_request(
         req=req,
         db=db,
         file=file

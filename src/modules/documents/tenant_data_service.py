@@ -1,0 +1,51 @@
+from sqlalchemy.orm import Session
+import pandas as pd
+import io
+from uuid import UUID
+from src.core.repository.base_repository import BaseRepository
+from src.modules.documents.documents_models import TenantTable
+from src.core.decorators.service_error_handler import service_error_handler
+import os 
+
+class TenantDataService:
+    __MODULE = "tenant_data.service"
+    def __init__(self, repository: BaseRepository):
+        self.__repository = repository
+
+    @service_error_handler(module=__MODULE)
+    def create_table_from_file(
+        self,
+        db: Session,
+        company_id: UUID,
+        document_id: UUID,
+        filename: str,
+        file_bytes: bytes
+    ):
+        if filename.endswith(".csv"):
+            df = pd.read_csv(io.BytesIO(file_bytes), encoding="latin1")
+        elif filename.endswith((".xlsx", ".xls", ".xlsm", ".xlsb")):
+            df = pd.read_excel(io.BytesIO(file_bytes))
+        else:
+            raise ValueError("Unsupported file type")
+        
+        table_name = f"{company_id}_{os.path.splitext(filename)[0]}"
+        
+        ## Create a table in th db from the df
+        df.to_sql(
+            name=table_name, 
+            con=db.get_bind(),
+            index=False,
+            if_exists="replace",
+            schema="public"
+        )
+
+        ## Create a reference in tenant_tables
+        tenant_table = TenantTable(
+            company_id=company_id,
+            document_id=document_id,
+            table_name=table_name
+        )
+
+        self.__repository.create(db=db, data=tenant_table)
+
+

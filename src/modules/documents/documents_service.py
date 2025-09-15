@@ -5,6 +5,7 @@ from  uuid import UUID
 from src.core.services.data_handling_service import DataHandlingService
 from  typing import List
 from src.core.decorators.service_error_handler import service_error_handler
+from fastapi import UploadFile
 
 class DocumentsService:
     __MODULE = "documents.service"
@@ -23,9 +24,19 @@ class DocumentsService:
         return self.__repository.create(db=db, data=document)
     
     @service_error_handler(module=__MODULE)
+    def resource(self, db: Session, document_id: UUID) -> Document:
+        return self.__repository.get_one(db=db, key="document_id", value=document_id)
+    
+    @service_error_handler(module=__MODULE)
     def collection(self, db: Session, company_id: UUID) -> List[Document]:
         return self.__repository.get_many(db=db, key="company_id", value=company_id)
     
     @service_error_handler(module=__MODULE)
     def delete(self, db: Session, document_id: UUID) -> Document:
         return self.__repository.delete(db=db, key="document_id", value=document_id)
+    
+    @staticmethod
+    async def read_file(
+        file: UploadFile
+    ) -> bytes:
+        return await file.read()

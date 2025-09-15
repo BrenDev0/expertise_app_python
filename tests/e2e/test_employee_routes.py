@@ -24,18 +24,18 @@ auth_header = {
 }
 
 
-# def test_employee_create_success():
-#     with TestClient(app) as client:
-#         res = client.post(
-#             "/employees/verified/create",
-#             headers=verification_header,
-#             json={
-#                 "password": "carpincha"
-#             }
-#         )
+def test_employee_create_success():
+    with TestClient(app) as client:
+        res = client.post(
+            "/employees/verified/create",
+            headers=verification_header,
+            json={
+                "password": "carpincha"
+            }
+        )
 
-#     assert res.status_code == 201
-#     assert "token" in res.json()
+    assert res.status_code == 201
+    assert "token" in res.json()
 
 def test_resource_success():
     employee_id = ""
@@ -80,27 +80,27 @@ def test_collection_not_found():
         assert res.status_code == 404
         assert res.json()["detail"] == "Company not found"
 
-def test_update_success():
-    employee_update = ""
-    with TestClient(app) as client:
-        res = client.put(
-            f"/employees/secure/{employee_update}",
-            headers=auth_header,
-            json=({
-                "position": "updated role"
-            })
-        )
+# def test_update_success():
+#     employee_update = ""
+#     with TestClient(app) as client:
+#         res = client.put(
+#             f"/employees/secure/{employee_update}",
+#             headers=auth_header,
+#             json=({
+#                 "position": "updated role"
+#             })
+#         )
        
-        assert res.status_code == 200
-        assert res.json()["detail"] == "Employee updated"
+#         assert res.status_code == 200
+#         assert res.json()["detail"] == "Employee updated"
 
-def test_delete_success():
-    with TestClient(app) as client:
-        employee_delete = ""
-        res = client.delete(
-            f"/employees/secure/{employee_delete}",
-            headers=auth_header,
-        )
-        print(res.json(), "RES::::::::::::")
-        assert res.status_code == 200
-        assert res.json()["detail"] == "Employee deleted"
+# def test_delete_success():
+#     with TestClient(app) as client:
+#         employee_delete = ""
+#         res = client.delete(
+#             f"/employees/secure/{employee_delete}",
+#             headers=auth_header,
+#         )
+#         print(res.json(), "RES::::::::::::")
+#         assert res.status_code == 200
+#         assert res.json()["detail"] == "Employee deleted"

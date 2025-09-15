@@ -1,10 +1,12 @@
 from src.core.database.database_models import Base
-from  sqlalchemy import String, Column, Boolean, ForeignKey, UniqueConstraint
+from sqlalchemy import String, Column, Boolean, ForeignKey, UniqueConstraint
+from sqlalchemy.orm import relationship
 from sqlalchemy.dialects.postgresql import UUID
 import uuid
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel, ConfigDict, EmailStr
 from pydantic.alias_generators import to_camel
 from typing import Optional
+from src.modules.users.users_models import User, UserPublic
 
 class Employee(Base):
     __tablename__ = "employees"
@@ -19,6 +21,8 @@ class Employee(Base):
         UniqueConstraint("user_id", "company_id", name="uq_user_company"),
     )
 
+    user = relationship("User")
+
 class EmployeeConfig(BaseModel):
     model_config = ConfigDict(
         populate_by_name=True,
@@ -26,6 +30,11 @@ class EmployeeConfig(BaseModel):
         alias_generator=to_camel,
         extra="forbid"
     )
+
+class EmployeeUser(EmployeeConfig):
+    name: str
+    email: EmailStr
+    phone: str
 
 class EmployeeCreate(EmployeeConfig):
     password: str
@@ -36,6 +45,7 @@ class EmployeePublic(EmployeeConfig):
     company_id: uuid.UUID
     position: Optional[str] = None
     is_manager: bool
+    user: EmployeeUser
 
 class EmployeeUpdate(EmployeeConfig):
     position: str 
