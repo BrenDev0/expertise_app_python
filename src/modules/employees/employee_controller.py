@@ -1,5 +1,5 @@
 from src.core.services.http_service import HttpService
-from src.modules.employees.employees_models import Employee, EmployeeCreate, EmployeeUpdate, EmployeePublic
+from src.modules.employees.employees_models import Employee, EmployeeCreate, EmployeeUpdate, EmployeePublic, EmployeeUser
 from src.modules.employees.employees_service import EmployeesService
 from src.modules.users.users_service import UsersService
 from src.core.models.http_responses import CommonHttpResponse, ResponseWithToken
@@ -178,9 +178,23 @@ class EmployeesController:
             detail="Employee deleted"
         )
 
-    @staticmethod
-    def __to_public(data: Employee) -> EmployeePublic:
-        return EmployeePublic.model_validate(data, from_attributes=True)
+    def __to_public(self, data: Employee) -> EmployeePublic:
+        user_public = EmployeeUser(
+            name=self.__http_service.encryption_service.decrypt(data.user.name),
+            email=self.__http_service.encryption_service.decrypt(data.user.email),
+            phone=self.__http_service.encryption_service.decrypt(data.user.phone)
+        )
+
+        employee_public = EmployeePublic(
+            employee_id=data.employee_id,
+            user_id=data.user_id,
+            company_id=data.company_id,
+            position=data.position,
+            is_manager=data.is_manager,
+            user=user_public
+        )
+    
+        return employee_public
 
         
 
