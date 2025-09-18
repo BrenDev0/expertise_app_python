@@ -56,7 +56,7 @@ class BaseRepository(Generic[T]):
         updated_user = self.model(**updated_row._mapping)
         return updated_user
 
-    def delete(self, db: Session, key: str, value: str | uuid.UUID) -> Optional[T]:
+    def delete(self, db: Session, key: str, value: str | uuid.UUID) -> List[T] | T:
         stmt = delete(self.model).where(getattr(self.model, key) == value).returning(*self.model.__table__.c)
         result = db.execute(stmt)
         db.commit()
