@@ -7,9 +7,7 @@ from src.modules.users.users_models import User
 from sqlalchemy.orm import Session
 from src.modules.companies.companies_models import Company
 from src.core.models.http_responses import CommonHttpResponse
-from src.modules.documents.documents_service import DocumentsService
-from src.modules.documents.embeddings_service import EmbeddingService
-from src.modules.documents.tenant_data_service import TenantDataService
+from src.modules.documents.document_manager import DocumentManager
 import asyncio
 
 
@@ -17,16 +15,11 @@ class DocumentsController:
     def __init__(
         self, 
         http_service: HttpService, 
-        s3_service: S3Service, 
-        documents_service: DocumentsService, 
-        embeddings_service: EmbeddingService,
-        tenant_data_service: TenantDataService
+        document_manager: DocumentManager
     ):
         self.__http_service = http_service
-        self.__s3_service = s3_service
-        self.__documents_service = documents_service
-        self.__embeddings_service = embeddings_service
-        self.__tenant_data_service = tenant_data_service
+        self.__document_manager = document_manager
+       
 
     async def upload_request(
         self,
@@ -48,35 +41,14 @@ class DocumentsController:
 
         self.__http_service.request_validation_service.validate_action_authorization(user.user_id, company_resource.user_id)
 
-        filename = file.filename.lower().replace(" ", "_")
-        
-        file_bytes = await self.__documents_service.read_file(file=file)
-
-        s3_url = await self.__s3_service.upload(file_bytes=file_bytes, filename=filename, company_id=company_resource.company_id, user_id=company_resource.user_id)
-
-        new_document = self.__documents_service.create(db=db, company_id=company_resource.company_id, filename=filename, url=s3_url)
-
-        if filename.endswith((".xlsx", ".xls", ".xlsm", ".xlsb", ".csv")):
-            
-            asyncio.create_task(
-                self.__tenant_data_service.create_table_from_file(
-                    db=db,
-                    company_id=company_resource.company_id,
-                    document_id=new_document.document_id,
-                    filename=filename,
-                    file_bytes=file_bytes
-                )
+        asyncio.create_task(
+            self.__document_manager.handle_upload(
+                file=file,
+                company_id=company_resource.company_id,
+                user_id=company_resource.user_id,
+                db=db
             )
-            
-        else: 
-            asyncio.create_task(
-                self.__embeddings_service.add_document(
-                    file_bytes=file_bytes,
-                    filename=filename, 
-                    user_id=user.user_id, 
-                    company_id=company_resource.company_id
-                )
-            )
+        )
         
         return CommonHttpResponse(
             detail="file uploaded"
@@ -102,7 +74,7 @@ class DocumentsController:
 
         self.__http_service.request_validation_service.validate_action_authorization(user.user_id, company_resource.user_id)
 
-        data = self.__documents_service.collection(db=db, company_id=company_resource.company_id)
+        data = self.__document_manager.documents_service.collection(db=db, company_id=company_resource.company_id)
 
         return [
             self.__to_public(doc) for doc in data
@@ -128,17 +100,12 @@ class DocumentsController:
 
         self.__http_service.request_validation_service.validate_action_authorization(user.user_id, document_resource.company.user_id)
 
-        self.__s3_service.delete_document_data(user_id=document_resource.company.user_id, company_id=document_resource.company_id, filename=document_resource.filename)
-        
-        self.__embeddings_service.delete_document_data(
-            user_id=str(user.user_id),
-            company_id=str(document_resource.company_id),
-            filename=document_resource.filename
-        )
-
-        self.__documents_service.delete(
-            db=db,
-            document_id=document_resource.document_id
+        self.__document_manager.document_level_deletion(
+            document_id=document_resource.document_id,
+            company_id=document_resource.company.company_id,
+            user_id=document_resource.company.user_id,
+            filename=document_resource.filename,
+            db=db
         )
 
         return CommonHttpResponse(

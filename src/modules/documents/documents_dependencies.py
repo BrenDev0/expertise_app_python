@@ -8,9 +8,15 @@ from src.core.services.data_handling_service import DataHandlingService
 from src.core.dependencies.container import Container
 from src.modules.documents.embeddings_service import EmbeddingService
 from src.modules.documents.tenant_data_service import TenantDataService
+from src.modules.documents.document_manager import DocumentManager
 
 
-def configure_documents_dependencies(http_service: HttpService, data_handler: DataHandlingService, s3_service: S3Service, embeddings_service: EmbeddingService):
+def configure_documents_dependencies(
+    http_service: HttpService, 
+    data_handler: DataHandlingService, 
+    s3_service: S3Service, 
+    embeddings_service: EmbeddingService
+):
     repository = BaseRepository(Document)
     tenant_repository = BaseRepository(TenantTable)
 
@@ -23,14 +29,19 @@ def configure_documents_dependencies(http_service: HttpService, data_handler: Da
         repository=tenant_repository
     )
 
+    document_manager = DocumentManager(
+        documents_service=service,
+        embedding_service=embeddings_service,
+        s3_service=s3_service,
+        tenant_data_service=tenant_data_service
+    )
+
 
     controller = DocumentsController(
         http_service=http_service,
-        s3_service=s3_service,
-        documents_service=service,
-        embeddings_service=embeddings_service,
-        tenant_data_service=tenant_data_service
+        document_manager=document_manager
     )
 
     Container.register("documents_service", service)
     Container.register("documents_controller", controller)
+    Container.register("document_manager", document_manager)
