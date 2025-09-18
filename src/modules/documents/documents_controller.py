@@ -57,18 +57,17 @@ class DocumentsController:
         new_document = self.__documents_service.create(db=db, company_id=company_resource.company_id, filename=filename, url=s3_url)
 
         if filename.endswith((".xlsx", ".xls", ".xlsm", ".xlsb", ".csv")):
-            try:
-                asyncio.create_task(
-                    self.__tenant_data_service.create_table_from_file(
+            
+            asyncio.create_task(
+                self.__tenant_data_service.create_table_from_file(
                     db=db,
                     company_id=company_resource.company_id,
                     document_id=new_document.document_id,
                     filename=filename,
                     file_bytes=file_bytes
                 )
-                )
-            except:
-                raise HTTPException(status_code=400, detail="Unsupported document type")
+            )
+            
         else: 
             asyncio.create_task(
                 self.__embeddings_service.add_document(
