@@ -36,7 +36,7 @@ class DocumentManager:
     ):
         filename = file.filename.lower().replace(" ", "_")
         
-        file_bytes = await self.documents_service.read_file(file=file)
+        file_bytes = await file.read()
 
         s3_url = await self.__s3_service.upload(file_bytes=file_bytes, filename=filename, company_id=company_id, user_id=user_id)
 
@@ -101,7 +101,7 @@ class DocumentManager:
         company_id: UUID,
         user_id: UUID,
         db: Session
-    ):
+    ) -> str:
         self.__tenant_data_service.delete_companies_tables(
             db=db,
             company_id=company_id
@@ -123,12 +123,14 @@ class DocumentManager:
             value=company_id
         )
 
+        return "Company documents deleted"
+
     @service_error_handler(module=__MODULE)
     def user_level_deletion(
         self,
         user_id: UUID,
         db: Session
-    ):
+    ) -> str:
         companies_service: CompaniesService = Container.resolve("companies_service")
         users_companies = companies_service.collection(db=db, user_id=user_id)
 
@@ -147,3 +149,5 @@ class DocumentManager:
                 key="company_id",
                 value=company.company_id
             )
+
+        return "User documents deleted"
