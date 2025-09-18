@@ -64,7 +64,7 @@ class DocumentsController:
         company_id = self.__http_service.request_validation_service.verify_company_in_request_state(req=req)
 
         company_resource: Company = self.__http_service.request_validation_service.verify_resource(
-            service_key="documents_service",
+            service_key="companies_service",
             params={
                 "db": db,
                 "company_id": company_id
