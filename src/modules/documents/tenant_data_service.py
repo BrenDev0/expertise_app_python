@@ -1,4 +1,5 @@
 from sqlalchemy.orm import Session
+from sqlalchemy import text
 import pandas as pd
 import io
 from uuid import UUID
@@ -79,7 +80,7 @@ class TenantDataService:
         )
 
         if table:
-            db.execute(f'DROP TABLE IF EXISTS "{table.table_name}"')
+            db.execute(text(f'DROP TABLE IF EXISTS "{table.table_name}"'))
             db.commit()
 
             return self.__repository.delete(
