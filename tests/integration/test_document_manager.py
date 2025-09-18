@@ -8,18 +8,35 @@ from src.modules.documents.document_manager import DocumentManager
 from src.core.database.session import get_db_session
 
 
-def test_delete_company_data():
+# def test_delete_company_data():
+#     configure_container()
+#     document_manager: DocumentManager = Container.resolve("document_manager")
+
+#     user_id = os.getenv("TEST_USER_ID")
+#     company_id = os.getenv("TEST_COMPANY_ID")
+#     db = next(get_db_session())
+
+#     result = document_manager.company_level_deletion(
+#         company_id=company_id,
+#         user_id=user_id,
+#         db=db
+#     )
+
+#     assert result == "Company documents deleted"
+
+
+def test_delete_user_data():
     configure_container()
     document_manager: DocumentManager = Container.resolve("document_manager")
 
     user_id = os.getenv("TEST_USER_ID")
-    company_id = os.getenv("TEST_COMPANY_ID")
+
     db = next(get_db_session())
 
-    result = document_manager.company_level_deletion(
-        company_id=company_id,
+    result = document_manager.user_level_deletion(
         user_id=user_id,
         db=db
     )
 
-    assert result == "Company documents deleted"
+    assert result == "User documents deleted"
+

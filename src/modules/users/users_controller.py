@@ -7,8 +7,7 @@ from src.core.models.http_responses import CommonHttpResponse, ResponseWithToken
 from src.core.dependencies.container import Container
 from src.core.services.email_service import EmailService
 from src.modules.employees.employees_models import Employee
-from src.modules.documents.s3_service import S3Service
-from src.modules.documents.embeddings_service import EmbeddingService
+from src.modules.documents.document_manager import DocumentManager
 
 
 class UsersController:
@@ -178,10 +177,8 @@ class UsersController:
         self.__users_service.delete(db=db, user_id=user.user_id) 
 
         ## delete bucket and vector base data 
-        s3_service: S3Service = Container.resolve("s3_service")
-        embeddings_service: EmbeddingService = Container.resolve("embeddings_service")
-        s3_service.delete_user_data(user.user_id)
-        embeddings_service.delete_user_data(user.user_id)
+        document_manager: DocumentManager = Container.resolve("document_manager")
+        document_manager.user_level_deletion(user_id=user.user_id, db=db)
 
         return CommonHttpResponse(
             detail="User deleted"
