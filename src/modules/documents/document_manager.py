@@ -52,7 +52,7 @@ class DocumentManager:
             )
             
         else: 
-            self.__embedding_service.add_document(
+            await self.__embedding_service.add_document(
                     file_bytes=file_bytes,
                     filename=filename, 
                     user_id=user_id, 
