@@ -32,6 +32,7 @@ class EmployeeConfig(BaseModel):
     )
 
 class EmployeeUser(EmployeeConfig):
+    user_id: str
     name: str
     email: EmailStr
     phone: str
@@ -41,7 +42,6 @@ class EmployeeCreate(EmployeeConfig):
 
 class EmployeePublic(EmployeeConfig):
     employee_id: uuid.UUID
-    user_id: uuid.UUID
     company_id: uuid.UUID
     position: Optional[str] = None
     is_manager: bool
