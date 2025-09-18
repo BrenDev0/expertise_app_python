@@ -8,6 +8,7 @@ from src.modules.documents.documents_models import TenantTable
 from src.core.decorators.service_error_handler import service_error_handler
 import os 
 import chardet
+from typing import List
 
 class TenantDataService:
     """
@@ -68,6 +69,19 @@ class TenantDataService:
             key="document_id",
             value=document_id
         )
+    
+
+    @service_error_handler(module=__MODULE)
+    def collection(
+        self,
+        db: Session,
+        comapny_id: UUID,
+    ) -> List[TenantTable]:
+        return self.__repository.get_many(
+            db=db,
+            key="company_id",
+            value=comapny_id
+        )
 
     def delete_document_table(
         self,
@@ -80,13 +94,45 @@ class TenantDataService:
         )
 
         if table:
-            db.execute(text(f'DROP TABLE IF EXISTS "{table.table_name}"'))
-            db.commit()
-
-            return self.__repository.delete(
+            self.__handle_delete(
                 db=db,
-                key="tenant_table_id",
-                value=table.tenant_table_id
+                table=table
             )
+            
+        
+    
+    def delete_companies_tables(
+        self,
+        db: Session,
+        company_id: UUID
+    ) ->  List[TenantTable]:
+        tables = self.collection(
+            db=db,
+            comapny_id=company_id
+        )
+
+        if len(tables) != 0:
+            for table in tables:
+                self.__handle_delete(
+                    db=db,
+                    table=table
+                )
+
+    @service_error_handler(module=__MODULE)
+    def __handle_delete(
+        self,
+        db: Session,
+        table: TenantTable
+    ) -> TenantTable:
+        
+        db.execute(text(f'DROP TABLE IF EXISTS "{table.table_name}"'))
+        db.commit()
+
+        return self.__repository.delete(
+            db=db,
+            key="tenant_table_id",
+            value=table.tenant_table_id
+        )
+        
             
         
