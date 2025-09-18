@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 from src.modules.documents.documents_models import Document
 from  uuid import UUID
 from src.core.services.data_handling_service import DataHandlingService
-from  typing import List
+from  typing import List, Any
 from src.core.decorators.service_error_handler import service_error_handler
 from fastapi import UploadFile
 
@@ -32,11 +32,6 @@ class DocumentsService:
         return self.__repository.get_many(db=db, key="company_id", value=company_id)
     
     @service_error_handler(module=__MODULE)
-    def delete(self, db: Session, document_id: UUID) -> Document:
-        return self.__repository.delete(db=db, key="document_id", value=document_id)
+    def delete(self, db: Session, key: str, value: Any) -> Document | List[Document]:
+        return self.__repository.delete(db=db, key=key, value=value)
     
-    @staticmethod
-    async def read_file(
-        file: UploadFile
-    ) -> bytes:
-        return await file.read()

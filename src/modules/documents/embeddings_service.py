@@ -138,7 +138,11 @@ class EmbeddingService:
         """Delete entire collection for a company (all documents)"""
         collection_name = self.get_collection_name(user_id, company_id)
         
-        self.__client.delete_collection(collection_name)
+        try:
+            self.__client.delete_collection(collection_name)
+        except:
+            return
+         
         return {
             "status": "success",
             "operation": "delete_company",
@@ -154,9 +158,11 @@ class EmbeddingService:
         
         for collection in collections.collections:
             if collection.name.startswith(user_prefix):
-                self.__client.delete_collection(collection.name)
-                deleted_collections.append(collection.name)
-        
+                try:
+                    self.__client.delete_collection(collection.name)
+                    deleted_collections.append(collection.name)
+                except:
+                    pass
         return {
             "status": "success",
             "operation": "delete_user",

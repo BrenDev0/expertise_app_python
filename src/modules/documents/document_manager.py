@@ -7,6 +7,10 @@ from fastapi import UploadFile
 from  uuid import UUID
 from sqlalchemy.orm import Session
 from src.modules.documents.documents_models import Document
+from src.core.dependencies.container import Container
+from src.modules.companies.companies_service import CompaniesService
+from src.modules.companies.companies_models import Company
+
 class DocumentManager:
     __MODULE = "documents.manager"
     def __init__(
@@ -87,5 +91,59 @@ class DocumentManager:
 
         self.documents_service.delete(
             db=db,
-            document_id=document_id
+            key="document_id",
+            value=document_id
         )
+
+    @service_error_handler(module=__MODULE)
+    def company_level_deletion(
+        self,
+        company_id: UUID,
+        user_id: UUID,
+        db: Session
+    ):
+        self.__tenant_data_service.delete_companies_tables(
+            db=db,
+            company_id=company_id
+        )
+
+        self.__s3_service.delete_company_data(
+            user_id=user_id,
+            company_id=company_id
+        )
+
+        self.__embedding_service.delete_company_data(
+            user_id=user_id,
+            company_id=company_id
+        )
+
+        self.documents_service.delete(
+            db=db,
+            key="company_id",
+            value=company_id
+        )
+
+    @service_error_handler(module=__MODULE)
+    def user_level_deletion(
+        self,
+        user_id: UUID,
+        db: Session
+    ):
+        companies_service: CompaniesService = Container.resolve("companies_service")
+        users_companies = companies_service.collection(db=db, user_id=user_id)
+
+        self.__s3_service.delete_user_data(user_id=user_id)
+
+        self.__embedding_service.delete_user_data(user_id=user_id)
+
+        for company in users_companies:
+            self.__tenant_data_service.delete_companies_tables(
+                db=db,
+                company_id=company.company_id
+            )
+
+            self.documents_service.delete(
+                db=db,
+                key="company_id",
+                value=company.company_id
+            )

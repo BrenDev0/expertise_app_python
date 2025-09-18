@@ -83,6 +83,7 @@ class TenantDataService:
             value=comapny_id
         )
 
+    @service_error_handler(module=__MODULE)
     def delete_document_table(
         self,
         db: Session,
@@ -100,7 +101,7 @@ class TenantDataService:
             )
             
         
-    
+    @service_error_handler(module=__MODULE)
     def delete_companies_tables(
         self,
         db: Session,

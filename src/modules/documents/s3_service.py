@@ -29,21 +29,23 @@ class S3Service:
         return file_url
     
     @service_error_handler(__MODULE)
-    def delete_user_data(self, 
-        user_id: UUID,
-    ) -> None:
-        s3_key = self.__build_key(user_id=user_id)
-        self.s3_client.delete_object(Bucket=self.bucket_name, Key=s3_key)
+    def delete_user_data(self, user_id: UUID) -> None:
+        prefix = self.__build_key(user_id=user_id)
+        response = self.s3_client.list_objects_v2(Bucket=self.bucket_name, Prefix=prefix)
+        if "Contents" in response:
+            for obj in response["Contents"]:
+                self.s3_client.delete_object(Bucket=self.bucket_name, Key=obj["Key"])
+        return "User data deleted"
 
 
     @service_error_handler(__MODULE)
-    def delete_company_data(self, 
-        user_id: UUID,
-        company_id: UUID,
-       
-    ) -> None:
-        s3_key = self.__build_key(user_id=user_id, company_id=company_id)
-        self.s3_client.delete_object(Bucket=self.bucket_name, Key=s3_key)
+    def delete_company_data(self, user_id: UUID, company_id: UUID) -> None:
+        prefix = self.__build_key(user_id=user_id, company_id=company_id)
+        response = self.s3_client.list_objects_v2(Bucket=self.bucket_name, Prefix=prefix)
+        if "Contents" in response:
+            for obj in response["Contents"]:
+                self.s3_client.delete_object(Bucket=self.bucket_name, Key=obj["Key"])
+        return "Company data deleted"
 
     @service_error_handler(__MODULE)
     def delete_document_data(self, 
@@ -70,6 +72,8 @@ class S3Service:
             
         if filename:
             key_parts.extend(["docs", filename])
+
+        print("/".join(key_parts))
             
         return "/".join(key_parts)
     
