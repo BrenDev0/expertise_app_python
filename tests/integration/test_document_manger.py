@@ -4,19 +4,19 @@ import os
 import pytest
 from src.core.dependencies.configure_container import configure_container
 from src.core.dependencies.container import Container
-from src.modules.documents.s3_service import S3Service
+from src.modules.documents.document_manager import DocumentManager
 
 
 def test_delete_company_data():
     configure_container()
-    s3_service: S3Service = Container.resolve("s3_service")
+    document_manager: DocumentManager = Container.resolve("doument_manger")
 
     user_id = os.getenv("TEST_USER_ID")
     company_id = os.getenv("TEST_COMPANY_ID")
 
-    result = s3_service.delete_company_data(
-        user_id=user_id,
-        company_id=company_id
+    result = document_manager.company_level_deletion(
+        company_id=company_id,
+        user_id=user_id
     )
 
-    assert result == "Company data deleted"
+    assert result == "Company documents deleted"
