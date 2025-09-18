@@ -180,6 +180,7 @@ class EmployeesController:
 
     def __to_public(self, data: Employee) -> EmployeePublic:
         user_public = EmployeeUser(
+            user_id=str(data.user.user_id),
             name=self.__http_service.encryption_service.decrypt(data.user.name),
             email=self.__http_service.encryption_service.decrypt(data.user.email),
             phone=self.__http_service.encryption_service.decrypt(data.user.phone)
@@ -187,7 +188,6 @@ class EmployeesController:
 
         employee_public = EmployeePublic(
             employee_id=data.employee_id,
-            user_id=data.user_id,
             company_id=data.company_id,
             position=data.position,
             is_manager=data.is_manager,
