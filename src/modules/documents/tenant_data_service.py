@@ -32,7 +32,7 @@ class TenantDataService:
         if filename.endswith(".csv"):
             df = pd.read_csv(io.BytesIO(file_bytes), encoding=encoding)
         elif filename.endswith((".xlsx", ".xls", ".xlsm", ".xlsb")):
-            df = pd.read_excel(io.BytesIO(file_bytes), encoding=encoding)
+            df = pd.read_excel(io.BytesIO(file_bytes))
         else:
             raise ValueError("Unsupported file type")
         

@@ -1,7 +1,7 @@
 from src.core.services.http_service import HttpService
 from src.modules.documents.s3_service import S3Service
 from uuid import UUID
-from fastapi import Request, UploadFile
+from fastapi import Request, UploadFile, HTTPException
 from src.modules.documents.documents_models import Document, DocumentPublic
 from src.modules.users.users_models import User
 from sqlalchemy.orm import Session
@@ -55,13 +55,16 @@ class DocumentsController:
         new_document = self.__documents_service.create(db=db, company_id=company_resource.company_id, filename=file.filename, url=s3_url)
 
         if file.filename.endswith((".xlsx", ".xls", ".xlsm", ".xlsb", ".csv")):
-            self.__tenant_data_service.create_table_from_file(
-                db=db,
-                company_id=company_resource.company_id,
-                document_id=new_document.document_id,
-                filename=file.filename,
-                file_bytes=file_bytes
-            )
+            try:
+                self.__tenant_data_service.create_table_from_file(
+                    db=db,
+                    company_id=company_resource.company_id,
+                    document_id=new_document.document_id,
+                    filename=file.filename,
+                    file_bytes=file_bytes
+                )
+            except:
+                raise HTTPException(status_code=400, detail="Unsupported document type")
         else: 
             asyncio.create_task(
                 self.__embeddings_service.add_document(
