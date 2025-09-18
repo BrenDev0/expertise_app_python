@@ -47,21 +47,25 @@ class DocumentsController:
         )
 
         self.__http_service.request_validation_service.validate_action_authorization(user.user_id, company_resource.user_id)
+
+        filename = file.filename.lower().replace(" ", "_")
         
         file_bytes = await self.__documents_service.read_file(file=file)
 
-        s3_url = await self.__s3_service.upload(file_bytes=file_bytes, filename=file.filename, company_id=company_resource.company_id, user_id=company_resource.user_id)
+        s3_url = await self.__s3_service.upload(file_bytes=file_bytes, filename=filename, company_id=company_resource.company_id, user_id=company_resource.user_id)
 
-        new_document = self.__documents_service.create(db=db, company_id=company_resource.company_id, filename=file.filename, url=s3_url)
+        new_document = self.__documents_service.create(db=db, company_id=company_resource.company_id, filename=filename, url=s3_url)
 
-        if file.filename.endswith((".xlsx", ".xls", ".xlsm", ".xlsb", ".csv")):
+        if filename.endswith((".xlsx", ".xls", ".xlsm", ".xlsb", ".csv")):
             try:
-                self.__tenant_data_service.create_table_from_file(
+                asyncio.create_task(
+                    self.__tenant_data_service.create_table_from_file(
                     db=db,
                     company_id=company_resource.company_id,
                     document_id=new_document.document_id,
-                    filename=file.filename,
+                    filename=filename,
                     file_bytes=file_bytes
+                )
                 )
             except:
                 raise HTTPException(status_code=400, detail="Unsupported document type")
@@ -69,7 +73,7 @@ class DocumentsController:
             asyncio.create_task(
                 self.__embeddings_service.add_document(
                     file_bytes=file_bytes,
-                    filename=file.filename, 
+                    filename=filename, 
                     user_id=user.user_id, 
                     company_id=company_resource.company_id
                 )
@@ -128,8 +132,8 @@ class DocumentsController:
         self.__s3_service.delete_document_data(user_id=document_resource.company.user_id, company_id=document_resource.company_id, filename=document_resource.filename)
         
         self.__embeddings_service.delete_document_data(
-            user_id=user.user_id,
-            company_id=document_resource.company_id,
+            user_id=str(user.user_id),
+            company_id=str(document_resource.company_id),
             filename=document_resource.filename
         )
 
