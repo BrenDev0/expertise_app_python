@@ -56,4 +56,36 @@ class TenantDataService:
 
         self.__repository.create(db=db, data=tenant_table)
 
+    @service_error_handler(module=__MODULE)
+    def resource(
+        self,
+        db: Session,
+        document_id: UUID,
+    ) -> TenantTable | None:
+        return self.__repository.get_one(
+            db=db,
+            key="document_id",
+            value=document_id
+        )
 
+    def delete_document_table(
+        self,
+        db: Session,
+        document_id: UUID
+    ):
+        table: TenantTable = self.resource(
+            db=db,
+            document_id=document_id
+        )
+
+        if table:
+            db.execute(f'DROP TABLE IF EXISTS "{table.table_name}"')
+            db.commit()
+
+            return self.__repository.delete(
+                db=db,
+                key="tenant_table_id",
+                value=table.tenant_table_id
+            )
+            
+        
