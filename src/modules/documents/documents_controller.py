@@ -137,6 +137,11 @@ class DocumentsController:
             filename=document_resource.filename
         )
 
+        self.__documents_service.delete(
+            db=db,
+            document_id=document_resource.document_id
+        )
+
         return CommonHttpResponse(
             detail="Document deleted"
         )
