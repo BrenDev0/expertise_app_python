@@ -72,8 +72,6 @@ class S3Service:
             
         if filename:
             key_parts.extend(["docs", filename])
-
-        print("/".join(key_parts))
             
         return "/".join(key_parts)
     

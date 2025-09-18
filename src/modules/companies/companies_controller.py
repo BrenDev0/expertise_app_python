@@ -7,8 +7,7 @@ from fastapi import Request
 from sqlalchemy.orm import Session
 from uuid import UUID
 from src.core.dependencies.container import Container
-from src.modules.documents.s3_service import S3Service
-from src.modules.documents.embeddings_service import EmbeddingService
+from src.modules.documents.document_manager import DocumentManager
 
 class CompaniesController:
     def __init__(self, http_service: HttpService, companies_service: CompaniesService):
@@ -108,11 +107,13 @@ class CompaniesController:
         self.__companies_service.delete(db=db, company_id=company_id)
 
 
-        ## delete bucket and vector base data 
-        s3_service: S3Service = Container.resolve("s3_service")
-        embeddings_service: EmbeddingService = Container.resolve("embeddings_service")
-        s3_service.delete_company_data(user_id=user.user_id, company_id=company_resource.company_id)
-        embeddings_service.delete_company_data(user_id=user.user_id, company_id=company_resource.company_id)
+        ## delete company documents from all cloud providers and db
+        document_manager: DocumentManager = Container.resolve("document_manager")
+        document_manager.company_level_deletion(
+            company_id=company_id,
+            user_id=company_resource.user_id,
+            db=db
+        )
 
         return CommonHttpResponse(
             detail="Company deleted"
