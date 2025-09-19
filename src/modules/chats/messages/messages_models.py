@@ -5,6 +5,7 @@ from src.core.database.database_models import Base
 import uuid
 from sqlalchemy.dialects.postgresql import UUID
 from  datetime import datetime
+from typing import Union, Dict, List, Any
 
 class Message(Base):
     __tablename__ = "messages"
@@ -27,7 +28,7 @@ class MessageConfig(BaseModel):
 class MessageCreate(MessageConfig):
     sender: uuid.UUID
     message_type: str
-    text: str
+    text: Union[str, List[Any]]
 
 class MessagePublic(MessageCreate):
     chat_id: uuid.UUID
