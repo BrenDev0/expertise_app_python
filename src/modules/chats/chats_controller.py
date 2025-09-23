@@ -25,7 +25,7 @@ class ChatsController:
         req: Request, 
         data: ChatCreate,
         db: Session
-    ) -> ChatCreateResponse:
+    ) -> ChatPublic:
         user: User = req.state.user
 
         chat: Chat = self.__chats_service.create(
@@ -69,9 +69,7 @@ class ChatsController:
 
             self.__participants_service.create(db=db, agent_id=agent_id, chat_id=chat.chat_id)
 
-        return ChatCreateResponse(
-            chatId=chat.chat_id
-        )
+        return self.__to_public(chat)
  
     def collection_request(
         self, 
