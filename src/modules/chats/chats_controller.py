@@ -3,7 +3,7 @@ from src.modules.users.users_models import User
 from src.modules.chats.chats_service import ChatsService
 from src.modules.chats.chats_models import  Chat, ChatCreate, ChatCreateResponse, ChatUpdate
 from src.core.models.http_responses import CommonHttpResponse
-from fastapi import Request
+from fastapi import Request, HTTPException
 from src.core.services.http_service import HttpService
 from sqlalchemy.orm import Session
 from typing import List
@@ -34,7 +34,20 @@ class ChatsController:
             user_id=user.user_id
         )
 
+        valid_agents = []
         for agent_id in data.agents:
+            agent_resource: Agent = self.__http_service.request_validation_service.verify_resource(
+                service_key="agents_service",
+                params={
+                    "db": db,
+                    "agent_id": agent_id
+                },
+                throw_http_error=False
+            )
+
+            if agent_resource == None:
+                continue
+
             if not user.is_admin:
                 employee_resource: Employee = self.__http_service.request_validation_service.verify_resource(
                     service_key="employees_service",
@@ -47,15 +60,6 @@ class ChatsController:
                 )
 
                 if not employee_resource.is_manager:
-                    agent_resource: Agent = self.__http_service.request_validation_service.verify_resource(
-                        service_key="agents_service",
-                        params={
-                            "db": db,
-                            "agent_id": agent_id
-                        },
-                        not_found_message="Agent not found"
-                    )
-
                     self.__http_service.request_validation_service.verify_resource(
                         service_key="agent_access_service",
                         params={
@@ -69,6 +73,10 @@ class ChatsController:
 
             self.__participants_service.create(db=db, agent_id=agent_id, chat_id=chat.chat_id)
 
+        if len(valid_agents) == 0:
+            self.__chats_service.delete(db=db, chat_id=chat.chat_id)
+            raise HTTPException(status_code=400, detail="No valid agents found. Please check agent permissions.")
+        
         return self.__to_public(chat)
  
     def collection_request(
