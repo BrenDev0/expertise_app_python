@@ -21,7 +21,7 @@ router = APIRouter(
 def get_controller() -> ChatsController:
     return Container.resolve("chats_controller")
 
-@router.post("/secure/create", status_code=201, response_model=ChatCreateResponse)
+@router.post("/secure/create", status_code=201, response_model=ChatPublic)
 def secure_create(
     req: Request,
     data: ChatCreate = Body(...),
