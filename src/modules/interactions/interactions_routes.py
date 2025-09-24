@@ -6,11 +6,13 @@ from sqlalchemy.orm import Session
 from src.core.database.session import get_db_session
 from src.modules.chats.messages.messages_models import MessagePublic
 from src.core.middleware.auth_middleware import auth_middleware
+from src.core.middleware.middleware_service import security
 from uuid import UUID
 
 router = APIRouter(
     prefix="/interactions",
-    tags=["Interactions"]
+    tags=["Interactions"],
+    dependencies=[Depends(security)]
 )
 
 def get_controller() -> InteractionsController:
