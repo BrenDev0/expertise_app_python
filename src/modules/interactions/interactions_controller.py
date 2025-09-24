@@ -40,8 +40,7 @@ class InteractionsController:
             chat_id=str(chat_resource.chat_id),
             input=data.input,
             user_id=data.user_id,
-            company_id=data.company_id,
-            agents=[str(agent.agent_id) for agent in chat_resource.agents]
+            company_id=data.company_id
         )
 
         return worker_state
