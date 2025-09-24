@@ -33,49 +33,6 @@ class ChatsController:
             title=data.title, 
             user_id=user.user_id
         )
-
-        valid_agents = []
-        for agent_id in data.agents:
-            agent_resource: Agent = self.__http_service.request_validation_service.verify_resource(
-                service_key="agents_service",
-                params={
-                    "db": db,
-                    "agent_id": agent_id
-                },
-                throw_http_error=False
-            )
-
-            if agent_resource == None:
-                continue
-
-            if not user.is_admin:
-                employee_resource: Employee = self.__http_service.request_validation_service.verify_resource(
-                    service_key="employees_service",
-                    params={
-                        "db": db,
-                        "key": "user_id",
-                        "value": user.user_id
-                    },
-                    not_found_message="Employee profile not found"
-                )
-
-                if not employee_resource.is_manager:
-                    self.__http_service.request_validation_service.verify_resource(
-                        service_key="agent_access_service",
-                        params={
-                            "db": db,
-                            "user_id": user.user_id,
-                            "agent_id": agent_resource.agent_id
-                        },
-                        not_found_message="User does not have access to agent",
-                        status_code=403
-                    )
-
-            self.__participants_service.create(db=db, agent_id=agent_id, chat_id=chat.chat_id)
-
-        if len(valid_agents) == 0:
-            self.__chats_service.delete(db=db, chat_id=chat.chat_id)
-            raise HTTPException(status_code=400, detail="No valid agents found. Please check agent permissions.")
         
         return self.__to_public(chat)
  
@@ -138,13 +95,11 @@ class ChatsController:
    
     @staticmethod
     def __to_public(chat: Chat) -> ChatPublic:
-        agent_ids = [agent.agent_id for agent in chat.agents]
         return ChatPublic.model_validate(
             {
                 "chat_id": chat.chat_id,
                 "user_id": chat.user_id,
-                "title": chat.title,
-                "agents": agent_ids
+                "title": chat.title
             }
         )
         
