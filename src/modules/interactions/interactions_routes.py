@@ -4,7 +4,7 @@ from  src.modules.interactions.interactions_models import HumanToAgentRequest
 from src.core.dependencies.container import Container
 from sqlalchemy.orm import Session
 from src.core.database.session import get_db_session
-from src.core.models.http_responses import CommonHttpResponse
+from src.modules.chats.messages.messages_models import MessagePublic
 from src.core.middleware.auth_middleware import auth_middleware
 from uuid import UUID
 
@@ -18,7 +18,7 @@ def get_controller() -> InteractionsController:
     return controller
 
 
-@router.post("/secure/incomming/{chat_id}", status_code=200, response_model=CommonHttpResponse)
+@router.post("/secure/incomming/{chat_id}", status_code=200, response_model=MessagePublic)
 async def internal_incomming_interaction(
     chat_id: UUID,
     req: Request,

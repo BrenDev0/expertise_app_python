@@ -3,6 +3,8 @@ from src.core.models.http_responses import CommonHttpResponse
 from src.core.services.http_service import HttpService
 from src.modules.interactions.interactions_models import HumanToAgentRequest
 from src.modules.state.state_service import StateService
+from src.modules.chats.messages.messages_service import MessagesService
+from src.modules.chats.messages.messages_models import MessagePublic
 from sqlalchemy.orm import Session
 from uuid import UUID
 from src.modules.users.users_models import User
@@ -17,10 +19,12 @@ class InteractionsController:
     def __init__(
         self, 
         http_service: HttpService,
-        state_service: StateService
+        state_service: StateService,
+        messages_service: MessagesService
     ):
         self.__http_service = http_service
         self.__state_service = state_service
+        self.__messages_service = messages_service
 
     async def incoming_interaction(
         self,
@@ -28,7 +32,7 @@ class InteractionsController:
         req: Request,
         data: HumanToAgentRequest,
         db: Session
-    )-> WorkerState: 
+    )-> MessagePublic: 
         user: User = req.user
         company_id = self.__http_service.request_validation_service.verify_company_in_request_state(req=req)
 
@@ -43,6 +47,16 @@ class InteractionsController:
 
         self.__http_service.request_validation_service.validate_action_authorization(user.user_id, chat_resource.user_id)
         
+        message = self.__messages_service.create(
+            db=db,
+            chat_id=chat_resource.chat_id,
+            sender_id=user.user_id,
+            message_type="human",
+            text=data.input
+        )
+
+
+
         worker_state: WorkerState = await self.__state_service.ensure_chat_state(
             db=db,
             chat_id=str(chat_resource.chat_id),
@@ -53,9 +67,7 @@ class InteractionsController:
 
         self.__send_to_agent(state=worker_state)
 
-        return CommonHttpResponse(
-            detail="Request sent to agent."
-        )
+        return MessagePublic.model_validate(message, from_attributes=True)
     
 
     async def __send_to_agent(
