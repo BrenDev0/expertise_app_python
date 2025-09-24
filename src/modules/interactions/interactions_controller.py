@@ -65,7 +65,7 @@ class InteractionsController:
             company_id=company_id
         )
 
-        self.__send_to_agent(state=worker_state)
+        await self.__send_to_agent(state=worker_state)
 
         return MessagePublic.model_validate(message, from_attributes=True)
     
