@@ -33,7 +33,7 @@ class InteractionsController:
         data: HumanToAgentRequest,
         db: Session
     )-> MessagePublic: 
-        user: User = req.user
+        user: User = req.state.user
         company_id = self.__http_service.request_validation_service.verify_company_in_request_state(req=req)
 
         chat_resource: Chat = self.__http_service.request_validation_service.verify_resource(
