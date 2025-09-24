@@ -85,7 +85,7 @@ class InteractionsController:
             response = await client.post(
                 f"https://{agent_id}{agent_host}/interactions/internal/interact",
                 headers=hmac_headers,
-                json=state
+                json=state.model_dump_json()
             )
             
             return response
