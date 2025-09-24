@@ -65,7 +65,10 @@ class InteractionsController:
             company_id=company_id
         )
 
-        await self.__send_to_agent(state=worker_state)
+        await self.__send_to_agent(
+            state=worker_state,
+            agent_id=data.agent_id
+        )
 
         return MessagePublic.model_validate(message, from_attributes=True)
     
@@ -82,7 +85,7 @@ class InteractionsController:
             response = await client.post(
                 f"https://{agent_id}{agent_host}/interactions/internal/interact",
                 headers=hmac_headers,
-                json=state
+                json=state.model_dump_json()
             )
             
             return response
