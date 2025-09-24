@@ -1,24 +1,20 @@
 from src.modules.chats.chats_models import Chat, ChatPublic
 from src.modules.users.users_models import User
 from src.modules.chats.chats_service import ChatsService
-from src.modules.chats.chats_models import  Chat, ChatCreate, ChatCreateResponse, ChatUpdate
+from src.modules.chats.chats_models import  Chat, ChatCreate, ChatUpdate
 from src.core.models.http_responses import CommonHttpResponse
-from fastapi import Request, HTTPException
+from fastapi import Request
 from src.core.services.http_service import HttpService
 from sqlalchemy.orm import Session
 from typing import List
 from uuid import UUID
 from src.modules.users.users_models import User
-from src.modules.agents.agents_models import Agent
-from src.modules.employees.employees_models import Employee
-from src.modules.chats.participants.participants_service import ParticipantsService
 
 
 class ChatsController:
-    def __init__(self, http_service: HttpService, chats_service: ChatsService, participants_service: ParticipantsService):
+    def __init__(self, http_service: HttpService, chats_service: ChatsService):
         self.__http_service: HttpService = http_service
         self.__chats_service = chats_service
-        self.__participants_service = participants_service
 
     def create_request(
         self, 

@@ -1,11 +1,11 @@
-from fastapi import APIRouter, Body, Depends
+from fastapi import APIRouter, Body, Depends, Request
 from src.modules.interactions.interactions_controller import InteractionsController
 from  src.modules.interactions.interactions_models import HumanToAgentRequest
 from src.core.dependencies.container import Container
 from sqlalchemy.orm import Session
 from src.core.database.session import get_db_session
-from src.modules.state.state_models import WorkerState
-from src.core.middleware.hmac_verification import verify_hmac
+from src.core.models.http_responses import CommonHttpResponse
+from src.core.middleware.auth_middleware import auth_middleware
 from uuid import UUID
 
 router = APIRouter(
@@ -18,11 +18,12 @@ def get_controller() -> InteractionsController:
     return controller
 
 
-@router.post("/internal/incomming/{chat_id}", status_code=202, response_model=WorkerState)
+@router.post("/secure/incomming/{chat_id}", status_code=200, response_model=CommonHttpResponse)
 async def internal_incomming_interaction(
     chat_id: UUID,
+    req: Request,
     data: HumanToAgentRequest = Body(...),
-    _: None = Depends(verify_hmac),
+    _: None = Depends(auth_middleware),
     db: Session = Depends(get_db_session),
     controller: InteractionsController = Depends(get_controller)
 ):
@@ -32,6 +33,7 @@ async def internal_incomming_interaction(
 
     return await controller.incoming_interaction(
         chat_id=chat_id,
+        req=req,
         data=data,
         db=db
     )

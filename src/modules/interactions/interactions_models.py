@@ -11,11 +11,9 @@ class InteractionConfig(BaseModel):
     )
 
 class HumanToAgentRequest(InteractionConfig):
+    agent_id: UUID
     input: str
-    user_id: UUID
-    company_id: UUID 
-
-
+  
 class AgentToHumanRequest(InteractionConfig):
     human_message: str
     ai_message: Union[str, List[Any]]

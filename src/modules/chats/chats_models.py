@@ -1,6 +1,5 @@
 from pydantic import BaseModel, ConfigDict
 from sqlalchemy import Column, String, ForeignKey
-from sqlalchemy.orm import relationship
 from src.core.database.database_models import Base
 import uuid
 from sqlalchemy.dialects.postgresql import UUID
@@ -19,7 +18,6 @@ class ChatConfig(BaseModel):
         alias_generator=to_camel,
         extra="forbid"
     )
-
 
 class ChatCreate(ChatConfig):
     title: str
