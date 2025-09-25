@@ -33,7 +33,7 @@ class MessagesService():
             value=chat_id, 
             limit=num_of_messages, 
             order_by="created_at",
-            desc=True
+            desc=False
         )
     
     @service_error_handler(f"{__MODULE}.delete")
