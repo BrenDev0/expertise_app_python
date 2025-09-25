@@ -11,6 +11,7 @@ from src.modules.users.users_models import User
 from src.modules.chats.chats_models import Chat
 import asyncio
 from fastapi import Request
+from fastapi.encoders import jsonable_encoder
 from src.utils.http.hmac import get_hmac_headers
 import os
 import httpx
@@ -65,12 +66,11 @@ class InteractionsController:
             company_id=company_id
         )
 
-        response = await self.__send_to_agent(
+        await self.__send_to_agent(
             state=worker_state,
             agent_id=data.agent_id
         )
 
-        print("RESPONSE::::", response)
         return MessagePublic.model_validate(message, from_attributes=True)
     
 
@@ -86,7 +86,7 @@ class InteractionsController:
             response = await client.post(
                 f"https://{agent_id}{agent_host}/interactions/internal/interact",
                 headers=hmac_headers,
-                json=state.model_dump_json()
+                json=jsonable_encoder(state)
             )
             
             return response
