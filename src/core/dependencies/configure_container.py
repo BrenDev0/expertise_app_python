@@ -81,7 +81,6 @@ def configure_container():
     Container.register("data_handler", data_handler)
 
     http_service = HttpService(
-        logger=logger,
         encryption_service=encryption_service,
         hashing_service=hashing_service,
         request_validation_service=request_validation_service,
