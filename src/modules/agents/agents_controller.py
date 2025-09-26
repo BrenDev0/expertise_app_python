@@ -93,6 +93,7 @@ class AgentsController:
         db: Session
     ) -> List[AgentPublic]:
         user: User = req.state.user
+        company_id = self.__http_service.request_validation_service.verify_company_in_request_state(req=req)
 
         employee_resource: Employee = self.__http_service.request_validation_service.verify_resource(
             service_key="employees_service",
@@ -102,6 +103,8 @@ class AgentsController:
             },
             not_found_message="Employee not found"
         )
+
+        self.__http_service.request_validation_service.validate_action_authorization(company_id, employee_resource.company_id)
 
         data = self.__agent_access_service.collection(db=db, user_id=employee_resource.user_id)
 
