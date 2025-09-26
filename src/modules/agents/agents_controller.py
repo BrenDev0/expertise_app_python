@@ -89,20 +89,22 @@ class AgentsController:
     
     def collection_request(
         self,
-        employee_id: UUID,
         req: Request,
         db: Session
     ) -> List[AgentPublic]:
-        user = req.state.user
+        user: User = req.state.user
+        company_id = self.__http_service.request_validation_service.verify_company_in_request_state(req=req)
 
         employee_resource: Employee = self.__http_service.request_validation_service.verify_resource(
             service_key="employees_service",
             params={
                 "db": db,
-                "employee_id": employee_id
+                "user_id": user.user_id
             },
             not_found_message="Employee not found"
         )
+
+        self.__http_service.request_validation_service.validate_action_authorization(company_id, employee_resource.company_id)
 
         data = self.__agent_access_service.collection(db=db, user_id=employee_resource.user_id)
 

@@ -63,9 +63,8 @@ def secure_resource(
         db=db 
     )
 
-@router.get("/secure/collection/{employee_id}", status_code=200, response_model=List[AgentPublic])
+@router.get("/secure/collection", status_code=200, response_model=List[AgentPublic])
 def secure_collection(
-    employee_id: UUID,
     req: Request,
     _: None = Depends(auth_middleware),
     db: Session = Depends(get_db_session),
@@ -77,7 +76,6 @@ def secure_collection(
     This endpoint returns all agents the employee id has access to.
     """
     return controller.collection_request(
-        employee_id=employee_id,
         req=req,
         db=db
     )
