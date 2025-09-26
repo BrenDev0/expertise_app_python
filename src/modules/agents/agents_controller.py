@@ -95,6 +95,11 @@ class AgentsController:
         user: User = req.state.user
         company_id = self.__http_service.request_validation_service.verify_company_in_request_state(req=req)
 
+        if user.is_admin:
+            data = self.__agents_service.read(db=db)
+
+            return [self.__to_public(agent) for agent in data]
+
         employee_resource: Employee = self.__http_service.request_validation_service.verify_resource(
             service_key="employees_service",
             params={
@@ -103,6 +108,11 @@ class AgentsController:
             },
             not_found_message="Employee not found"
         )
+
+        if employee_resource.is_manager:
+            data = self.__agents_service.read(db=db)
+
+            return [self.__to_public(agent) for agent in data]
 
         self.__http_service.request_validation_service.validate_action_authorization(company_id, employee_resource.company_id)
 
