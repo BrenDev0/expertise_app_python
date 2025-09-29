@@ -1,13 +1,13 @@
-from src.modules.documents.s3_service import S3Service
+from src.modules.documents.services.s3_service import S3Service
 from src.modules.documents.documents_controller import DocumentsController
-from src.modules.documents.documents_service import DocumentsService
+from src.modules.documents.services.documents_service import DocumentsService
 from src.modules.documents.documents_models import Document, TenantTable
 from src.core.repository.base_repository import BaseRepository
 from src.core.services.http_service import HttpService
 from src.core.services.data_handling_service import DataHandlingService
 from src.core.dependencies.container import Container
-from src.modules.documents.embeddings_service import EmbeddingService
-from src.modules.documents.tenant_data_service import TenantDataService
+from src.modules.documents.services.embeddings_service import EmbeddingService
+from src.modules.documents.services.tenant_data_service import TenantDataService
 from src.modules.documents.document_manager import DocumentManager
 
 

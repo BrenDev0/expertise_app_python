@@ -2,7 +2,7 @@ import pytest
 from unittest.mock import Mock
 import uuid
 
-from src.modules.documents.documents_service import DocumentsService
+from src.modules.documents.services.documents_service import DocumentsService
 from src.modules.documents.documents_models import Document
 from src.modules.companies.companies_models import Company 
 
