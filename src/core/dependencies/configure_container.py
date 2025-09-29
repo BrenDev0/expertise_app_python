@@ -11,9 +11,9 @@ from src.core.services.webtoken_service import WebTokenService
 from src.core.services.redis_service import RedisService
 import boto3
 import os
-from src.modules.documents.s3_service import S3Service
+from src.modules.documents.services.s3_service import S3Service
 from qdrant_client import QdrantClient
-from src.modules.documents.embeddings_service import EmbeddingService
+from src.modules.documents.services.embeddings_service import EmbeddingService
 from src.modules.users.users_dependencies import configure_users_dependencies
 from src.modules.chats.chats_dependencies import configure_chats_dependencies
 from src.modules.companies.companies_dependencies import configure_companies_dependencies

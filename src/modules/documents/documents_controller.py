@@ -1,14 +1,24 @@
-from src.core.services.http_service import HttpService
-from src.modules.documents.s3_service import S3Service
 from uuid import UUID
+from typing import List, Dict, Any
+import asyncio
 from fastapi import Request, UploadFile, HTTPException
+from  fastapi.responses import StreamingResponse
+import pandas as pd
+import io
+
+from sqlalchemy.orm import Session
+
+
+from src.modules.documents.services.s3_service import S3Service
 from src.modules.documents.documents_models import Document, DocumentPublic
 from src.modules.users.users_models import User
-from sqlalchemy.orm import Session
 from src.modules.companies.companies_models import Company
-from src.core.models.http_responses import CommonHttpResponse
+
 from src.modules.documents.document_manager import DocumentManager
-import asyncio
+
+from src.core.services.http_service import HttpService
+from src.core.models.http_responses import CommonHttpResponse
+
 
 
 class DocumentsController:
@@ -52,7 +62,7 @@ class DocumentsController:
         
         return CommonHttpResponse(
             detail="file uploaded"
-        )
+        )        
     
 
     def collection_request(

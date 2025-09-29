@@ -1,5 +1,6 @@
-from  fastapi import APIRouter, UploadFile, Request, File,  Depends
-from src.modules.documents.s3_service import S3Service
+from  fastapi import APIRouter, UploadFile, Request, File,  Depends, Body
+from fastapi.responses import StreamingResponse
+from src.modules.documents.services.s3_service import S3Service
 from src.modules.documents.documents_controller import DocumentsController
 from src.core.models.http_responses import CommonHttpResponse
 from uuid import UUID
@@ -9,7 +10,7 @@ from src.core.dependencies.container import Container
 from src.core.database.session import get_db_session
 from sqlalchemy.orm import Session
 from src.modules.documents.documents_models import DocumentPublic
-from typing import List
+from typing import List, Dict, Any
 from src.core.middleware.hmac_verification import verify_hmac
 
 router = APIRouter(
@@ -42,6 +43,7 @@ async def secure_upload(
         file=file
     )
 
+
 @router.get("/secure/collection", status_code=200, response_model=List[DocumentPublic])
 def secure_collection(
     req: Request,
@@ -73,3 +75,4 @@ def secure_delete(
 
     """
     return controller.delete_request(document_id=document_id, req=req, db=db)
+
