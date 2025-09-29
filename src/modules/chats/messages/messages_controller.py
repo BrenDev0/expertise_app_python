@@ -40,7 +40,7 @@ class MessagesController:
             chat_id=chat_resource.chat_id, 
             sender_id=data.sender, 
             message_type=data.message_type, 
-            text=data.text
+            text=str(data.text)
         )
 
 
