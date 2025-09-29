@@ -23,7 +23,7 @@ class MessagesService():
             chat_id=chat_id,
             sender=sender_id,
             message_type=message_type,
-            text=text
+            text=str(text)
         )
 
         return self.__repository.create(db=db, data=message)
