@@ -35,7 +35,14 @@ class MessagesController:
         if data.message_type == "human":
             self.__http_service.request_validation_service.validate_action_authorization(chat_resource.user_id, data.sender)
         
-        message = self.__messages_service.create(db=db, chat_id=chat_resource.chat_id, sender_id=data.sender, message_type=data.message_type, text=str(data.text))
+        message = self.__messages_service.create(
+            db=db, 
+            chat_id=chat_resource.chat_id, 
+            sender_id=data.sender, 
+            message_type=data.message_type, 
+            text=data.text,
+            json_data=data.json_data
+        )
 
 
         ## handle state if exists

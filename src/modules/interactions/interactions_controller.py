@@ -37,6 +37,16 @@ class InteractionsController:
         user: User = req.state.user
         company_id = self.__http_service.request_validation_service.verify_company_in_request_state(req=req)
 
+        self.__http_service.request_validation_service.verify_resource(
+            service_key="agents_service",
+            params={
+                "db": db,
+                "agent_id": data.agent_id 
+            },
+            not_found_message="Agent not found"
+        )
+
+
         chat_resource: Chat = self.__http_service.request_validation_service.verify_resource(
             service_key="chats_service",
             params={
