@@ -1,6 +1,6 @@
 from src.modules.chats.messages.messages_models import Message, MessageCreate
 from src.core.repository.base_repository import BaseRepository
-from typing import List
+from typing import List, Any
 from sqlalchemy.orm import Session
 from uuid import UUID
 from src.core.decorators.service_error_handler import service_error_handler
@@ -11,12 +11,21 @@ class MessagesService():
         self.__repository = repository
 
     @service_error_handler(f"{__MODULE}.create")
-    def create(self, db: Session, chat_id: UUID, sender_id: UUID, message_type: UUID, text: str)-> Message:     
+    def create(
+        self, 
+        db: Session, 
+        chat_id: UUID, 
+        sender_id: UUID, 
+        message_type: UUID, 
+        text: str = None,
+        json_data: Any = None
+    )-> Message:     
         message = Message(
             chat_id=chat_id,
             sender=sender_id,
             message_type=message_type,
-            text=text
+            text=text,
+            json_data=json_data
         )
 
         return self.__repository.create(db=db, data=message)
