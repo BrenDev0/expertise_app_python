@@ -62,28 +62,7 @@ class DocumentsController:
         
         return CommonHttpResponse(
             detail="file uploaded"
-        )
-    
-
-    async def download_request(
-        self,
-        data: List[Dict[str, Any]]
-    ):
-        df = pd.DataFrame(data)
-    
-       
-        output = io.BytesIO()
-        with pd.ExcelWriter(output, engine='xlsxwriter') as writer:
-            df.to_excel(writer, index=False)
-        output.seek(0)
-        
-      
-        headers = {
-            'Content-Disposition': 'attachment; filename="data.xlsx"'
-        }
-        
-        return StreamingResponse(output, media_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', headers=headers)
-        
+        )        
     
 
     def collection_request(

@@ -43,17 +43,6 @@ async def secure_upload(
         file=file
     )
 
-@router.post("/secure/download", status_code=200, response_class=StreamingResponse)
-async def download_spreadsheet(
-    data: List[Dict[str, Any]] = Body(...),
-    controller: DocumentsController = Depends(get_controller)
-):
-    """
-    ##  Download request
-
-    This endpoint will convert json json to downloadable dataframe
-    """
-    return controller.download_request(data=data)
 
 @router.get("/secure/collection", status_code=200, response_model=List[DocumentPublic])
 def secure_collection(

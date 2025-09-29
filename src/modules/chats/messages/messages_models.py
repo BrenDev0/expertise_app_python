@@ -1,19 +1,18 @@
 from pydantic import BaseModel, ConfigDict
 from pydantic.alias_generators import to_camel
-from sqlalchemy import Column, String, Text, ForeignKey, DateTime, func, JSON
+from sqlalchemy import Column, String, Text, ForeignKey, DateTime, func
 from src.core.database.database_models import Base
 import uuid
 from sqlalchemy.dialects.postgresql import UUID
 from  datetime import datetime
-from typing import Union, Dict, List, Any, Optional
+from typing import Union, Dict, List, Any
 
 class Message(Base):
     __tablename__ = "messages"
     message_id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, unique=True, nullable=False)
     chat_id = Column(UUID(as_uuid=True), ForeignKey("chats.chat_id", ondelete="CASCADE"), nullable=False)
     sender = Column(UUID(as_uuid=True), nullable=False) # can be user_id or agent_id depending on message_type 
-    text = Column(Text, nullable=True)
-    json_data = Column(JSON, nullable=True)
+    text = Column(Text, nullable=False)
     message_type = Column(String, nullable=False)
     created_at = Column(DateTime(timezone=True), nullable=False, server_default=func.now())
 
@@ -29,8 +28,8 @@ class MessageConfig(BaseModel):
 class MessageCreate(MessageConfig):
     sender: uuid.UUID
     message_type: str
-    text: Optional[Union[str, List[Any]]] = None
-    json_data: Optional[Any] = None
+    text: Union[str, List[Any]]
+
 
 class MessagePublic(MessageCreate):
     chat_id: uuid.UUID
