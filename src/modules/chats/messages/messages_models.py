@@ -29,8 +29,8 @@ class MessageConfig(BaseModel):
 class MessageCreate(MessageConfig):
     sender: uuid.UUID
     message_type: str
-    text: Optional[Union[str, List[Any]]]
-    json_data: Optional[Any]
+    text: Optional[Union[str, List[Any]]] = None
+    json_data: Optional[Any] = None
 
 
 class MessagePublic(MessageCreate):
