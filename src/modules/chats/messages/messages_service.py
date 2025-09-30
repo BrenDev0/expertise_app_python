@@ -17,13 +17,15 @@ class MessagesService():
         chat_id: UUID, 
         sender_id: UUID, 
         message_type: UUID, 
-        text: str 
+        text: str = None,
+        json_data: Any = None
     )-> Message:     
         message = Message(
             chat_id=chat_id,
             sender=sender_id,
             message_type=message_type,
-            text=text
+            text=text,
+            json_data=json_data
         )
 
         return self.__repository.create(db=db, data=message)
