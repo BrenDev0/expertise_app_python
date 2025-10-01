@@ -61,5 +61,5 @@ class UsersService:
         return self.__repository.update(db=db, key="user_id", value=user_id, changes=data)
     
     @service_error_handler(module=f"{__MODULE}.delete")
-    def delete(self, db: Session, user_id: UUID) -> User:
+    def delete(self, db: Session, user_id: UUID) -> User| None:
         return self.__repository.delete(db=db, key="user_id", value=user_id)

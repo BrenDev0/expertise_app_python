@@ -32,6 +32,6 @@ class DocumentsService:
         return self.__repository.get_many(db=db, key="company_id", value=company_id)
     
     @service_error_handler(module=__MODULE)
-    def delete(self, db: Session, key: str, value: Any) -> Document | List[Document]:
+    def delete(self, db: Session, key: str, value: Any) -> Document | List[Document] | None:
         return self.__repository.delete(db=db, key=key, value=value)
     

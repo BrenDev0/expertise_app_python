@@ -31,5 +31,5 @@ class ChatsService():
         return self._repository.update(db=db, key="chat_id", value=chat_id, changes=changes.model_dump(exclude_unset=True))
 
     @service_error_handler(module=_MODULE)
-    def delete(self, db: Session, chat_id: UUID)-> Chat:
+    def delete(self, db: Session, chat_id: UUID)-> Chat | None:
         return self._repository.delete(db=db, key="chat_id", value=chat_id)

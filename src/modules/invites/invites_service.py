@@ -49,7 +49,7 @@ class InvitesService:
         )
     
     @service_error_handler(module=f"{__MODULE}.delete")
-    def delete(self, db: Session, invite_id: UUID) -> Invite:
+    def delete(self, db: Session, invite_id: UUID) -> Invite | None:
         return self.__repository.delete(db=db, key="invite_id", value=invite_id)
     
     @service_error_handler(module=f"{__MODULE}.extract_user_data_from_invite")
