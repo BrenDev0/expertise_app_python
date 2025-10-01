@@ -30,7 +30,6 @@ def get_controller() -> DocumentsController:
 
 @router.post("/secure/upload", status_code=201, response_model=CommonHttpResponse)
 async def secure_upload(
-    background_tasks: BackgroundTasks,
     req: Request,
     file: UploadFile = File(...),
     _: None = Depends(is_owner),
@@ -44,7 +43,6 @@ async def secure_upload(
     Only admin level users have access to this endpoint. 
     """
     return await controller.upload_request(
-        background_tasks=background_tasks,
         req=req,
         db=db,
         file=file

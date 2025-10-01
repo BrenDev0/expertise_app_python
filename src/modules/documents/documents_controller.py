@@ -29,7 +29,6 @@ class DocumentsController:
 
     async def upload_request(
         self,
-        background_tasks: BackgroundTasks,
         req: Request,
         db: Session,
         file: UploadFile
@@ -61,7 +60,14 @@ class DocumentsController:
         if file.content_type not in allowed_mime_types:
             raise HTTPException(status_code=400, detail="Unsupported file type")
 
-        background_tasks.add_task(self.__document_manager.handle_upload, file, company_id, user.user_id, db)
+        asyncio.create_task(
+            self.__document_manager.handle_upload(
+                file=file,
+                company_id=company_id,
+                user_id=user.user_id,
+                db=db
+            )
+        )
         
         return CommonHttpResponse(
             detail="file uploaded"
