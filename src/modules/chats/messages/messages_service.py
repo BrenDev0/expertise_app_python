@@ -46,7 +46,7 @@ class MessagesService():
         )
     
     @service_error_handler(f"{__MODULE}.delete")
-    def delete(self, db: Session, message_id: UUID)-> Message:
+    def delete(self, db: Session, message_id: UUID)-> Message | None:
         return self.__repository.delete(db=db, key="message_id", value=message_id)
  
 

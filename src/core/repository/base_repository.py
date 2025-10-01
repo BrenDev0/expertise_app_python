@@ -56,13 +56,18 @@ class BaseRepository(Generic[T]):
         updated_user = self.model(**updated_row._mapping)
         return updated_user
 
-    def delete(self, db: Session, key: str, value: str | uuid.UUID) -> List[T] | T:
+    def delete(self, db: Session, key: str, value: str | uuid.UUID) -> List[T] | T | None:
         stmt = delete(self.model).where(getattr(self.model, key) == value).returning(*self.model.__table__.c)
         result = db.execute(stmt)
         db.commit()
-        deleted_row = result.fetchone()
         
+        deleted_rows = result.fetchall()  # Get all deleted rows
         
-        deleted_user = self.model(**deleted_row._mapping)
-        return deleted_user
+        if not deleted_rows:
+            return None 
+        
+        if len(deleted_rows) == 1:
+            return self.model(**deleted_rows[0]._mapping)
+        else:
+            return [self.model(**row._mapping) for row in deleted_rows]
     
