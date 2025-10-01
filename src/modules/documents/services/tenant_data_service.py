@@ -111,6 +111,7 @@ class TenantDataService:
             db=db,
             comapny_id=company_id
         )
+        print(tables)
 
         if len(tables) != 0:
             for table in tables:
