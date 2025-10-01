@@ -38,7 +38,7 @@ class TenantDataService:
         else:
             raise ValueError("Unsupported file type")
         
-        table_name = f"{document_id}_{os.path.splitext(filename)[0]}"
+        table_name = str(document_id).replace('-', "")[:16]
         
         ## Create a table in th db from the df
         df.to_sql(

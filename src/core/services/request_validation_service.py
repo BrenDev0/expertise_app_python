@@ -28,7 +28,7 @@ class RequestValidationService:
         service = Container.resolve(service_key)
 
         result = service.resource(**params)
-        print("recieved company", result)
+  
         if result is None and throw_http_error:
             raise HTTPException(status_code=status_code, detail=not_found_message)
         

@@ -12,10 +12,9 @@ async def auth_middleware(request: Request, db: Session = Depends(get_db_session
     user, token_payload = middleware_service.auth(request=request, db=db)
 
     request.state.user = user
-    print("added user to req state")
+    
     company_id = token_payload.get("company_id", None)
     if company_id:
-        print("checking company id in token")
         company_resource: Company = middleware_service.http_service.request_validation_service.verify_resource(
             service_key="companies_service",
             params={
@@ -28,6 +27,5 @@ async def auth_middleware(request: Request, db: Session = Depends(get_db_session
         if company_resource:
             request.state.company_id = company_resource.company_id
 
-    print("leaving auth middleware")
     return user
     
