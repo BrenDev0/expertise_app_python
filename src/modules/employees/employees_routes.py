@@ -11,6 +11,7 @@ from src.core.middleware.middleware_service import security
 from uuid import UUID
 from typing import List
 from src.core.middleware.hmac_verification import verify_hmac
+from src.core.middleware.permissions import is_manager
 
 router = APIRouter(
     prefix="/employees",
@@ -47,7 +48,7 @@ def verified_create(
 def secure_resource(
     employee_id: UUID,
     req: Request,
-    _: None = Depends(auth_middleware),
+    _: None = Depends(is_manager),
     db: Session = Depends(get_db_session),
     controller: EmployeesController = Depends(get_controller)
 ): 
@@ -66,7 +67,7 @@ def secure_resource(
 @router.get("/secure/collection", status_code=200, response_model=List[EmployeePublic])
 def secure_collection(
     req: Request,
-    _: None = Depends(auth_middleware),
+    _: None = Depends(is_manager),
     db: Session = Depends(get_db_session),
     controller: EmployeesController = Depends(get_controller)
 ): 
@@ -86,7 +87,7 @@ def secure_update(
     employee_id: UUID,
     req: Request,
     data: EmployeeUpdate = Body(...),
-    _: None = Depends(auth_middleware),
+    _: None = Depends(is_manager),
     db: Session = Depends(get_db_session),
     controller: EmployeesController = Depends(get_controller)
 ):
@@ -107,7 +108,7 @@ def secure_update(
 def secure_delete(
     employee_id: UUID,
     req: Request, 
-    _: None = Depends(auth_middleware),
+    _: None = Depends(is_manager),
     db: Session = Depends(get_db_session),
     controller: EmployeesController = Depends(get_controller)
 ): 

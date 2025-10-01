@@ -25,7 +25,7 @@ class AgentsController:
         req: Request,
         db: Session
     ) -> CommonHttpResponse:
-        user: User = req.state.user
+        company_id = self.__http_service.request_validation_service.verify_company_in_request_state(req=req)
         
         employee_resource: Employee = self.__http_service.request_validation_service.verify_resource(
             service_key="employees_service",
@@ -36,7 +36,7 @@ class AgentsController:
             not_found_message="Employee not found"
         )
 
-        self.__http_service.request_validation_service.verify_company_user_relation(db=db, user=user, company_id=employee_resource.company_id)
+        self.__http_service.request_validation_service.validate_action_authorization(company_id, employee_resource.company_id)
 
         self.__agent_access_service.create_many(db=db, data=data, user_id=employee_resource.user_id)
 
@@ -51,7 +51,7 @@ class AgentsController:
         req: Request,
         db: Session
     ) -> CommonHttpResponse:
-        user: User = req.state.user
+        company_id = self.__http_service.request_validation_service.verify_company_in_request_state(req=req)
 
         employee_resource: Employee = self.__http_service.request_validation_service.verify_resource(
             service_key="employees_service",
@@ -62,13 +62,37 @@ class AgentsController:
             not_found_message="Employee not found"
         )
 
-        self.__http_service.request_validation_service.verify_company_user_relation(db=db, user=user, company_id=employee_resource.company_id)
+        self.__http_service.request_validation_service.validate_action_authorization(company_id, employee_resource.company_id)
 
         self.__agent_access_service.remove_many(db=db, data=data, user_id=employee_resource.user_id)
 
         return CommonHttpResponse(
             detail="Agent access removed from employee"
         )
+    
+    def agent_acccess_collection_request(
+        self,
+        employee_id: UUID,
+        req: Request,
+        db: Session
+    ):
+        company_id= self.__http_service.request_validation_service.verify_company_in_request_state(req=req)
+        
+        employee_resource: Employee = self.__http_service.request_validation_service.verify_resource(
+            service_key="employees_service",
+            params={
+                "db": db,
+                "employee_id": employee_id
+            },
+            not_found_message="Employee not found"
+        )
+
+        self.__http_service.request_validation_service.validate_action_authorization(company_id, employee_resource.company_id)
+
+        collection = self.__agent_access_service.collection(db=db, user_id=employee_resource.user_id)
+
+        return [self.__to_public(agent) for agent in collection]
+        
     
     def resource_request(
         self,

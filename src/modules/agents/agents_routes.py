@@ -11,6 +11,8 @@ from sqlalchemy.orm import Session
 from src.core.database.session import get_db_session
 from src.core.models.http_responses import CommonHttpResponse
 from src.core.middleware.hmac_verification import verify_hmac
+from src.core.middleware.permissions import is_manager
+
 router = APIRouter(
     prefix="/agents",
     tags=["Agents"],
@@ -27,7 +29,7 @@ def secure_add_access(
     employee_id: UUID,
     req: Request,
     data: AgentAccessCreate = Body(...),
-    _: None = Depends(auth_middleware),
+    _: None = Depends(is_manager),
     db: Session = Depends(get_db_session),
     controller: AgentsController = Depends(get_controller)
 ):
@@ -63,6 +65,26 @@ def secure_resource(
         db=db 
     )
 
+@router.get("secure/access/collection/{employee_id}", status_code=200, response_model=List[AgentPublic])
+def acess_collection(
+    employee_id: UUID,
+    req: Request,
+    _: None = Depends(is_manager),
+    db: Session = Depends(get_db_session),
+    controller: AgentsController = Depends(get_controller)
+):
+    """
+    ## Collection request
+
+    This endpoint returns all agents the employee id has access to.
+    """  
+    return controller.agent_acccess_collection_request(
+        employee_id=employee_id,
+        req=req,
+        db=db
+    )
+
+
 @router.get("/secure/collection", status_code=200, response_model=List[AgentPublic])
 def secure_collection(
     req: Request,
@@ -73,7 +95,7 @@ def secure_collection(
     """
     ## Collection request
 
-    This endpoint returns all agents the employee id has access to.
+    This endpoint returns all agents the current user has access to.
     """
     return controller.collection_request(
         req=req,
@@ -100,7 +122,7 @@ def secure_remove_access(
     employee_id: UUID,
     req: Request,
     data: AgentAccessDelete = Body(...),
-    _: None = Depends(auth_middleware),
+    _: None = Depends(is_manager),
     db: Session = Depends(get_db_session),
     controller: AgentsController = Depends(get_controller)
 ): 
