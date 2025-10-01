@@ -21,7 +21,7 @@ def is_manager(
 ):
     user: User = req.state.user
 
-    if user.is_owner:
+    if user.is_admin:
         return 
     
     else:
