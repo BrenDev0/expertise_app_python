@@ -13,6 +13,7 @@ def is_owner(req: Request, _: None = Depends(auth_middleware)):
     if not user.is_admin:
         raise HTTPException(status_code=403, detail="Forbidden")
 
+
 def is_manager(
     req: Request,
     _: None = Depends(auth_middleware),

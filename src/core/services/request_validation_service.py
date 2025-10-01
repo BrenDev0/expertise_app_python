@@ -39,11 +39,20 @@ class RequestValidationService:
         if id != resource_id:
             raise HTTPException(status_code=403, detail="Forbidden")
     
-    @staticmethod
-    def verify_company_in_request_state(req: Request):
-        company_id = company_id = getattr(req.state, "company_id", None)
+
+    def verify_company_in_request_state(self, req: Request, db: Session):
+        company_id = getattr(req.state, "company_id", None)
 
         if not company_id:
             raise HTTPException(status_code=403, detail="Invalid credential")
+        else:
+            company_resource: Company = self.verify_resource(
+            service_key="companies_service",
+            params={
+                "db": db,
+                "company_id": company_id
+            },
+            not_found_message="Company not found"
+        )
         
-        return company_id
+        return company_resource.company_id

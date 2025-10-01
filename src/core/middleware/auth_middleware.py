@@ -21,8 +21,7 @@ async def auth_middleware(request: Request, db: Session = Depends(get_db_session
                 "db": db,
                 "company_id": company_id
             },
-            not_found_message="Invalid credentials",
-            status_code=403
+            throw_http_error=False
         )
 
         request.state.company_id = company_resource.company_id
