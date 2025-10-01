@@ -44,11 +44,11 @@ class InvitesController:
 
         print(token)
 
-        self.__email_service.handle_request(
-            email=data.email,
-            type_="INVITE", 
-            custom_code=token
-        )
+        # self.__email_service.handle_request(
+        #     email=data.email,
+        #     type_="INVITE", 
+        #     custom_code=token
+        # )
 
         return CommonHttpResponse(
             detail="Invitaion sent"
