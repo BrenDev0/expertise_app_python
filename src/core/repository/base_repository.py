@@ -51,10 +51,12 @@ class BaseRepository(Generic[T]):
         stmt = update(self.model).where(getattr(self.model, key) == value).values(**changes).returning(*self.model.__table__.c)
         result = db.execute(stmt)
         db.commit()
-        updated_row = result.fetchone()
-        
-        updated_user = self.model(**updated_row._mapping)
-        return updated_user
+
+        if result.rowcount == 0:
+            return None
+    
+        updated_record = self.get_one(db=db, key=key, value=value)
+        return updated_record
 
     def delete(self, db: Session, key: str, value: str | uuid.UUID) -> List[T] | T | None:
         stmt = delete(self.model).where(getattr(self.model, key) == value).returning(*self.model.__table__.c)
