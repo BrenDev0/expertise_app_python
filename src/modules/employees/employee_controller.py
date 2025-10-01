@@ -128,6 +128,7 @@ class EmployeesController:
         employee_resource: Employee = self.__http_service.request_validation_service.verify_resource(
             service_key="employees_service",
             params={
+                "db": db,
                 "key": "employee_id",
                 "value": employee_id
             },
