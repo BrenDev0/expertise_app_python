@@ -35,7 +35,7 @@ class InteractionsController:
         db: Session
     )-> MessagePublic: 
         user: User = req.state.user
-        company_id = self.__http_service.request_validation_service.verify_company_in_request_state(req=req)
+        company_id = self.__http_service.request_validation_service.verify_company_in_request_state(req=req, db=db)
 
         self.__http_service.request_validation_service.verify_resource(
             service_key="agents_service",

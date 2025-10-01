@@ -75,7 +75,7 @@ class EmployeesController:
         req: Request,
         db: Session
     ) -> EmployeePublic:
-        company_id = self.__http_service.request_validation_service.verify_company_in_request_state(req=req)
+        company_id = self.__http_service.request_validation_service.verify_company_in_request_state(req=req, db=db)
 
         employee_resource: Employee = self.__http_service.request_validation_service.verify_resource(
             service_key="employees_service", # employee_service.resource accepts key value parameters
@@ -99,7 +99,7 @@ class EmployeesController:
         req: Request,
         db: Session,
     ) -> List[EmployeePublic]:
-        company_id = self.__http_service.request_validation_service.verify_company_in_request_state(req=req)
+        company_id = self.__http_service.request_validation_service.verify_company_in_request_state(req=req, db=db)
 
         company_resource: Company = self.__http_service.request_validation_service.verify_resource(
             service_key="companies_service",
@@ -123,7 +123,7 @@ class EmployeesController:
         data: EmployeeUpdate,
         db: Session
     ) -> CommonHttpResponse:
-        company_id = self.__http_service.request_validation_service.verify_company_in_request_state(req=req)
+        company_id = self.__http_service.request_validation_service.verify_company_in_request_state(req=req, db=db)
 
         employee_resource: Employee = self.__http_service.request_validation_service.verify_resource(
             service_key="employees_service",
@@ -150,7 +150,7 @@ class EmployeesController:
         req: Request,
         db: Session
     ):
-        company_id = self.__http_service.request_validation_service.verify_company_in_request_state(req=req)
+        company_id = self.__http_service.request_validation_service.verify_company_in_request_state(req=req, db=db)
 
         employee_resource: Employee = self.__http_service.request_validation_service.verify_resource(
             service_key="employees_service",
