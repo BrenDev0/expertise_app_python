@@ -136,6 +136,7 @@ class DocumentsController:
             document_id=str(data.document_id),
             company_id=str(data.company_id),
             filename=data.filename,
+            file_type=data.file_type,
             url=self.__http_service.encryption_service.decrypt(data.url),
             uploaded_at=data.uploaded_at
         )
