@@ -42,11 +42,13 @@ class InvitesController:
             "verification_code": str(invite.invite_id) 
         }, "24h")
 
-        self.__email_service.handle_request(
-            email=data.email,
-            type_="INVITE", 
-            custom_code=token
-        )
+        print(token)
+
+        # self.__email_service.handle_request(
+        #     email=data.email,
+        #     type_="INVITE", 
+        #     custom_code=token
+        # )
 
         return CommonHttpResponse(
             detail="Invitaion sent"
