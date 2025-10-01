@@ -47,32 +47,3 @@ class RequestValidationService:
             raise HTTPException(status_code=403, detail="Invalid credential")
         
         return company_id
-
-    def verify_company_user_relation(
-        self,
-        db: Session,
-        user: User,
-        company_id: UUID
-    ) -> None:
-        if user.is_admin:
-            company_resource: Company = self.verify_resource(
-                service_key="companies_service",
-                params={
-                    "db": db,
-                    "company_id": company_id
-                },
-                not_found_message="Company not found"
-            )
-
-            self.validate_action_authorization(user.user_id, company_resource.user_id)
-            return 
-        
-        employees_service: EmployeesService = Container.resolve("employees_service")
-        manager: Employee = employees_service.resource_by_user_and_company(
-            db=db,
-            company_id=company_id,
-            user_id=user.user_id
-        )
-
-        if not manager or not manager.is_manager:
-            raise HTTPException(status_code=403, detail="Forbidden")

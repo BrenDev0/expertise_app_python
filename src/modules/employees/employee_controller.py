@@ -75,7 +75,7 @@ class EmployeesController:
         req: Request,
         db: Session
     ) -> EmployeePublic:
-        user: User = req.state.user
+        company_id = self.__http_service.request_validation_service.verify_company_in_request_state(req=req)
 
         employee_resource: Employee = self.__http_service.request_validation_service.verify_resource(
             service_key="employees_service", # employee_service.resource accepts key value parameters
@@ -88,7 +88,7 @@ class EmployeesController:
         )
 
         
-        self.__http_service.request_validation_service.verify_company_user_relation(db=db, user=user, company_id=employee_resource.company_id)
+        self.__http_service.request_validation_service.validate_action_authorization(company_id, employee_resource.company_id)
 
         
         return self.__to_public(employee_resource)
@@ -99,7 +99,6 @@ class EmployeesController:
         req: Request,
         db: Session,
     ) -> List[EmployeePublic]:
-        user: User = req.state.user
         company_id = self.__http_service.request_validation_service.verify_company_in_request_state(req=req)
 
         company_resource: Company = self.__http_service.request_validation_service.verify_resource(
@@ -109,12 +108,6 @@ class EmployeesController:
                 "company_id": company_id
             },
             not_found_message="Company not found"
-        )
-
-        self.__http_service.request_validation_service.verify_company_user_relation(
-            db=db,
-            user=user,
-            company_id=company_resource.company_id
         )
 
         data = self.__employees_service.collection(db=db, company_id=company_resource.company_id)
@@ -130,7 +123,7 @@ class EmployeesController:
         data: EmployeeUpdate,
         db: Session
     ) -> CommonHttpResponse:
-        user: User = req.state.user
+        company_id = self.__http_service.request_validation_service.verify_company_in_request_state(req=req)
 
         employee_resource: Employee = self.__http_service.request_validation_service.verify_resource(
             service_key="employees_service",
@@ -141,7 +134,7 @@ class EmployeesController:
             not_found_message="Employee not found"
         )
 
-        self.__http_service.request_validation_service.verify_company_user_relation(db=db, user=user, company_id=employee_resource.company_id)
+        self.__http_service.request_validation_service.validate_action_authorization(company_id, employee_resource.company_id)
 
         self.__employees_service.update(db=db, employee_id=employee_resource.employee_id, changes=data)
 
@@ -157,7 +150,7 @@ class EmployeesController:
         req: Request,
         db: Session
     ):
-        user: User = req.state.user
+        company_id = self.__http_service.request_validation_service.verify_company_in_request_state(req=req)
 
         employee_resource: Employee = self.__http_service.request_validation_service.verify_resource(
             service_key="employees_service",
@@ -169,7 +162,7 @@ class EmployeesController:
             not_found_message="Employee not found"
         )
 
-        self.__http_service.request_validation_service.verify_company_user_relation(db=db, user=user, company_id=employee_resource.company_id)
+        self.__http_service.request_validation_service.validate_action_authorization(company_id, employee_resource.company_id)
 
        
         self.__users_service.delete(db=db, user_id=employee_resource.user_id)  ## will delete employee by Cascade
