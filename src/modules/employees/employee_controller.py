@@ -122,7 +122,7 @@ class EmployeesController:
         req: Request,
         data: EmployeeUpdate,
         db: Session
-    ) -> CommonHttpResponse:
+    ) -> EmployeePublic:
         company_id = self.__http_service.request_validation_service.verify_company_in_request_state(req=req, db=db)
 
         employee_resource: Employee = self.__http_service.request_validation_service.verify_resource(
@@ -137,11 +137,9 @@ class EmployeesController:
 
         self.__http_service.request_validation_service.validate_action_authorization(company_id, employee_resource.company_id)
 
-        self.__employees_service.update(db=db, employee_id=employee_resource.employee_id, changes=data)
+        updated_emplooyee = self.__employees_service.update(db=db, employee_id=employee_resource.employee_id, changes=data)
 
-        return CommonHttpResponse(
-            detail="Employee updated"
-        ) 
+        return self.__to_public(updated_emplooyee)
     
 
 
