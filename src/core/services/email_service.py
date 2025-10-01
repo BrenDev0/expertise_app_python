@@ -14,7 +14,7 @@ class EmailService:
         self.port = int(os.getenv("MAILER_PORT", 587))
         self.user = os.getenv("MAILER_USER")
         self.password = os.getenv("MAILER_PASSWORD")
-        self.from_addr = "postmaster@ginrealestate.mx"
+        self.from_addr = os.getenv("MAILER_USER")
 
     def send(self, email: Dict[str, Any]) -> None:
       
