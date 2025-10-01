@@ -24,7 +24,8 @@ async def auth_middleware(request: Request, db: Session = Depends(get_db_session
             throw_http_error=False
         )
 
-        request.state.company_id = company_resource.company_id
+        if company_resource:
+            request.state.company_id = company_resource.company_id
 
    
     return user
