@@ -68,12 +68,6 @@ class EmbeddingService:
         elif filename.endswith('.txt'):
             text = file_bytes.decode("utf-8")
             documents = [Document(page_content=text)]
-        elif filename.endswith('.csv'):
-            df = pd.read_csv(io.BytesIO(file_bytes))
-            documents = [
-                Document(page_content=row.to_json(), metadata={"row_index": idx})
-                for idx, row in df.iterrows()
-            ]
         else:
             raise ValueError(f"Unsupported file type: {filename}")
 

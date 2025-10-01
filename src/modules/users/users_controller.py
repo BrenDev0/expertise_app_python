@@ -174,11 +174,12 @@ class UsersController:
     ) -> CommonHttpResponse:
         user: User = req.state.user
 
-        self.__users_service.delete(db=db, user_id=user.user_id) 
 
         ## delete bucket and vector base data 
         document_manager: DocumentManager = Container.resolve("document_manager")
         document_manager.user_level_deletion(user_id=user.user_id, db=db)
+
+        self.__users_service.delete(db=db, user_id=user.user_id) 
 
         return CommonHttpResponse(
             detail="User deleted"

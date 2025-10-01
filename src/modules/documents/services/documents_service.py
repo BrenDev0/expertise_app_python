@@ -14,10 +14,18 @@ class DocumentsService:
         self.__data_handler = data_hander
 
     @service_error_handler(module=__MODULE)
-    def create(self, db: Session, company_id: UUID, filename: str, url: str) -> Document:
+    def create(
+        self, 
+        db: Session, 
+        company_id: UUID, 
+        filename: str, 
+        file_type: str, 
+        url: str
+    ) -> Document:
         document = Document(
             company_id=company_id,
             filename=filename,
+            file_type=file_type,
             url=self.__data_handler.encryption_service.encrypt(url)
         )
 

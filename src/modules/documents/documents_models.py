@@ -15,6 +15,7 @@ class Document(Base):
     document_id = Column(UUID(as_uuid=True), primary_key=True, nullable=False, default=uuid.uuid4, unique=True)
     company_id = Column(UUID(as_uuid=True), ForeignKey("companies.company_id", ondelete="CASCADE"), nullable=False)
     filename = Column(String, nullable=False)
+    file_type = Column(String, nullable=False)
     url = Column(String, nullable=False)
     uploaded_at = Column(DateTime(timezone=True), nullable=False, server_default=func.now())
 
@@ -43,5 +44,6 @@ class DocumentPublic(DocumentConfig):
     document_id: uuid.UUID
     company_id: uuid.UUID
     filename: str
+    file_type: str
     url: str
     uploaded_at: datetime
