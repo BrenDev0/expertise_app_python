@@ -48,9 +48,17 @@ class DocumentsController:
 
         self.__http_service.request_validation_service.validate_action_authorization(user.user_id, company_resource.user_id)
 
-        allowed_file_types =  [".xlsx", ".xls", ".xlsm", ".xlsb", ".csv", ".pdf", "txt"]
+        allowed_mime_types = [
+            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",  # .xlsx
+            "application/vnd.ms-excel",  # .xls
+            "application/vnd.ms-excel.sheet.macroEnabled.12",  # .xlsm
+            "application/vnd.ms-excel.sheet.binary.macroEnabled.12",  # .xlsb
+            "text/csv",  # .csv
+            "application/pdf",  # .pdf
+            "text/plain"  # .txt
+        ]
         
-        if file.content_type not in allowed_file_types:
+        if file.content_type not in allowed_mime_types:
             raise HTTPException(status_code=400, detail="Unsupported file type")
 
         background_tasks.add_task(self.__document_manager.handle_upload, file, company_id, user.user_id, db)
