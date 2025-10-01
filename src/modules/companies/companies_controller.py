@@ -92,7 +92,7 @@ class CompaniesController:
         db: Session
     ) -> CommonHttpResponse:
         user: User = req.state.user
-
+        print("in controller")
         company_resource: Company = self.__https_service.request_validation_service.verify_resource(
             service_key="companies_service",
             params={
@@ -103,7 +103,7 @@ class CompaniesController:
         )
 
         self.__https_service.request_validation_service.validate_action_authorization(user.user_id, company_resource.user_id)
-
+        print("deleteting docs")
         ## delete company documents from all cloud providers and db
         document_manager: DocumentManager = Container.resolve("document_manager")
         document_manager.company_level_deletion(
@@ -111,9 +111,10 @@ class CompaniesController:
             user_id=company_resource.user_id,
             db=db
         )
-
+        print("docs deleted")
+    
         self.__companies_service.delete(db=db, company_id=company_id)
-        
+        print("company deleted")
         return CommonHttpResponse(
             detail="Company deleted"
         )
