@@ -106,7 +106,6 @@ class DocumentManager:
             value=document_id
         )
 
-    @service_error_handler(module=__MODULE)
     def company_level_deletion(
         self,
         company_id: UUID,

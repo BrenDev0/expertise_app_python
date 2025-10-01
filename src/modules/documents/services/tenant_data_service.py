@@ -125,6 +125,7 @@ class TenantDataService:
         db: Session,
         table: TenantTable
     ) -> TenantTable:
+        print(table)
         
         db.execute(text(f'DROP TABLE IF EXISTS "{table.table_name}"'))
         db.commit()
