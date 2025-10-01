@@ -1,15 +1,11 @@
 from uuid import UUID
 from typing import List, Dict, Any
 import asyncio
-from fastapi import Request, UploadFile, HTTPException
-from  fastapi.responses import StreamingResponse
-import pandas as pd
-import io
+from fastapi import Request, UploadFile, HTTPException, BackgroundTasks
+
 
 from sqlalchemy.orm import Session
 
-
-from src.modules.documents.services.s3_service import S3Service
 from src.modules.documents.documents_models import Document, DocumentPublic
 from src.modules.users.users_models import User
 from src.modules.companies.companies_models import Company
@@ -33,6 +29,7 @@ class DocumentsController:
 
     async def upload_request(
         self,
+        background_tasks: BackgroundTasks,
         req: Request,
         db: Session,
         file: UploadFile
@@ -51,14 +48,12 @@ class DocumentsController:
 
         self.__http_service.request_validation_service.validate_action_authorization(user.user_id, company_resource.user_id)
 
-        asyncio.create_task(
-            self.__document_manager.handle_upload(
-                file=file,
-                company_id=company_resource.company_id,
-                user_id=company_resource.user_id,
-                db=db
-            )
-        )
+        allowed_file_types =  [".xlsx", ".xls", ".xlsm", ".xlsb", ".csv", ".pdf", "txt"]
+        
+        if file.content_type not in allowed_file_types:
+            raise HTTPException(status_code=400, detail="Unsupported file type")
+
+        background_tasks.add_task(self.__document_manager.handle_upload, file, company_id, user.user_id, db)
         
         return CommonHttpResponse(
             detail="file uploaded"

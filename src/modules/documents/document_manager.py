@@ -1,15 +1,18 @@
+from fastapi import UploadFile, HTTPException
+from  uuid import UUID
+from sqlalchemy.orm import Session
+
 from src.modules.documents.services.documents_service import DocumentsService
 from src.modules.documents.services.embeddings_service import EmbeddingService
 from src.modules.documents.services.s3_service import S3Service
 from src.modules.documents.services.tenant_data_service import TenantDataService
-from src.core.decorators.service_error_handler import service_error_handler
-from fastapi import UploadFile
-from  uuid import UUID
-from sqlalchemy.orm import Session
-from src.modules.documents.documents_models import Document
-from src.core.dependencies.container import Container
 from src.modules.companies.companies_service import CompaniesService
-from src.modules.companies.companies_models import Company
+from src.modules.documents.documents_models import Document
+
+from src.core.decorators.service_error_handler import service_error_handler
+
+from src.core.dependencies.container import Container
+
 
 class DocumentManager:
     __MODULE = "documents.manager"
@@ -35,12 +38,19 @@ class DocumentManager:
         db: Session
     ):
         filename = file.filename.lower().replace(" ", "_")
-        
+        file_type = file.content_type
         file_bytes = await file.read()
 
         s3_url = await self.__s3_service.upload(file_bytes=file_bytes, filename=filename, company_id=company_id, user_id=user_id)
 
-        new_document: Document = self.documents_service.create(db=db, company_id=company_id, filename=filename, url=s3_url)
+
+        new_document: Document = self.documents_service.create(
+            db=db, 
+            company_id=company_id, 
+            filename=filename, 
+            file_type=file_type,
+            url=s3_url
+        )
 
         if filename.endswith((".xlsx", ".xls", ".xlsm", ".xlsb", ".csv")):
             self.__tenant_data_service.create_table_from_file(
@@ -58,6 +68,7 @@ class DocumentManager:
                     user_id=user_id, 
                     company_id=company_id
                 )
+
 
 
 

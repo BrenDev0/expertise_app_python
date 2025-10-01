@@ -104,9 +104,6 @@ class CompaniesController:
 
         self.__https_service.request_validation_service.validate_action_authorization(user.user_id, company_resource.user_id)
 
-        self.__companies_service.delete(db=db, company_id=company_id)
-
-
         ## delete company documents from all cloud providers and db
         document_manager: DocumentManager = Container.resolve("document_manager")
         document_manager.company_level_deletion(
@@ -115,6 +112,8 @@ class CompaniesController:
             db=db
         )
 
+        self.__companies_service.delete(db=db, company_id=company_id)
+        
         return CommonHttpResponse(
             detail="Company deleted"
         )

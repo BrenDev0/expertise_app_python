@@ -1,17 +1,22 @@
-from  fastapi import APIRouter, UploadFile, Request, File,  Depends, Body
-from fastapi.responses import StreamingResponse
-from src.modules.documents.services.s3_service import S3Service
-from src.modules.documents.documents_controller import DocumentsController
-from src.core.models.http_responses import CommonHttpResponse
+from  fastapi import APIRouter, UploadFile, Request, File,  Depends, BackgroundTasks
 from uuid import UUID
+from sqlalchemy.orm import Session
+from typing import List, Dict, Any
+
+from src.core.models.http_responses import CommonHttpResponse
+
 from src.core.middleware.permissions import is_owner
 from src.core.middleware.middleware_service import security
+from src.core.middleware.hmac_verification import verify_hmac
+
 from src.core.dependencies.container import Container
 from src.core.database.session import get_db_session
-from sqlalchemy.orm import Session
+
+
 from src.modules.documents.documents_models import DocumentPublic
-from typing import List, Dict, Any
-from src.core.middleware.hmac_verification import verify_hmac
+from src.modules.documents.documents_controller import DocumentsController
+
+
 
 router = APIRouter(
     prefix="/documents",
@@ -25,6 +30,7 @@ def get_controller() -> DocumentsController:
 
 @router.post("/secure/upload", status_code=201, response_model=CommonHttpResponse)
 async def secure_upload(
+    background_tasks: BackgroundTasks,
     req: Request,
     file: UploadFile = File(...),
     _: None = Depends(is_owner),
@@ -38,6 +44,7 @@ async def secure_upload(
     Only admin level users have access to this endpoint. 
     """
     return await controller.upload_request(
+        background_tasks=background_tasks,
         req=req,
         db=db,
         file=file
