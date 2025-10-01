@@ -26,7 +26,7 @@ class InvitesController:
         db: Session
     ) -> CommonHttpResponse:
         user: User = req.state.user
-        company_id  = self.__http_service.request_validation_service.verify_company_in_request_state(req=req)
+        company_id  = self.__http_service.request_validation_service.verify_company_in_request_state(req=req, db=db)
 
         hashed_email = self.__http_service.hashing_service.hash_for_search(data=data.email)
         
@@ -59,7 +59,7 @@ class InvitesController:
         db: Session
     ) -> InvitePublic:
         user: User = req.state.user
-        company_id  = self.__http_service.request_validation_service.verify_company_in_request_state(req=req)
+        company_id  = self.__http_service.request_validation_service.verify_company_in_request_state(req=req, db=db)
 
         invite_resource: Invite = self.__http_service.request_validation_service.verify_resource(
             service_key="invites_service",
@@ -80,7 +80,7 @@ class InvitesController:
         db: Session
     ) -> List[InvitePublic]:
         user: User = req.state.user
-        company_id  = self.__http_service.request_validation_service.verify_company_in_request_state(req=req)
+        company_id  = self.__http_service.request_validation_service.verify_company_in_request_state(req=req, db=db)
 
         data = self.__invites_service.collection(db=db, company_id=company_id)
 
@@ -97,7 +97,7 @@ class InvitesController:
         db: Session
     ) -> CommonHttpResponse: 
         user: User = req.state.user
-        company_id = self.__http_service.request_validation_service.verify_company_in_request_state(req=req)
+        company_id = self.__http_service.request_validation_service.verify_company_in_request_state(req=req, db=db)
 
         invite_resource: Invite = self.__http_service.request_validation_service.verify_resource(
             service_key="invites_service",
@@ -123,7 +123,7 @@ class InvitesController:
         db: Session
     ) -> CommonHttpResponse: 
         user: User = req.state.user
-        company_id  = self.__http_service.request_validation_service.verify_company_in_request_state(req=req)
+        company_id  = self.__http_service.request_validation_service.verify_company_in_request_state(req=req, db=db)
 
         invite_resource: Invite = self.__http_service.request_validation_service.verify_resource(
             service_key="invites_service",

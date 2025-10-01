@@ -25,7 +25,7 @@ class AgentsController:
         req: Request,
         db: Session
     ) -> CommonHttpResponse:
-        company_id = self.__http_service.request_validation_service.verify_company_in_request_state(req=req)
+        company_id = self.__http_service.request_validation_service.verify_company_in_request_state(req=req, db=db)
         
         employee_resource: Employee = self.__http_service.request_validation_service.verify_resource(
             service_key="employees_service",
@@ -51,7 +51,7 @@ class AgentsController:
         req: Request,
         db: Session
     ) -> CommonHttpResponse:
-        company_id = self.__http_service.request_validation_service.verify_company_in_request_state(req=req)
+        company_id = self.__http_service.request_validation_service.verify_company_in_request_state(req=req, db=db)
 
         employee_resource: Employee = self.__http_service.request_validation_service.verify_resource(
             service_key="employees_service",
@@ -76,7 +76,7 @@ class AgentsController:
         req: Request,
         db: Session
     ):
-        company_id= self.__http_service.request_validation_service.verify_company_in_request_state(req=req)
+        company_id= self.__http_service.request_validation_service.verify_company_in_request_state(req=req, db=db)
         
         employee_resource: Employee = self.__http_service.request_validation_service.verify_resource(
             service_key="employees_service",
@@ -117,7 +117,7 @@ class AgentsController:
         db: Session
     ) -> List[AgentPublic]:
         user: User = req.state.user
-        company_id = self.__http_service.request_validation_service.verify_company_in_request_state(req=req)
+        company_id = self.__http_service.request_validation_service.verify_company_in_request_state(req=req, db=db)
 
         if user.is_admin:
             data = self.__agents_service.read(db=db)

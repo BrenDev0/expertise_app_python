@@ -34,7 +34,7 @@ class DocumentsController:
         file: UploadFile
     ):
         user: User = req.state.user
-        company_id = self.__http_service.request_validation_service.verify_company_in_request_state(req=req)
+        company_id = self.__http_service.request_validation_service.verify_company_in_request_state(req=req, db=db)
 
         company_resource: Company = self.__http_service.request_validation_service.verify_resource(
             service_key="companies_service",
@@ -80,7 +80,7 @@ class DocumentsController:
         db: Session
     ):
         user: User = req.state.user
-        company_id = self.__http_service.request_validation_service.verify_company_in_request_state(req=req)
+        company_id = self.__http_service.request_validation_service.verify_company_in_request_state(req=req, db=db)
 
         company_resource: Company = self.__http_service.request_validation_service.verify_resource(
             service_key="companies_service",
@@ -106,7 +106,7 @@ class DocumentsController:
         db: Session
     ) ->  CommonHttpResponse:
         user: User = req.state.user
-        company_id = self.__http_service.request_validation_service.verify_company_in_request_state(req=req)
+        company_id = self.__http_service.request_validation_service.verify_company_in_request_state(req=req, db=db)
 
         document_resource: Document = self.__http_service.request_validation_service.verify_resource(
             service_key="documents_service",
