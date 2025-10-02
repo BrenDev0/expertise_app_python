@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, Request, Body
 from src.core.dependencies.container import Container
 from src.modules.agents.agents_models import AgentPublic
-from src.modules.agents.agent_access.agent_access_models import AgentAccessCreate, AgentAccessDelete
+from src.modules.agents.agent_access.agent_access_models import AgentAccessCreate, AgentAccessDelete, AgentAccess
 from src.core.middleware.middleware_service import security
 from src.core.middleware.auth_middleware import auth_middleware
 from src.modules.agents.agents_controller import AgentsController
@@ -24,7 +24,7 @@ def get_controller() -> AgentsController:
     return controller
 
 
-@router.post("/secure/access/{employee_id}", status_code=201, response_model=CommonHttpResponse)
+@router.post("/secure/access/{employee_id}", status_code=201, response_model=List[UUID])
 def secure_add_access(
     employee_id: UUID,
     req: Request,
