@@ -1,18 +1,22 @@
 from sqlalchemy.orm import Session
-from  src.modules.users.users_models import User, UserCreate, UserUpdate, VerifiedUserUpdate
-from src.core.repository.base_repository import BaseRepository
+from uuid import UUID
+from typing import List
+
+from src.modules.users.users_models import User, UserCreate, UserUpdate, VerifiedUserUpdate
+from src.modules.users.users_repository import UsersRepository
+
 from src.core.services.data_handling_service import DataHandlingService
 from src.core.decorators.service_error_handler import service_error_handler
-from uuid import UUID
+
 
 class UsersService:
     __MODULE = "users.service"
 
-    def __init__(self, respository: BaseRepository, data_hanlder: DataHandlingService):
+    def __init__(self, respository: UsersRepository, data_hanlder: DataHandlingService):
         self.__repository = respository
         self.__data_handler = data_hanlder
 
-    @service_error_handler(module=f"{__MODULE}.create")
+    @service_error_handler(module=__MODULE)
     def create(self, db: Session, data: UserCreate, is_admin: bool = False) -> User:
         hashed_email = self.__data_handler.hashing_service.hash_for_search(data=data.email)
         hashed_password = self.__data_handler.hashing_service.hash_password(password=data.password)
@@ -34,11 +38,11 @@ class UsersService:
 
         return self.__repository.create(db=db, data=new_user)
     
-    @service_error_handler(module=f"{__MODULE}.resource")
+    @service_error_handler(module=__MODULE)
     def resource(self, db: Session, key: str,  value: UUID | str) -> User:
         return self.__repository.get_one(db=db, key=key, value=value)
     
-    @service_error_handler(module=f"{__MODULE}.update")
+    @service_error_handler(module=__MODULE)
     def update(self, db: Session, user_id: UUID, changes: UserUpdate | VerifiedUserUpdate) -> User:
         data = changes.model_dump(exclude={"old_password", "code"}, by_alias=False, exclude_unset=True)
 
@@ -60,6 +64,18 @@ class UsersService:
             
         return self.__repository.update(db=db, key="user_id", value=user_id, changes=data)
     
-    @service_error_handler(module=f"{__MODULE}.delete")
+    @service_error_handler(module=__MODULE)
     def delete(self, db: Session, user_id: UUID) -> User| None:
         return self.__repository.delete(db=db, key="user_id", value=user_id)
+    
+    
+    @service_error_handler(module=__MODULE)
+    def bulk_delete(
+        self,
+        db: Session,
+        ids: List[UUID]
+    ) -> List[User]:
+        return self.__repository.bulk_delete(
+            db=db,
+            ids=ids
+        )
