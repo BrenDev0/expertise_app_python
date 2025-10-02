@@ -31,7 +31,8 @@ class AgentsController:
             service_key="employees_service",
             params={
                 "db": db,
-                "employee_id": employee_id
+                "key": "employee_id",
+                "value": employee_id
             },
             not_found_message="Employee not found"
         )
@@ -130,7 +131,8 @@ class AgentsController:
             service_key="employees_service",
             params={
                 "db": db,
-                "user_id": user.user_id
+                "key": "user_id", 
+                "value": user.user_id
             },
             not_found_message="Employee not found"
         )
