@@ -71,18 +71,18 @@ class EmployeesController:
 
     def resource_request(
         self,
-        employee_id: UUID,
         req: Request,
         db: Session
     ) -> EmployeePublic:
+        user: User = req.state.user
         company_id = self.__http_service.request_validation_service.verify_company_in_request_state(req=req, db=db)
 
         employee_resource: Employee = self.__http_service.request_validation_service.verify_resource(
             service_key="employees_service", # employee_service.resource accepts key value parameters
             params={
                 "db": db,
-                "key": "employee_id",
-                "value": employee_id
+                "key": "user_id",
+                "value": user.user_id
             },
             not_found_message="Employee not found"
         )
