@@ -82,7 +82,8 @@ class AgentsController:
             service_key="employees_service",
             params={
                 "db": db,
-                "employee_id": employee_id
+                "key": "employee_id",
+                "value": employee_id
             },
             not_found_message="Employee not found"
         )
