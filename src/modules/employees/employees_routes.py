@@ -44,11 +44,10 @@ def verified_create(
         db=db
     )
 
-@router.get("/secure/resource/{employee_id}", status_code=200, response_model=EmployeePublic)
+@router.get("/secure/resource", status_code=200, response_model=EmployeePublic)
 def secure_resource(
-    employee_id: UUID,
     req: Request,
-    _: None = Depends(is_manager),
+    _: None = Depends(auth_middleware),
     db: Session = Depends(get_db_session),
     controller: EmployeesController = Depends(get_controller)
 ): 
@@ -59,7 +58,6 @@ def secure_resource(
     Only admin level users, and manager level employees have access to this endpoint. 
     """
     return controller.resource_request(
-        employee_id=employee_id,
         req=req,
         db=db
     )

@@ -25,13 +25,14 @@ def is_manager(
         return 
     
     else:
-        http_service: HttpService = Container.resolve("employee_service")
+        http_service: HttpService = Container.resolve("http_service")
 
         employee_resource: Employee = http_service.request_validation_service.verify_resource(
             service_key="employees_service",
             params={
                 "db": db,
-                "user_id": user.user_id
+                "key": "user_id",
+                "value": user.user_id
             },
             not_found_message="forbidden",
             status_code=403

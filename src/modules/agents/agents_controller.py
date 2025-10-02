@@ -27,7 +27,7 @@ class AgentsController:
         data: AgentAccessCreate,
         req: Request,
         db: Session
-    ) -> List[UUID]:
+    ) -> List[AgentPublic]:
         company_id = self.__http_service.request_validation_service.verify_company_in_request_state(req=req, db=db)
         
         employee_resource: Employee = self.__http_service.request_validation_service.verify_resource(
@@ -46,14 +46,20 @@ class AgentsController:
         for agent_id in data.agent_ids:
             agent_resource: Agent = self.__agents_service.resource(db=db, agent_id=agent_id)
             if agent_resource:
-                valid_agents.append(agent_id)
+                valid_agents.append(agent_resource)
         
         if len(valid_agents) == 0:
             raise HTTPException(status_code=400, detail="No valid agents in request")
 
-        agent_acess = self.__agent_access_service.create_many(db=db, agent_ids=valid_agents, user_id=employee_resource.user_id)
+        requested_access = self.__agent_access_service.create_many(db=db, agent_ids=[agent.agent_id for agent in valid_agents], user_id=employee_resource.user_id)
+        
+        created = [agent.agent_id for agent in requested_access]
+        print(created)
 
-        return [str(agent.agent_id) for agent in agent_acess]
+        return [
+            self.__to_public(agent) for agent in valid_agents if agent.agent_id in created
+        ]
+       
     
     def remove_access(
         self,

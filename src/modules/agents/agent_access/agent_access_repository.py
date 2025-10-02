@@ -10,7 +10,7 @@ class AgentAccessRepository(BaseRepository):
     def __init__(self):
         super().__init__(AgentAccess)
 
-    def create_many(self, db: Session, user_id: UUID, agent_ids: List[UUID]):
+    def create_many(self, db: Session, user_id: UUID, agent_ids: List[AgentAccess]):
         existing = db.query(AgentAccess.agent_id).filter(
             AgentAccess.user_id == user_id,
             AgentAccess.agent_id.in_(agent_ids)

@@ -118,6 +118,7 @@ class UsersController:
         db: Session
     ) -> UserPublic:
         user: User = req.state.user
+        
         data = self.__to_public(data=user)
 
         return data

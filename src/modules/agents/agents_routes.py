@@ -24,7 +24,7 @@ def get_controller() -> AgentsController:
     return controller
 
 
-@router.post("/secure/access/{employee_id}", status_code=201, response_model=List[UUID])
+@router.post("/secure/access/{employee_id}", status_code=201, response_model=List[AgentPublic])
 def secure_add_access(
     employee_id: UUID,
     req: Request,
