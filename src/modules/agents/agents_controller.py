@@ -1,15 +1,18 @@
+from fastapi import Request, HTTPException
+from sqlalchemy.orm import Session
+from uuid import UUID
+from  typing import List
+
+from src.core.models.http_responses import CommonHttpResponse
 from src.core.services.http_service import HttpService
 from src.modules.agents.agents_models import Agent, AgentPublic
 from src.modules.users.users_models import User
 from src.modules.agents.agents_service import AgentsService
-from src.modules.agents.agent_access.agent_access_models import AgentAccessCreate, AgentAccessDelete
+from src.modules.agents.agent_access.agent_access_models import AgentAccessCreate, AgentAccessDelete, AgentAccess
 from src.modules.agents.agent_access.agent_access_service import AgentAccessService
 from src.modules.employees.employees_models import Employee
-from src.core.models.http_responses import CommonHttpResponse
-from fastapi import Request
-from sqlalchemy.orm import Session
-from uuid import UUID
-from  typing import List
+
+
 
 
 class AgentsController:
@@ -24,7 +27,7 @@ class AgentsController:
         data: AgentAccessCreate,
         req: Request,
         db: Session
-    ) -> CommonHttpResponse:
+    ) -> List[UUID]:
         company_id = self.__http_service.request_validation_service.verify_company_in_request_state(req=req, db=db)
         
         employee_resource: Employee = self.__http_service.request_validation_service.verify_resource(
@@ -39,11 +42,18 @@ class AgentsController:
 
         self.__http_service.request_validation_service.validate_action_authorization(company_id, employee_resource.company_id)
 
-        self.__agent_access_service.create_many(db=db, data=data, user_id=employee_resource.user_id)
+        valid_agents = []
+        for agent_id in data.agent_ids:
+            agent_resource: Agent = self.__agents_service.resource(db=db, agent_id=agent_id)
+            if agent_resource:
+                valid_agents.append(agent_id)
+        
+        if len(valid_agents) == 0:
+            raise HTTPException(status_code=400, detail="No valid agents in request")
 
-        return CommonHttpResponse(
-            detail="Agent access added to employee"
-        )
+        agent_acess = self.__agent_access_service.create_many(db=db, agent_ids=valid_agents, user_id=employee_resource.user_id)
+
+        return [str(agent.agent_id) for agent in agent_acess]
     
     def remove_access(
         self,
