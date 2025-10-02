@@ -65,7 +65,7 @@ def secure_resource(
         db=db 
     )
 
-@router.get("secure/access/collection/{employee_id}", status_code=200, response_model=List[AgentPublic])
+@router.get("/secure/access/collection/{employee_id}", status_code=200, response_model=List[AgentPublic])
 def acess_collection(
     employee_id: UUID,
     req: Request,
