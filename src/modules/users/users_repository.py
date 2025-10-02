@@ -11,7 +11,7 @@ class UsersRepository(BaseRepository):
 
     
     def bulk_delete(self, db: Session, ids: List[UUID]) -> List[User] | None:
-        stmt = delete(self.model).where(self.model.user_id.in_(ids))
+        stmt = delete(self.model).where(self.model.user_id.in_(ids)).returning(*self.model.__table__.c)
 
         result = db.execute(stmt)
         db.commit()
@@ -21,5 +21,5 @@ class UsersRepository(BaseRepository):
         if not deleted_rows:
             return None
         else:
-            [self.model(**row._mapping) for row in deleted_rows]
+            return [self.model(**row._mapping) for row in deleted_rows]
         
