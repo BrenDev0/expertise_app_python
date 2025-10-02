@@ -1,13 +1,16 @@
 from  fastapi import Request, HTTPException
 from sqlalchemy.orm import Session
+
 from src.core.services.http_service import HttpService
-from src.modules.users.users_service import UsersService
-from src.modules.users.users_models import UserPublic, User, UserCreate, UserLogin, VerifyEmail, UserLogin, UserUpdate, VerifiedUserUpdate
 from src.core.models.http_responses import CommonHttpResponse, ResponseWithToken
 from src.core.dependencies.container import Container
 from src.core.services.email_service import EmailService
+
+from src.modules.users.users_service import UsersService
+from src.modules.users.users_models import UserPublic, User, UserCreate, UserLogin, VerifyEmail, UserLogin, UserUpdate, VerifiedUserUpdate
 from src.modules.employees.employees_models import Employee
 from src.modules.documents.document_manager import DocumentManager
+from src.modules.companies.companies_service import CompaniesService
 
 
 class UsersController:
@@ -173,11 +176,20 @@ class UsersController:
         db: Session
     ) -> CommonHttpResponse:
         user: User = req.state.user
+        
+        if user.is_admin:
+            ## delete bucket and vector base data 
+            document_manager: DocumentManager = Container.resolve("document_manager")
+            document_manager.user_level_deletion(user_id=user.user_id, db=db)
 
+            ## delete companies and employee accounts
+            companies_service: CompaniesService = Container.resolve("companies_service")
+            companies = companies_service.collection(db=db, user_id=user.user_id)
 
-        ## delete bucket and vector base data 
-        document_manager: DocumentManager = Container.resolve("document_manager")
-        document_manager.user_level_deletion(user_id=user.user_id, db=db)
+            if len(companies) != 0:
+                for company in companies:
+                    companies_service.delete(db=db, company_id=company.company_id)
+
 
         self.__users_service.delete(db=db, user_id=user.user_id) 
 

@@ -1,14 +1,16 @@
 from fastapi import APIRouter, Depends, Body, Request
 from src.modules.users.users_controller import UsersController
-from src.core.models.http_responses import CommonHttpResponse, ResponseWithToken
-from src.modules.users.users_models import UserCreate, UserPublic, UserLogin, VerifyEmail, UserUpdate, VerifiedUserUpdate
-from src.core.database.session import get_db_session
 from sqlalchemy.orm import Session
+
+from src.core.database.session import get_db_session
+from src.core.models.http_responses import CommonHttpResponse, ResponseWithToken
 from src.core.dependencies.container import Container
 from src.core.middleware.middleware_service import security
 from src.core.middleware.auth_middleware import auth_middleware
 from src.core.middleware.verification_middleware import verification_middleware
 from src.core.middleware.hmac_verification import verify_hmac
+
+from src.modules.users.users_models import UserCreate, UserPublic, UserLogin, VerifyEmail, UserUpdate, VerifiedUserUpdate
 
 
 

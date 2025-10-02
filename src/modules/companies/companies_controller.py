@@ -120,16 +120,6 @@ class CompaniesController:
             user_id=company_resource.user_id,
             db=db
         )
-
-        ## delete users accounts of the employees
-        employees_service: EmployeesService = Container.resolve("employees_service")
-
-        employees = employees_service.collection(db=db, company_id=company_resource.company_id)
-        employee_account_ids = [employee.user_id for employee in employees] 
-
-        if len(employee_account_ids) != 0:
-            users_service: UsersService = Container.resolve("users_service")
-            users_service.bulk_delete(db=db, ids=employee_account_ids)
     
         self.__companies_service.delete(db=db, company_id=company_resource.company_id)
      
