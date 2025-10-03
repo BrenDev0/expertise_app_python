@@ -20,7 +20,7 @@ class AgentAccessService:
         return self.__repository.get_access_resource(db=db, user_id=user_id, agent_id=agent_id)
 
     @service_error_handler(f"{__MODULE}.collection")
-    def collection(self, db: Session, user_id: UUID) -> List[Agent]:
+    def collection(self, db: Session, user_id: UUID) -> List[AgentAccess]:
         return self.__repository.get_agents_by_user(db=db, user_id=user_id)
 
     @service_error_handler(f"{__MODULE}.remove_many")
