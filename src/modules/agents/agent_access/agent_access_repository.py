@@ -61,46 +61,8 @@ class AgentAccessRepository(BaseRepository):
         ).delete(synchronize_session=False)
         db.commit()
 
-    def get_agents_by_user(self, db: Session, user_id: UUID) -> List[Agent]:
+    def get_agents_by_user(self, db: Session, user_id: UUID) -> List[AgentAccess]:
         stmt = (
-            select(Agent)
-            .join(AgentAccess, Agent.agent_id == AgentAccess.agent_id)
-            .where(AgentAccess.user_id == user_id)
+            select(AgentAccess).where(AgentAccess.user_id == user_id)
         )
         return db.execute(stmt).scalars().all()
-    
-    def upsert_many(
-        self, 
-        db: Session,
-        user_id: UUID,
-        agent_ids: List[UUID]
-    ) -> List[AgentAccess]:
-        if not agent_ids:
-            db.query(AgentAccess).filter(AgentAccess.user_id == user_id).delete(synchronize_session=False)
-            db.commit()
-            return []
-        
-        current_access = db.query(AgentAccess).filter(AgentAccess.user_id == user_id).all()
-        current_agent_ids = {access.agent_id for access in current_access}
-
-        requested_agent_ids = set(agent_ids)
-
-        to_add = requested_agent_ids - current_agent_ids
-        to_delete = current_access - requested_agent_ids
-
-        if to_delete:
-            db.query(AgentAccess).filter(
-                AgentAccess.user_id == user_id,
-                AgentAccess.agent_id.in_(to_delete)
-            ).delete(synchronize_session=False)
-
-        if to_add:
-            new_access = [
-                AgentAccess(agent_id=id, user_id=user_id)
-                for id in to_add
-            ]
-            db.add_all(new_access)
-
-        db.commit()
-
-        return db.query(AgentAccess).filter(AgentAccess.user_id == user_id).all()
