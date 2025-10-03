@@ -35,24 +35,13 @@ class CompaniesController:
     
     def resource_request(
         self,
-        company_id: UUID,
         req: Request,
         db: Session
     ) -> CompanyPublic:
         user: User = req.state.user
+        company: Company = self.__https_service.request_validation_service.verify_company_in_request_state(req=req, db=db)
 
-        company_resource: Company = self.__https_service.request_validation_service.verify_resource(
-            service_key="companies_service",
-            params={
-                "db": db,
-                "company_id": company_id
-            },
-            not_found_message="Company not found"
-        )
-
-        self.__https_service.request_validation_service.validate_action_authorization(user.user_id, company_resource.user_id)
-
-        return self.__to_public(company_resource)
+        return self.__to_public(company)
 
 
     def collection_request(

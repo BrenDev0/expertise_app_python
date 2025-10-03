@@ -5,6 +5,7 @@ from src.modules.interactions.interactions_models import HumanToAgentRequest
 from src.modules.state.state_service import StateService
 from src.modules.chats.messages.messages_service import MessagesService
 from src.modules.chats.messages.messages_models import MessagePublic
+from src.modules.companies.companies_models import Company
 from sqlalchemy.orm import Session
 from uuid import UUID
 from src.modules.users.users_models import User
@@ -35,7 +36,7 @@ class InteractionsController:
         db: Session
     )-> MessagePublic: 
         user: User = req.state.user
-        company_id = self.__http_service.request_validation_service.verify_company_in_request_state(req=req, db=db)
+        company: Company = self.__http_service.request_validation_service.verify_company_in_request_state(req=req, db=db)
 
         self.__http_service.request_validation_service.verify_resource(
             service_key="agents_service",
@@ -73,7 +74,7 @@ class InteractionsController:
             chat_id=str(chat_resource.chat_id),
             input=data.input,
             user_id=user.user_id,
-            company_id=company_id
+            company_id=company.company_id
         )
 
         await self.__send_to_agent(

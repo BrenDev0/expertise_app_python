@@ -34,13 +34,13 @@ class DocumentsController:
         file: UploadFile
     ):
         user: User = req.state.user
-        company_id = self.__http_service.request_validation_service.verify_company_in_request_state(req=req, db=db)
+        company: Company = self.__http_service.request_validation_service.verify_company_in_request_state(req=req, db=db)
 
         company_resource: Company = self.__http_service.request_validation_service.verify_resource(
             service_key="companies_service",
             params={
                 "db": db,
-                "company_id": company_id
+                "company_id": company.company_id
             },
             not_found_message="Company not found"
         )
@@ -63,7 +63,7 @@ class DocumentsController:
         asyncio.create_task(
             self.__document_manager.handle_upload(
                 file=file,
-                company_id=company_id,
+                company_id=company.company_id,
                 user_id=user.user_id,
                 db=db
             )
@@ -80,13 +80,13 @@ class DocumentsController:
         db: Session
     ):
         user: User = req.state.user
-        company_id = self.__http_service.request_validation_service.verify_company_in_request_state(req=req, db=db)
+        company: Company = self.__http_service.request_validation_service.verify_company_in_request_state(req=req, db=db)
 
         company_resource: Company = self.__http_service.request_validation_service.verify_resource(
             service_key="companies_service",
             params={
                 "db": db,
-                "company_id": company_id
+                "company_id": company.company_id
             },
             not_found_message="Company not found"
         )
@@ -106,7 +106,7 @@ class DocumentsController:
         db: Session
     ) ->  CommonHttpResponse:
         user: User = req.state.user
-        company_id = self.__http_service.request_validation_service.verify_company_in_request_state(req=req, db=db)
+        company: Company = self.__http_service.request_validation_service.verify_company_in_request_state(req=req, db=db)
 
         document_resource: Document = self.__http_service.request_validation_service.verify_resource(
             service_key="documents_service",

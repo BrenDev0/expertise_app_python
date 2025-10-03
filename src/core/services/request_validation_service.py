@@ -55,4 +55,4 @@ class RequestValidationService:
             not_found_message="Company not found"
         )
         
-        return company_resource.company_id
+        return company_resource
