@@ -51,43 +51,17 @@ class AgentsController:
         if len(valid_agents) == 0:
             raise HTTPException(status_code=400, detail="No valid agents in request")
 
-        requested_access = self.__agent_access_service.create_many(db=db, agent_ids=[agent.agent_id for agent in valid_agents], user_id=employee_resource.user_id)
+        updated_access = self.__agent_access_service.upsert(
+            db=db, 
+            agent_ids=[agent.agent_id for agent in valid_agents], 
+            user_id=employee_resource.user_id
+        )
         
-        created = [agent.agent_id for agent in requested_access]
-        print(created)
-
         return [
-            self.__to_public(agent) for agent in valid_agents if agent.agent_id in created
+            self.__to_public(access.agent) for access in updated_access
         ]
        
-    
-    def remove_access(
-        self,
-        employee_id: UUID,
-        data: AgentAccessDelete,
-        req: Request,
-        db: Session
-    ) -> CommonHttpResponse:
-        company_id = self.__http_service.request_validation_service.verify_company_in_request_state(req=req, db=db)
 
-        employee_resource: Employee = self.__http_service.request_validation_service.verify_resource(
-            service_key="employees_service",
-            params={
-                "db": db,
-                "key": "employee_id",
-                "value": employee_id
-            },
-            not_found_message="Employee not found"
-        )
-
-        self.__http_service.request_validation_service.validate_action_authorization(company_id, employee_resource.company_id)
-
-        self.__agent_access_service.remove_many(db=db, data=data, user_id=employee_resource.user_id)
-
-        return CommonHttpResponse(
-            detail="Agent access removed from employee"
-        )
-    
     def agent_acccess_collection_request(
         self,
         employee_id: UUID,

@@ -1,11 +1,13 @@
-from pydantic import BaseModel, EmailStr, ConfigDict
-from typing import Optional, List
+from pydantic import BaseModel, ConfigDict
+from typing import List
 from pydantic.alias_generators import to_camel
-from sqlalchemy import Column, String, Boolean, DateTime, func, Text, ForeignKey, UniqueConstraint
+from sqlalchemy import Column, ForeignKey, UniqueConstraint
+from sqlalchemy.orm import relationship
 from sqlalchemy.dialects.postgresql import UUID
-from src.core.database.database_models import Base 
 import uuid
-from  datetime import datetime
+
+from src.core.database.database_models import Base 
+
 
 
 class AgentAccess(Base):
@@ -13,6 +15,8 @@ class AgentAccess(Base):
 
     agent_id = Column(UUID(as_uuid=True), ForeignKey("agents.agent_id", ondelete="CASCADE"), primary_key=True, nullable=False)
     user_id = Column(UUID(as_uuid=True), ForeignKey("users.user_id", ondelete="CASCADE"), primary_key=True, nullable=False)
+
+    agent = relationship("Agent")
 
     __table_args__ = (
         UniqueConstraint("agent_id", "user_id", name="uq_agent_user"),

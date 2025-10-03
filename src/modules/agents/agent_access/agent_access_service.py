@@ -12,8 +12,8 @@ class AgentAccessService:
         self.__repository = repository
 
     @service_error_handler(f"{__MODULE}.create_many")
-    def create_many(self, db: Session, agent_ids: List[UUID], user_id: UUID) -> List[AgentAccess]:
-        return self.__repository.create_many(db=db, user_id=user_id, agent_ids=agent_ids)
+    def upsert(self, db: Session, agent_ids: List[UUID], user_id: UUID) -> List[AgentAccess]:
+        return self.__repository.upsert_many(db=db, user_id=user_id, agent_ids=agent_ids)
     
     @service_error_handler(f"{__MODULE}.resource")
     def resource(self, db: Session, user_id: UUID, agent_id: UUID) -> AgentAccess | None:
