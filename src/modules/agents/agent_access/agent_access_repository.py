@@ -85,7 +85,7 @@ class AgentAccessRepository(BaseRepository):
 
         requested_agent_ids = set(agent_ids)
 
-        to_add = requested_agent_ids -current_access
+        to_add = requested_agent_ids - current_agent_ids
         to_delete = current_access - requested_agent_ids
 
         if to_delete:
