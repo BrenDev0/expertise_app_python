@@ -24,8 +24,8 @@ def get_controller() -> AgentsController:
     return controller
 
 
-@router.post("/secure/access/{employee_id}", status_code=201, response_model=List[AgentPublic])
-def secure_add_access(
+@router.put("/secure/access/{employee_id}", status_code=201, response_model=List[AgentPublic])
+def secure_upsert_access(
     employee_id: UUID,
     req: Request,
     data: AgentAccessCreate = Body(...),
@@ -116,25 +116,3 @@ def secure_read(
     """
 
     return controller.read_request(db=db)
-
-@router.delete("/secure/access/{employee_id}", status_code=200, response_model=CommonHttpResponse)
-def secure_remove_access(
-    employee_id: UUID,
-    req: Request,
-    data: AgentAccessDelete = Body(...),
-    _: None = Depends(is_manager),
-    db: Session = Depends(get_db_session),
-    controller: AgentsController = Depends(get_controller)
-): 
-    """
-    ## Add agent access to employee
-
-    This endpoint will remove agent access to the employee id.
-    Only admin level users, and manager level employees have access to this endpoint. 
-    """
-    return controller.remove_access(
-        employee_id=employee_id,
-        data=data,
-        req=req,
-        db=db
-    )

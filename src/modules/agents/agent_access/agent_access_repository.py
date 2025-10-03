@@ -10,23 +10,42 @@ class AgentAccessRepository(BaseRepository):
     def __init__(self):
         super().__init__(AgentAccess)
 
-    def create_many(self, db: Session, user_id: UUID, agent_ids: List[AgentAccess]):
-        existing = db.query(AgentAccess.agent_id).filter(
-            AgentAccess.user_id == user_id,
-            AgentAccess.agent_id.in_(agent_ids)
-        ).all()
-        existing_ids = {row[0] for row in existing}
+    def upsert_many(
+        self, 
+        db: Session,
+        user_id: UUID,
+        agent_ids: List[UUID]
+    ) -> List[AgentAccess]:
+        if not agent_ids:
+            db.query(AgentAccess).filter(AgentAccess.user_id == user_id).delete(synchronize_session=False)
+            db.commit()
+            return []
+        
+        current_access = db.query(AgentAccess).filter(AgentAccess.user_id == user_id).all()
+        current_agent_ids = {access.agent_id for access in current_access}
 
-    
-        new_agent_ids = [aid for aid in agent_ids if aid not in existing_ids]
+        requested_agent_ids = set(agent_ids)
 
-        new_links = [
-            AgentAccess(agent_id=aid, user_id=user_id)
-            for aid in new_agent_ids
-        ]
-        db.add_all(new_links)
+        to_add = requested_agent_ids - current_agent_ids
+        to_delete = current_agent_ids - requested_agent_ids
+
+        if to_delete:
+            db.query(AgentAccess).filter(
+                AgentAccess.user_id == user_id,
+                AgentAccess.agent_id.in_(to_delete)
+            ).delete(synchronize_session=False)
+
+        if to_add:
+            new_access = [
+                AgentAccess(agent_id=id, user_id=user_id)
+                for id in to_add
+            ]
+            db.add_all(new_access)
+
         db.commit()
-        return new_links
+
+        return db.query(AgentAccess).filter(AgentAccess.user_id == user_id).all()
+
     
     def get_access_resource(self, db: Session, user_id: UUID, agent_id: UUID) -> AgentAccess | None:
         stmt = select(self.model).where(
@@ -49,3 +68,39 @@ class AgentAccessRepository(BaseRepository):
             .where(AgentAccess.user_id == user_id)
         )
         return db.execute(stmt).scalars().all()
+    
+    def upsert_many(
+        self, 
+        db: Session,
+        user_id: UUID,
+        agent_ids: List[UUID]
+    ) -> List[AgentAccess]:
+        if not agent_ids:
+            db.query(AgentAccess).filter(AgentAccess.user_id == user_id).delete(synchronize_session=False)
+            db.commit()
+            return []
+        
+        current_access = db.query(AgentAccess).filter(AgentAccess.user_id == user_id).all()
+        current_agent_ids = {access.agent_id for access in current_access}
+
+        requested_agent_ids = set(agent_ids)
+
+        to_add = requested_agent_ids -current_access
+        to_delete = current_access - requested_agent_ids
+
+        if to_delete:
+            db.query(AgentAccess).filter(
+                AgentAccess.user_id == user_id,
+                AgentAccess.agent_id.in_(to_delete)
+            ).delete(synchronize_session=False)
+
+        if to_add:
+            new_access = [
+                AgentAccess(agent_id=id, user_id=user_id)
+                for id in to_add
+            ]
+            db.add_all(new_access)
+
+        db.commit()
+
+        return db.query(AgentAccess).filter(AgentAccess.user_id == user_id).all()
