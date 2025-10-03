@@ -75,7 +75,7 @@ class EmployeesController:
         db: Session
     ) -> EmployeePublic:
         user: User = req.state.user
-        company_id = self.__http_service.request_validation_service.verify_company_in_request_state(req=req, db=db)
+        company: Company = self.__http_service.request_validation_service.verify_company_in_request_state(req=req, db=db)
 
         employee_resource: Employee = self.__http_service.request_validation_service.verify_resource(
             service_key="employees_service", # employee_service.resource accepts key value parameters
@@ -88,7 +88,7 @@ class EmployeesController:
         )
 
         
-        self.__http_service.request_validation_service.validate_action_authorization(company_id, employee_resource.company_id)
+        self.__http_service.request_validation_service.validate_action_authorization(company.company_id, employee_resource.company_id)
 
         
         return self.__to_public(employee_resource)
@@ -99,18 +99,9 @@ class EmployeesController:
         req: Request,
         db: Session,
     ) -> List[EmployeePublic]:
-        company_id = self.__http_service.request_validation_service.verify_company_in_request_state(req=req, db=db)
+        company: Company = self.__http_service.request_validation_service.verify_company_in_request_state(req=req, db=db)
 
-        company_resource: Company = self.__http_service.request_validation_service.verify_resource(
-            service_key="companies_service",
-            params={
-                "db": db,
-                "company_id": company_id
-            },
-            not_found_message="Company not found"
-        )
-
-        data = self.__employees_service.collection(db=db, company_id=company_resource.company_id)
+        data = self.__employees_service.collection(db=db, company_id=company.company_id)
 
         return [
             self.__to_public(employee) for employee in data
@@ -123,7 +114,7 @@ class EmployeesController:
         data: EmployeeUpdate,
         db: Session
     ) -> EmployeePublic:
-        company_id = self.__http_service.request_validation_service.verify_company_in_request_state(req=req, db=db)
+        company: Company = self.__http_service.request_validation_service.verify_company_in_request_state(req=req, db=db)
 
         employee_resource: Employee = self.__http_service.request_validation_service.verify_resource(
             service_key="employees_service",
@@ -135,7 +126,7 @@ class EmployeesController:
             not_found_message="Employee not found"
         )
 
-        self.__http_service.request_validation_service.validate_action_authorization(company_id, employee_resource.company_id)
+        self.__http_service.request_validation_service.validate_action_authorization(company.company_id, employee_resource.company_id)
 
         updated_emplooyee = self.__employees_service.update(db=db, employee_id=employee_resource.employee_id, changes=data)
 
@@ -149,7 +140,7 @@ class EmployeesController:
         req: Request,
         db: Session
     ):
-        company_id = self.__http_service.request_validation_service.verify_company_in_request_state(req=req, db=db)
+        company: Company = self.__http_service.request_validation_service.verify_company_in_request_state(req=req, db=db)
 
         employee_resource: Employee = self.__http_service.request_validation_service.verify_resource(
             service_key="employees_service",
@@ -161,7 +152,7 @@ class EmployeesController:
             not_found_message="Employee not found"
         )
 
-        self.__http_service.request_validation_service.validate_action_authorization(company_id, employee_resource.company_id)
+        self.__http_service.request_validation_service.validate_action_authorization(company.company_id, employee_resource.company_id)
 
        
         self.__users_service.delete(db=db, user_id=employee_resource.user_id)  ## will delete employee by Cascade

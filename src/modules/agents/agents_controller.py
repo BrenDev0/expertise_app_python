@@ -11,6 +11,7 @@ from src.modules.agents.agents_service import AgentsService
 from src.modules.agents.agent_access.agent_access_models import AgentAccessCreate, AgentAccessDelete, AgentAccess
 from src.modules.agents.agent_access.agent_access_service import AgentAccessService
 from src.modules.employees.employees_models import Employee
+from src.modules.companies.companies_models import Company
 
 
 
@@ -28,7 +29,7 @@ class AgentsController:
         req: Request,
         db: Session
     ) -> List[AgentPublic]:
-        company_id = self.__http_service.request_validation_service.verify_company_in_request_state(req=req, db=db)
+        company: Company = self.__http_service.request_validation_service.verify_company_in_request_state(req=req, db=db)
         
         employee_resource: Employee = self.__http_service.request_validation_service.verify_resource(
             service_key="employees_service",
@@ -40,7 +41,7 @@ class AgentsController:
             not_found_message="Employee not found"
         )
 
-        self.__http_service.request_validation_service.validate_action_authorization(company_id, employee_resource.company_id)
+        self.__http_service.request_validation_service.validate_action_authorization(company.company_id, employee_resource.company_id)
 
         valid_agents = []
         for agent_id in data.agent_ids:
@@ -65,7 +66,7 @@ class AgentsController:
         req: Request,
         db: Session
     ):
-        company_id= self.__http_service.request_validation_service.verify_company_in_request_state(req=req, db=db)
+        company: Company = self.__http_service.request_validation_service.verify_company_in_request_state(req=req, db=db)
         
         employee_resource: Employee = self.__http_service.request_validation_service.verify_resource(
             service_key="employees_service",
@@ -77,7 +78,7 @@ class AgentsController:
             not_found_message="Employee not found"
         )
 
-        self.__http_service.request_validation_service.validate_action_authorization(company_id, employee_resource.company_id)
+        self.__http_service.request_validation_service.validate_action_authorization(company.company_id, employee_resource.company_id)
 
         collection = self.__agent_access_service.collection(db=db, user_id=employee_resource.user_id)
 
@@ -107,7 +108,7 @@ class AgentsController:
         db: Session
     ) -> List[AgentPublic]:
         user: User = req.state.user
-        company_id = self.__http_service.request_validation_service.verify_company_in_request_state(req=req, db=db)
+        company: Company = self.__http_service.request_validation_service.verify_company_in_request_state(req=req, db=db)
 
         if user.is_admin:
             data = self.__agents_service.read(db=db)
@@ -129,7 +130,7 @@ class AgentsController:
 
             return [self.__to_public(agent) for agent in data]
 
-        self.__http_service.request_validation_service.validate_action_authorization(company_id, employee_resource.company_id)
+        self.__http_service.request_validation_service.validate_action_authorization(company.company_id, employee_resource.company_id)
 
         data = self.__agent_access_service.collection(db=db, user_id=employee_resource.user_id)
 

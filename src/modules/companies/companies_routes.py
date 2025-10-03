@@ -11,12 +11,13 @@ from src.core.middleware.middleware_service import security
 from uuid import UUID
 from typing import List
 from src.core.middleware.hmac_verification import verify_hmac
+from src.core.middleware.auth_middleware import auth_middleware
 
 
 router = APIRouter(
     prefix="/companies",
     tags=["Companies"],
-    dependencies=[Depends(security), Depends(verify_hmac), Depends(is_owner)] # applied to all routes
+    dependencies=[Depends(security), Depends(verify_hmac)] # applied to all routes
 )
 
 def get_controller() -> CompaniesController:
@@ -27,6 +28,7 @@ def get_controller() -> CompaniesController:
 def secure_create(
     req: Request,
     data: CompanyCreate = Body(...),
+    _: None = Depends(is_owner),
     db: Session = Depends(get_db_session),
     controller: CompaniesController = Depends(get_controller)
 ):
@@ -46,6 +48,7 @@ def secure_create(
 def secure_login(
     company_id: UUID,
     req: Request,
+    _: None = Depends(is_owner),
     db: Session = Depends(get_db_session),
     controller: CompaniesController = Depends(get_controller)
 ):
@@ -63,21 +66,19 @@ def secure_login(
         db=db
     )
 
-@router.get("/secure/resource/{company_id}", status_code=200, response_model=CompanyPublic)
+@router.get("/secure/resource", status_code=200, response_model=CompanyPublic)
 def secure_resource(
-    company_id: UUID,
     req: Request,
+    _: None = Depends(auth_middleware),
     db: Session = Depends(get_db_session),
     controller: CompaniesController = Depends(get_controller)
 ):
     """
     ## Resource request
 
-    This endpoint gets a company from the db by id.
-    Only admin level users have access to this endpoint.
+    This endpoint gets the company that the user is currently working in.
     """
     return controller.resource_request(
-        company_id=company_id,
         req=req,
         db=db
     )
@@ -86,6 +87,7 @@ def secure_resource(
 @router.get("/secure/collection", status_code=200, response_model=List[CompanyPublic])
 def secure_collection(
     req: Request,
+    _: None = Depends(is_owner),
     db: Session = Depends(get_db_session),
     controller: CompaniesController = Depends(get_controller)
 ):
@@ -104,6 +106,7 @@ def secure_collection(
 def secure_update(
     req: Request,
     data: CompanyUpdate = Body(...),
+    _: None = Depends(is_owner),
     db: Session = Depends(get_db_session),
     controller: CompaniesController = Depends(get_controller)
 ):
@@ -123,6 +126,7 @@ def secure_update(
 def secure_delete(
     company_id: UUID,
     req: Request,
+    _: None = Depends(is_owner),
     db: Session = Depends(get_db_session),
     controller: CompaniesController = Depends(get_controller)
 ):
