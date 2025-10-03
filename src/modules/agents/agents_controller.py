@@ -47,9 +47,6 @@ class AgentsController:
             agent_resource: Agent = self.__agents_service.resource(db=db, agent_id=agent_id)
             if agent_resource:
                 valid_agents.append(agent_resource)
-        
-        if len(valid_agents) == 0:
-            raise HTTPException(status_code=400, detail="No valid agents in request")
 
         updated_access = self.__agent_access_service.upsert(
             db=db, 
@@ -84,7 +81,7 @@ class AgentsController:
 
         collection = self.__agent_access_service.collection(db=db, user_id=employee_resource.user_id)
 
-        return [self.__to_public(agent) for agent in collection]
+        return [self.__to_public(access.agent) for access in collection]
         
     
     def resource_request(
