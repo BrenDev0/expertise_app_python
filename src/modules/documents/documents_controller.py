@@ -54,7 +54,9 @@ class DocumentsController:
             "application/vnd.ms-excel.sheet.binary.macroEnabled.12",  # .xlsb
             "text/csv",  # .csv
             "application/pdf",  # .pdf
-            "text/plain"  # .txt
+            "text/plain",  # .txt
+            "application/vnd.openxmlformats-officedocument.wordprocessingml.document",  # .docx
+            "application/msword" 
         ]
         
         if file.content_type not in allowed_mime_types:
