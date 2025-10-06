@@ -51,7 +51,7 @@ class InvitesController:
         # )
 
         return CommonHttpResponse(
-            detail="Invitation sent"
+            detail=token
         )
     
     def resource_request(
