@@ -75,11 +75,26 @@ class MessagesController:
     
         self.__http_service.request_validation_service.validate_action_authorization(user.user_id, chat_resource.user_id)
         
-        data = self.__messages_service.collection(db=db, chat_id=chat_resource.chat_id)
+        data = self.__messages_service.collection(db=db, key="chat_id", value=chat_resource.chat_id)
 
         return [self.__to_public(message) for message in data]
-        
-   
+    
+    def search_request(
+        self,
+        req: Request,
+        query: str,
+        db: Session
+    ) -> List[MessagePublic]:
+        user: User = req.state.user
+
+        data = self.__messages_service.query(
+            db=db,
+            content=query,
+            user_id=user.user_id
+        )
+
+        return [self.__to_public(message) for message in data]
+
     @staticmethod
     def __to_public(message: Message) -> MessagePublic:
         return MessagePublic.model_validate(message, from_attributes=True)

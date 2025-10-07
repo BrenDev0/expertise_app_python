@@ -1,13 +1,14 @@
-from src.modules.chats.messages.messages_models import Message, MessageCreate
-from src.core.repository.base_repository import BaseRepository
-from typing import List, Any
+from typing import List, Any, Union
 from sqlalchemy.orm import Session
 from uuid import UUID
+
+from src.modules.chats.messages.messages_models import Message, MessageCreate
+from src.modules.chats.messages.messages_repository import MessagesRepository
 from src.core.decorators.service_error_handler import service_error_handler
 
 class MessagesService():
     __MODULE = "messages.service"
-    def __init__(self, repository: BaseRepository):
+    def __init__(self, repository: MessagesRepository):
         self.__repository = repository
 
     @service_error_handler(f"{__MODULE}.create")
@@ -30,28 +31,32 @@ class MessagesService():
 
         return self.__repository.create(db=db, data=message)
 
-    @service_error_handler(f"{__MODULE}.resource")
+    @service_error_handler(module=__MODULE)
     def resource(self, db: Session, message_id: UUID) -> Message | None:
         return self.__repository.get_one(db=db, key="chat_id", value=message_id)
     
-    @service_error_handler(f"{__MODULE}.collection")
-    def collection(self, db: Session, chat_id: UUID, num_of_messages: int = 50) -> List[Message]:
+    @service_error_handler(module=__MODULE)
+    def collection(self, db: Session, key: str, value: Union[UUID, str], num_of_messages: int = 50) -> List[Message]:
         return self.__repository.get_many(
             db=db, 
-            key="chat_id", 
-            value=chat_id, 
+            key=key, 
+            value=value, 
             limit=num_of_messages, 
             order_by="created_at",
             desc=False
         )
     
-    @service_error_handler(f"{__MODULE}.delete")
+    @service_error_handler(module=__MODULE)
     def delete(self, db: Session, message_id: UUID)-> Message | None:
         return self.__repository.delete(db=db, key="message_id", value=message_id)
  
 
-    @service_error_handler(f"{__MODULE}.get_chat_history")
+    @service_error_handler(module=__MODULE)
     def get_chat_history(self, db: Session, chat_id: UUID, num_of_messages: int = 12) -> List[Message]:
         return self.collection(db=db, chat_id=chat_id, num_of_messages=num_of_messages)
+    
+    @service_error_handler(module=__MODULE)
+    def query(self, db: Session, content: str, user_id: UUID):
+        return self.__repository.search_by_content(db=db, content=content, user_id=user_id)
 
     
