@@ -3,14 +3,15 @@ from src.modules.users.users_controller import UsersController
 from sqlalchemy.orm import Session
 
 from src.core.database.session import get_db_session
-from src.core.models.http_responses import CommonHttpResponse, ResponseWithToken
+from src.core.domain.models.http_responses import CommonHttpResponse, ResponseWithToken
 from src.core.dependencies.container import Container
 from src.core.middleware.middleware_service import security
 from src.core.middleware.auth_middleware import auth_middleware
 from src.core.middleware.verification_middleware import verification_middleware
 from src.core.middleware.hmac_verification import verify_hmac
 
-from src.modules.users.users_models import UserCreate, UserPublic, UserLogin, VerifyEmail, UserUpdate, VerifiedUserUpdate
+from src.modules.users.domain.models import UserCreate, UserPublic, UserLogin, VerifyEmail, UserUpdate, VerifiedUserUpdate
+from src.modules.users.users_dependencies import get_users_controller
 
 
 
@@ -20,16 +21,12 @@ router = APIRouter(
     dependencies=([Depends(verify_hmac)])
 )
 
-def get_controller() -> UsersController:
-    controller = Container.resolve("users_controller")
-    return controller
-
 @router.post("/verify-email", status_code=200, response_model=ResponseWithToken)
 def verify_email(
     req: Request,
     data: VerifyEmail = Body(...),
     db: Session = Depends(get_db_session),
-    controller: UsersController = Depends(get_controller)
+    controller: UsersController = Depends(get_users_controller)
 ):
     """
     ## Verify email request
@@ -50,7 +47,7 @@ def secure_verify_email(
     data: VerifyEmail = Body(...),
     _: None = Depends(auth_middleware),
     db: Session = Depends(get_db_session),
-    controller: UsersController = Depends(get_controller)
+    controller: UsersController = Depends(get_users_controller)
 ):
     """
     ## Verify email for Update email request
@@ -71,7 +68,7 @@ def verifies_create(
     _: None = Depends(verification_middleware),
     data: UserCreate = Body(...),
     db: Session = Depends(get_db_session),
-    controller: UsersController = Depends(get_controller)
+    controller: UsersController = Depends(get_users_controller)
 ):
     """
     ## Create Request
@@ -92,7 +89,7 @@ def secure_resource(
     req: Request,
     _: None = Depends(auth_middleware),
     db: Session = Depends(get_db_session),
-    controller: UsersController = Depends(get_controller)
+    controller: UsersController = Depends(get_users_controller)
 ):
     """
     ## Resource request
@@ -110,7 +107,7 @@ def secure_update(
     data: UserUpdate,
     _: None = Depends(auth_middleware),
     db: Session = Depends(get_db_session),
-    controller: UsersController = Depends(get_controller)
+    controller: UsersController = Depends(get_users_controller)
 ):
     """
     ## Update request 
@@ -130,7 +127,7 @@ def verified_update(
     data: VerifiedUserUpdate = Body(...),
     _: None = Depends(verification_middleware),
     db: Session = Depends(get_db_session),
-    controller: UsersController = Depends(get_controller)
+    controller: UsersController = Depends(get_users_controller)
 ):
     """
     ## Verified update request
@@ -148,7 +145,7 @@ def secure_delete(
     req: Request,
     _: None = Depends(auth_middleware),
     db: Session = Depends(get_db_session),
-    controller: UsersController = Depends(get_controller)
+    controller: UsersController = Depends(get_users_controller)
 ):
     """
     ## Delete request 
@@ -165,7 +162,7 @@ def secure_delete(
 def login(
     db: Session = Depends(get_db_session),
     data: UserLogin = Body(...),
-    controller: UsersController = Depends(get_controller)
+    controller: UsersController = Depends(get_users_controller)
 ):
     """
     ## Login request
@@ -183,7 +180,7 @@ def account_recovery(
     req: Request,
     data: VerifyEmail = Body(...),
     db: Session = Depends(get_db_session),
-    controller: UsersController = Depends(get_controller)
+    controller: UsersController = Depends(get_users_controller)
 ):
     """
     ## Acount recovery request

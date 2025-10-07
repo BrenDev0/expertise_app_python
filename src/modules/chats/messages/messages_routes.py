@@ -9,7 +9,7 @@ from src.modules.chats.messages.messages_controller import MessagesController
 from src.core.middleware.middleware_service import security
 from src.modules.chats.messages.messages_models import MessagePublic, MessageCreate
 from uuid import UUID
-from src.core.models.http_responses import CommonHttpResponse
+from src.core.domain.models.http_responses import CommonHttpResponse
 
 router = APIRouter(
     prefix="/messages",

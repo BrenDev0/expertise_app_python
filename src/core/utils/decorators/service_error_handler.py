@@ -2,7 +2,7 @@
 from functools import wraps
 import logging
 from typing import Callable, Any
-from src.core.logs.logger import Logger
+from src.core.utils.logs.logger import Logger
 from src.core.dependencies.container import Container
 
 

@@ -1,24 +1,8 @@
 from pydantic import BaseModel, EmailStr, ConfigDict
-from pydantic.alias_generators import to_camel
-from sqlalchemy import Column, String, Boolean, DateTime, func
-from sqlalchemy.dialects.postgresql import UUID
-from src.core.database.database_models import Base 
-import uuid
-from  datetime import datetime
+from  pydantic.alias_generators import to_camel
+from uuid import UUID
+from datetime import datetime
 from typing import Optional
-
-
-class User(Base):
-    __tablename__ = "users"
-
-    user_id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, unique=True, nullable=False)
-    name = Column(String, nullable=False)
-    phone = Column(String, nullable=False)
-    email = Column(String, unique=True, nullable=False, index=True)
-    email_hash = Column(String, unique=True, nullable=False, index=True)
-    password = Column(String, nullable=False)
-    is_admin = Column(Boolean, nullable=False, default=False)
-    created_at = Column(DateTime(timezone=True), nullable=False, server_default=func.now())
 
 class UsersConfig(BaseModel):
       model_config = ConfigDict(
@@ -29,7 +13,7 @@ class UsersConfig(BaseModel):
     )
 
 class UserPublic(UsersConfig):
-    user_id: uuid.UUID
+    user_id: UUID
     name: str
     phone: str
     email: EmailStr
@@ -61,7 +45,3 @@ class UserLogin(BaseModel):
 
 class VerifyEmail(BaseModel):
     email: EmailStr
-
-
-
-

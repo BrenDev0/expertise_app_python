@@ -6,7 +6,7 @@ from qdrant_client import QdrantClient
 from qdrant_client.http.models import Distance, VectorParams, Filter, FieldCondition, MatchValue
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain_openai import OpenAIEmbeddings
-from src.core.decorators.service_error_handler import service_error_handler
+from src.core.utils.decorators.service_error_handler import service_error_handler
 import os
 import uuid
 from typing import Dict, Any

@@ -3,10 +3,10 @@ from sqlalchemy.orm import Session
 from uuid import UUID
 from  typing import List
 
-from src.core.models.http_responses import CommonHttpResponse
+from src.core.domain.models.http_responses import CommonHttpResponse
 from src.core.services.http_service import HttpService
 from src.modules.agents.agents_models import Agent, AgentPublic
-from src.modules.users.users_models import User
+from src.modules.users.domain.entities import User
 from src.modules.agents.agents_service import AgentsService
 from src.modules.agents.agent_access.agent_access_models import AgentAccessCreate, AgentAccessDelete, AgentAccess
 from src.modules.agents.agent_access.agent_access_service import AgentAccessService

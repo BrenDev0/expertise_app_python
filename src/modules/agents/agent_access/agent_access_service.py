@@ -1,5 +1,5 @@
 from src.modules.agents.agent_access.agent_access_repository import AgentAccessRepository
-from src.core.decorators.service_error_handler import service_error_handler
+from src.core.utils.decorators.service_error_handler import service_error_handler
 from src.modules.agents.agent_access.agent_access_models import AgentAccess, AgentAccessCreate, AgentAccessDelete
 from sqlalchemy.orm import Session
 from  src.modules.agents.agents_models import Agent

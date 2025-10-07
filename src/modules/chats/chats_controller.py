@@ -1,14 +1,16 @@
-from src.modules.chats.chats_models import Chat, ChatPublic
-from src.modules.users.users_models import User
-from src.modules.chats.chats_service import ChatsService
-from src.modules.chats.chats_models import  Chat, ChatCreate, ChatUpdate
-from src.core.models.http_responses import CommonHttpResponse
 from fastapi import Request
 from src.core.services.http_service import HttpService
 from sqlalchemy.orm import Session
 from typing import List
 from uuid import UUID
-from src.modules.users.users_models import User
+
+
+from src.modules.chats.chats_models import Chat, ChatPublic
+from src.modules.users.domain.entities import User
+from src.modules.chats.chats_service import ChatsService
+from src.modules.chats.chats_models import  Chat, ChatCreate, ChatUpdate
+from src.core.domain.models.http_responses import CommonHttpResponse
+
 
 
 class ChatsController:

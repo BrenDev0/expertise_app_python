@@ -3,10 +3,10 @@ from uuid import UUID
 from typing import List
 
 from src.core.repository.base_repository import BaseRepository
-from src.core.decorators.service_error_handler import service_error_handler
+from src.core.utils.decorators.service_error_handler import service_error_handler
 from src.core.dependencies.container import Container
 
-from src.modules.users.users_service import UsersService
+from src.modules.users.application.users_service import UsersService
 from src.modules.employees.employees_service import EmployeesService
 from src.modules.companies.companies_models import Company, CompanyCreate, CompanyUpdate
 

@@ -2,12 +2,13 @@ from  fastapi import Request, HTTPException
 from sqlalchemy.orm import Session
 
 from src.core.services.http_service import HttpService
-from src.core.models.http_responses import CommonHttpResponse, ResponseWithToken
+from src.core.domain.models.http_responses import CommonHttpResponse, ResponseWithToken
 from src.core.dependencies.container import Container
 from src.core.services.email_service import EmailService
 
-from src.modules.users.users_service import UsersService
-from src.modules.users.users_models import UserPublic, User, UserCreate, UserLogin, VerifyEmail, UserLogin, UserUpdate, VerifiedUserUpdate
+from src.modules.users.application.users_service import UsersService
+from src.modules.users.domain.entities import User
+from src.modules.users.domain.models import UserPublic,UserCreate, UserLogin, VerifyEmail, UserLogin, UserUpdate, VerifiedUserUpdate
 from src.modules.employees.employees_models import Employee
 from src.modules.documents.document_manager import DocumentManager
 from src.modules.companies.companies_service import CompaniesService
@@ -37,7 +38,7 @@ class UsersController:
 
         hashed_email = self.__http_service.hashing_service.hash_for_search(data.email)
         email_type = "NEW" if not is_update else "UPDATE"
-        user_exists = self.__users_service.resource(db=db, key="email_hash", value=hashed_email)
+        user_exists = self.__users_service.resource(key="email_hash", value=hashed_email)
 
         if user_exists:
             raise HTTPException(status_code=400, detail="Email in use")
@@ -67,7 +68,6 @@ class UsersController:
         user_exists: User =  self.__http_service.request_validation_service.verify_resource(
             service_key="users_service",
             params={
-                "db": db,
                 "key": "email_hash",
                 "value": email_hash
             },
@@ -100,7 +100,7 @@ class UsersController:
 
         self.__http_service.request_validation_service.validate_action_authorization(verification_code, data.code)
 
-        new_user = self.__users_service.create(db=db, data=data, is_admin=True)
+        new_user = self.__users_service.create(data=data, is_admin=True)
 
         token = self.__http_service.webtoken_service.generate_token({
             "user_id": str(new_user.user_id)
@@ -165,7 +165,7 @@ class UsersController:
                 raise HTTPException(status_code=400, detail="New password must not match current password")
         
         
-        self.__users_service.update(db=db, user_id=user.user_id, changes=data)
+        self.__users_service.update(user_id=user.user_id, changes=data)
 
         return CommonHttpResponse(
             detail="User profile updated"
@@ -192,7 +192,7 @@ class UsersController:
                     companies_service.delete(db=db, company_id=company.company_id)
 
 
-        self.__users_service.delete(db=db, user_id=user.user_id) 
+        self.__users_service.delete(user_id=user.user_id) 
 
         return CommonHttpResponse(
             detail="User deleted"
@@ -207,7 +207,7 @@ class UsersController:
 
         user: User = self.__http_service.request_validation_service.verify_resource(
             service_key="users_service",
-            params={"db": db, "key": "email_hash", "value": hashed_email},
+            params={"key": "email_hash", "value": hashed_email},
             not_found_message="Incorrect email or password",
             status_code=400
         )

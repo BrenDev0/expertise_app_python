@@ -1,8 +1,8 @@
 from src.core.repository.base_repository import BaseRepository
-from src.core.decorators.service_error_handler import service_error_handler
+from src.core.utils.decorators.service_error_handler import service_error_handler
 from src.core.services.data_handling_service import DataHandlingService
 from src.modules.invites.invites_models import Invite, InviteCreate, InviteUpdate
-from src.modules.users.users_models import UserCreate
+from src.modules.users.domain.models import UserCreate
 from sqlalchemy.orm import Session
 from uuid import UUID
 from typing import List

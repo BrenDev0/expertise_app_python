@@ -6,7 +6,6 @@ import uuid
 from pydantic import BaseModel, ConfigDict, EmailStr
 from pydantic.alias_generators import to_camel
 from typing import Optional
-from src.modules.users.users_models import User, UserPublic
 
 class Employee(Base):
     __tablename__ = "employees"
@@ -21,7 +20,7 @@ class Employee(Base):
         UniqueConstraint("user_id", "company_id", name="uq_user_company"),
     )
 
-    user = relationship("User")
+    user = relationship("SqlAlchemyUser")
 
 class EmployeeConfig(BaseModel):
     model_config = ConfigDict(

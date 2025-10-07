@@ -1,5 +1,5 @@
 from src.modules.employees.employees_repository import EmployeesRepository
-from src.core.decorators.service_error_handler import service_error_handler
+from src.core.utils.decorators.service_error_handler import service_error_handler
 from src.modules.employees.employees_models import Employee, EmployeeCreate, EmployeeUpdate
 from sqlalchemy.orm import Session
 from uuid import UUID

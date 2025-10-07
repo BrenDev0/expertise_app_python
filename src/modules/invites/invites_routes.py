@@ -2,9 +2,8 @@ from fastapi import APIRouter, Request, Depends, Body, HTTPException
 from sqlalchemy.orm import Session
 from src.modules.invites.invites_controller import InvitesController
 from src.modules.invites.invites_models import InviteCreate, InvitePublic, InviteUpdate
-from src.modules.users.users_models import User
 from src.core.dependencies.container import Container
-from src.core.models.http_responses import CommonHttpResponse
+from src.core.domain.models.http_responses import CommonHttpResponse
 from src.core.database.session import get_db_session
 from src.core.middleware.middleware_service import security
 from src.core.middleware.permissions import is_owner

@@ -1,15 +1,14 @@
 from src.core.services.http_service import HttpService
-from src.modules.users.users_models import User
+from src.modules.users.domain.entities import User
 from src.modules.companies.companies_service import CompaniesService
 from src.modules.companies.companies_models import Company, CompanyCreate, CompanyPublic, CompanyUpdate
-from src.core.models.http_responses import CommonHttpResponse, ResponseWithToken
+from src.core.domain.models.http_responses import CommonHttpResponse, ResponseWithToken
 from fastapi import Request
 from sqlalchemy.orm import Session
 from uuid import UUID
 from src.core.dependencies.container import Container
 from src.modules.documents.document_manager import DocumentManager
-from src.modules.employees.employees_service import EmployeesService
-from src.modules.users.users_service import UsersService
+
 
 class CompaniesController:
     def __init__(

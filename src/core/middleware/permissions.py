@@ -1,5 +1,5 @@
 from fastapi import HTTPException, Depends, Request
-from src.modules.users.users_models import User
+from src.modules.users.domain.entities import User
 from src.core.middleware.auth_middleware import auth_middleware
 from src.core.dependencies.container import Container
 from src.core.services.http_service import HttpService

@@ -1,9 +1,9 @@
 from src.modules.chats.messages.messages_service import MessagesService
-from src.modules.users.users_models import User
+from src.modules.users.domain.entities import User
 from src.modules.chats.messages.messages_models import Message, MessagePublic, MessageCreate
 from src.modules.chats.chats_models import  Chat
 from fastapi import Request
-from src.core.models.http_responses import CommonHttpResponse
+from src.core.domain.models.http_responses import CommonHttpResponse
 from src.core.services.http_service import HttpService
 from sqlalchemy.orm import Session
 from uuid import UUID

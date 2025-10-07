@@ -1,5 +1,5 @@
 from src.core.repository.base_repository import BaseRepository
-from src.modules.users.users_models import User
+from src.modules.users.domain.entities import User
 from  uuid import UUID
 from typing import List
 from sqlalchemy.orm import Session

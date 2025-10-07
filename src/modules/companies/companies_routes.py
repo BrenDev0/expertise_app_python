@@ -2,10 +2,9 @@ from fastapi import APIRouter, Request, Body, HTTPException, Depends
 from src.core.dependencies.container import Container
 from src.modules.companies.companies_controller import CompaniesController
 from src.modules.companies.companies_models import CompanyPublic, CompanyCreate, CompanyUpdate
-from src.core.models.http_responses import CommonHttpResponse, ResponseWithToken
+from src.core.domain.models.http_responses import CommonHttpResponse, ResponseWithToken
 from src.core.database.session import get_db_session
 from sqlalchemy.orm import Session
-from src.modules.users.users_models import User
 from src.core.middleware.permissions import is_owner
 from src.core.middleware.middleware_service import security
 from uuid import UUID

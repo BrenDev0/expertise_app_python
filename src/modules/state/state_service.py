@@ -5,7 +5,7 @@ from src.modules.chats.messages.messages_service import MessagesService
 from  sqlalchemy.orm import Session
 from uuid import UUID
 from typing import List
-from src.core.decorators.service_error_handler import service_error_handler
+from src.core.utils.decorators.service_error_handler import service_error_handler
 
 class StateService: 
     __MODULE = "state.service"

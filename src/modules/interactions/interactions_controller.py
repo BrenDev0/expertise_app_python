@@ -1,5 +1,5 @@
 from src.modules.state.state_models import WorkerState
-from src.core.models.http_responses import CommonHttpResponse
+from src.core.domain.models.http_responses import CommonHttpResponse
 from src.core.services.http_service import HttpService
 from src.modules.interactions.interactions_models import HumanToAgentRequest
 from src.modules.state.state_service import StateService
@@ -8,7 +8,7 @@ from src.modules.chats.messages.messages_models import MessagePublic
 from src.modules.companies.companies_models import Company
 from sqlalchemy.orm import Session
 from uuid import UUID
-from src.modules.users.users_models import User
+from src.modules.users.domain.entities import User
 from src.modules.chats.chats_models import Chat
 import asyncio
 from fastapi import Request

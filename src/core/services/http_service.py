@@ -2,7 +2,6 @@ from src.core.services.encryption_service import EncryptionService
 from src.core.services.hashing_service import HashingService
 from src.core.services.request_validation_service import RequestValidationService
 from src.core.services.webtoken_service import WebTokenService
-from src.core.logs.logger import Logger
 
 class HttpService:
     def __init__(

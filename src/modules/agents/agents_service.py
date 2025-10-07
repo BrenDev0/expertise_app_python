@@ -1,6 +1,6 @@
 from src.core.repository.base_repository import BaseRepository
 from  src.modules.agents.agents_models import Agent
-from src.core.decorators.service_error_handler import service_error_handler
+from src.core.utils.decorators.service_error_handler import service_error_handler
 from typing import List
 from sqlalchemy.orm import Session
 from uuid import UUID

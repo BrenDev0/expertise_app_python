@@ -6,7 +6,7 @@ from sqlalchemy.orm import Session
 from src.core.database.session import get_db_session
 from src.modules.chats.chats_controller import ChatsController
 from src.modules.chats.chats_models import ChatPublic, ChatCreateResponse, ChatUpdate, ChatCreate
-from src.core.models.http_responses import CommonHttpResponse
+from src.core.domain.models.http_responses import CommonHttpResponse
 from src.core.middleware.middleware_service import security
 from src.core.middleware.hmac_verification import verify_hmac
 from uuid import UUID

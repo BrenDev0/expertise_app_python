@@ -1,11 +1,11 @@
 from src.core.services.http_service import HttpService
 from src.core.services.email_service import EmailService
-from src.core.models.http_responses import CommonHttpResponse, ResponseWithToken
+from src.core.domain.models.http_responses import CommonHttpResponse, ResponseWithToken
 from src.modules.invites.invites_service import InvitesService
 from src.core.dependencies.container import Container
-from src.modules.users.users_service import UsersService
+from src.modules.users.application.users_service import UsersService
 from src.modules.invites.invites_models import Invite, InviteCreate, InviteUpdate, InvitePublic
-from src.modules.users.users_models import User
+from src.modules.users.domain.entities import User
 from src.modules.companies.companies_models import Company
 from typing import List
 from fastapi import Request, HTTPException

@@ -9,7 +9,7 @@ from src.modules.documents.services.tenant_data_service import TenantDataService
 from src.modules.companies.companies_service import CompaniesService
 from src.modules.documents.documents_models import Document
 
-from src.core.decorators.service_error_handler import service_error_handler
+from src.core.utils.decorators.service_error_handler import service_error_handler
 
 from src.core.dependencies.container import Container
 

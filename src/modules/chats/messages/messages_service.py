@@ -4,7 +4,7 @@ from uuid import UUID
 
 from src.modules.chats.messages.messages_models import Message, MessageCreate
 from src.modules.chats.messages.messages_repository import MessagesRepository
-from src.core.decorators.service_error_handler import service_error_handler
+from src.core.utils.decorators.service_error_handler import service_error_handler
 
 class MessagesService():
     __MODULE = "messages.service"

@@ -3,7 +3,7 @@ from uuid import UUID
 from sqlalchemy.orm import Session
 from typing import List, Dict, Any
 
-from src.core.models.http_responses import CommonHttpResponse
+from src.core.domain.models.http_responses import CommonHttpResponse
 
 from src.core.middleware.permissions import is_owner
 from src.core.middleware.middleware_service import security

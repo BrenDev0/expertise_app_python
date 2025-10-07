@@ -5,9 +5,7 @@ from src.core.dependencies.container import Container
 from src.modules.companies.companies_models import Company
 from sqlalchemy.orm import Session
 from uuid import UUID
-from src.modules.users.users_models import User
-from src.modules.employees.employees_models import Employee
-from src.modules.employees.employees_service import EmployeesService
+
 
 class RequestValidationService:
     @staticmethod

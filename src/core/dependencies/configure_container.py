@@ -4,7 +4,7 @@ from src.core.services.email_service import EmailService
 from src.core.services.encryption_service import EncryptionService
 from src.core.services.hashing_service import HashingService
 from src.core.services.http_service import HttpService
-from src.core.logs.logger import Logger
+from src.core.utils.logs.logger import Logger
 from src.core.middleware.middleware_service import MiddlewareService
 from src.core.services.request_validation_service import RequestValidationService
 from src.core.services.webtoken_service import WebTokenService
@@ -14,7 +14,6 @@ import os
 from src.modules.documents.services.s3_service import S3Service
 from qdrant_client import QdrantClient
 from src.modules.documents.services.embeddings_service import EmbeddingService
-from src.modules.users.users_dependencies import configure_users_dependencies
 from src.modules.chats.chats_dependencies import configure_chats_dependencies
 from src.modules.companies.companies_dependencies import configure_companies_dependencies
 from src.modules.invites.invites_dependencies import configure_invites_dependencies
@@ -23,6 +22,12 @@ from src.modules.employees.employees_dependencies import configure_employee_depe
 from src.modules.agents.agents_dependencies import configure_agents_dependencies
 from src.modules.interactions.interactions_dependencies import configure_interactions_dependencies
 from src.modules.state.state_dependencies  import configure_state_dependencies
+
+from src.modules.users.application.users_service import UsersService
+from src.modules.users.infrastructure.sqlalchemy_user_repository import SqlAlchemyUsersRepository
+from src.modules.users.application.use_cases.create_user import CreateUserUseCase
+from src.modules.users.application.use_cases.update_user import UpdateUserUseCase
+
 
 def configure_container():
     ## core ##   
@@ -122,10 +127,21 @@ def configure_container():
     )
 
 
-    configure_users_dependencies(
-        http_service=http_service,
-        data_handling_service=data_handler
+    
+
+    users_service = UsersService(
+        respository=SqlAlchemyUsersRepository(),
+        create_user_use_case=CreateUserUseCase(
+            encryption_service=encryption_service,
+            hashing_service=hashing_service
+        ),
+        update_user_use_case=UpdateUserUseCase(
+            encryption_service=encryption_service,
+            hashing_service=hashing_service
+        )
     )
+
+    Container.register("users_service", users_service)
 
     
     # multi domain # must configure single domain dependencies above this line #

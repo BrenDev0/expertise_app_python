@@ -5,7 +5,7 @@ import io
 from uuid import UUID
 from src.core.repository.base_repository import BaseRepository
 from src.modules.documents.documents_models import TenantTable
-from src.core.decorators.service_error_handler import service_error_handler
+from src.core.utils.decorators.service_error_handler import service_error_handler
 import os 
 import chardet
 from typing import List

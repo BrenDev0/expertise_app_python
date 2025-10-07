@@ -9,7 +9,7 @@ from typing import List
 from uuid import UUID
 from sqlalchemy.orm import Session
 from src.core.database.session import get_db_session
-from src.core.models.http_responses import CommonHttpResponse
+from src.core.domain.models.http_responses import CommonHttpResponse
 from src.core.middleware.hmac_verification import verify_hmac
 from src.core.middleware.permissions import is_manager
 

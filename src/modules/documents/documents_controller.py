@@ -7,13 +7,13 @@ from fastapi import Request, UploadFile, HTTPException, BackgroundTasks
 from sqlalchemy.orm import Session
 
 from src.modules.documents.documents_models import Document, DocumentPublic
-from src.modules.users.users_models import User
+from src.modules.users.domain.entities import User
 from src.modules.companies.companies_models import Company
 
 from src.modules.documents.document_manager import DocumentManager
 
 from src.core.services.http_service import HttpService
-from src.core.models.http_responses import CommonHttpResponse
+from src.core.domain.models.http_responses import CommonHttpResponse
 
 
 

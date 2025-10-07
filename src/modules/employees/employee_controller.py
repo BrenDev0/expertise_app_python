@@ -1,10 +1,10 @@
 from src.core.services.http_service import HttpService
 from src.modules.employees.employees_models import Employee, EmployeeCreate, EmployeeUpdate, EmployeePublic, EmployeeUser
 from src.modules.employees.employees_service import EmployeesService
-from src.modules.users.users_service import UsersService
-from src.core.models.http_responses import CommonHttpResponse, ResponseWithToken
+from src.modules.users.application.users_service import UsersService
+from src.core.domain.models.http_responses import CommonHttpResponse, ResponseWithToken
 from src.modules.invites.invites_service import InvitesService
-from src.modules.users.users_models import User, UserCreate
+from src.modules.users.domain.entities import User
 from src.modules.companies.companies_models import Company
 from src.modules.invites.invites_models import Invite
 from fastapi  import Request, HTTPException

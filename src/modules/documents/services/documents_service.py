@@ -4,7 +4,7 @@ from src.modules.documents.documents_models import Document
 from  uuid import UUID
 from src.core.services.data_handling_service import DataHandlingService
 from  typing import List, Any
-from src.core.decorators.service_error_handler import service_error_handler
+from src.core.utils.decorators.service_error_handler import service_error_handler
 from fastapi import UploadFile
 
 class DocumentsService:
