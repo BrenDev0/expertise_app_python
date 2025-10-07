@@ -63,7 +63,8 @@ def test_collection(mock_db, mock_repository, messages_service):
 
     result = messages_service.collection(
         db=mock_db,
-        chat_id=chat_id
+        key="chat_id",
+        value=chat_id
     )
 
     assert result == [mock_message1, mock_message2] or result == [mock_message2, mock_message1]

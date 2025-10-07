@@ -54,7 +54,7 @@ class StateService:
             return state
         
         # Not found: build from DB
-        chat_history = self.__messages_service.collection(db, chat_id, num_of_messages=self.__NUM_OF_MESSAGES)
+        chat_history = self.__messages_service.collection(db, key="chat_id", value=chat_id, num_of_messages=self.__NUM_OF_MESSAGES)
         state = WorkerState(
             input=input,
             chat_id=str(chat_id), 

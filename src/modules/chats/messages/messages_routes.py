@@ -33,7 +33,7 @@ async def internal_create(
     """
     return await controller.create_request(chat_id=chat_id, data=data, db=db)
 
-@router.get("/secure/collection/{chat_id}", status_code=200, response_model=List[MessagePublic], dependencies=[Depends(security)] )
+@router.get("/secure/collection/{chat_id}", status_code=200, response_model=List[MessagePublic], dependencies=[Depends(security)])
 def secure_collection( 
     chat_id: UUID,
     req: Request,
@@ -48,5 +48,22 @@ def secure_collection(
     """
     return controller.collection_request(req=req, db=db, chat_id=chat_id)
 
+@router.get("/secure/search", status_code=200, response_model=List[MessagePublic], dependencies=[Depends(security)])
+def secure_serch(
+    query: str,
+    req: Request,
+    _: None = Depends(auth_middleware),
+    db: Session = Depends(get_db_session),
+    controller: MessagesController = Depends(get_controller)
+):
+    """
+    ## Search request
 
-    
+    This endpoint will query the database for all users messages containing the string in the query
+    """
+
+    return controller.search_request(
+        req=req,
+        query=query,
+        db=db
+    )
