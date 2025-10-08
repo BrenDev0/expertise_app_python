@@ -1,19 +1,26 @@
-from src.core.dependencies.container import Container
-from src.core.repository.base_repository import BaseRepository
-from src.core.services.http_service import HttpService
-from src.modules.companies.companies_controller import CompaniesController
-from src.modules.companies.companies_service import CompaniesService
-from src.modules.companies.companies_models import Company
+from fastapi import Depends
 
-def configure_companies_dependencies(http_service: HttpService):
-    repository = BaseRepository(Company)
-    service = CompaniesService(
+from src.core.domain.repositories.data_repository import DataRepository
+from src.core.infrastructure.repositories.data.sqlalchemy.sqlalchemy_data_repository import SqlAlchemyDataRepository
+
+from src.modules.companies.companies_controller import CompaniesController
+from src.modules.companies.application.companies_service import CompaniesService
+from src.modules.companies.domain.enitities import Company
+
+
+def get_companies_repository() -> DataRepository:
+    return SqlAlchemyDataRepository(Company)
+
+def get_companies_service(
+    repository: DataRepository = Depends(get_companies_repository)
+) -> CompaniesService:
+    return CompaniesService(
         respository=repository
     )
-    controller = CompaniesController(
-        http_service=http_service,
-        companies_service=service
-    )
 
-    Container.register("companies_service", service)
-    Container.register("companies_controller", controller)
+def get_companies_controller(
+    companies_service: CompaniesService = Depends(get_companies_service)
+) -> CompaniesController:
+    return CompaniesController(
+        companies_service=companies_service
+    )

@@ -1,3 +1,5 @@
+from fastapi import Depends
+
 from src.core.dependencies.container import Container
 from src.modules.chats.chats_service import ChatsService
 from src.modules.chats.chats_controller import ChatsController
@@ -15,7 +17,24 @@ def configure_chats_dependencies(http_service: HttpService) -> None:
 
     repository = BaseRepository(Chat)
     service = ChatsService(repository=repository)
-    controller = ChatsController(http_service=http_service, chats_service=service)
+    controller = ChatsController(chats_service=service)
 
     Container.register("chats_service", service)
     Container.register("chats_controller", controller)
+
+def get_chats_repository() -> BaseRepository:
+    return BaseRepository(Chat)
+
+def get_chats_service(
+    repository: BaseRepository = Depends(get_chats_repository)
+) -> ChatsService:
+    return ChatsService(
+        repository=repository
+    )
+
+def get_chats_controller(
+    service: ChatsService = Depends(get_chats_service)
+) -> ChatsController:
+    return ChatsController(
+        chats_service=service
+    )

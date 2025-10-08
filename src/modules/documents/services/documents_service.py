@@ -32,8 +32,8 @@ class DocumentsService:
         return self.__repository.create(db=db, data=document)
     
     @service_error_handler(module=__MODULE)
-    def resource(self, db: Session, document_id: UUID) -> Document:
-        return self.__repository.get_one(db=db, key="document_id", value=document_id)
+    def resource(self, db: Session, key: str, value: UUID | str) -> Document:
+        return self.__repository.get_one(db=db, key=key, value=value)
     
     @service_error_handler(module=__MODULE)
     def collection(self, db: Session, company_id: UUID) -> List[Document]:

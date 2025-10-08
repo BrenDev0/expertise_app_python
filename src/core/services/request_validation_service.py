@@ -1,56 +1,32 @@
 import uuid
 from fastapi import HTTPException, Request
-from typing import List, Dict, Any
-from src.core.dependencies.container import Container
-from src.modules.companies.companies_models import Company
+from typing import Any, Union
+from src.modules.companies.domain.enitities import Company
 from sqlalchemy.orm import Session
 from uuid import UUID
 
 
 class RequestValidationService:
-    @staticmethod
-    def validate_uuid(uuid_str: str):
+    @classmethod
+    def validate_uuid(cls, uuid_str: str):
         try:
             uuid.UUID(uuid_str)
         except ValueError:
             raise HTTPException(status_code=400, detail="Invalid id")
 
-    @staticmethod   
+    @classmethod  
     def verify_resource(
-        service_key: str,
-        params: Dict[str, Any],
+        cls,
+        result: Any,
         not_found_message: str = "Resource not found" ,
         status_code: int = 404,
         throw_http_error: bool = True
     ):
-        service = Container.resolve(service_key)
-
-        result = service.resource(**params)
-  
         if result is None and throw_http_error:
             raise HTTPException(status_code=status_code, detail=not_found_message)
-        
-        return result
+
     
-    @staticmethod
-    def validate_action_authorization(id: UUID | str | int, resource_id: UUID | str | int):
-        if id != resource_id:
+    @classmethod
+    def verifiy_ownership(cls, id: Union[str, UUID], resource_id: Union[str, UUID]):
+        if str(id) != str(resource_id):
             raise HTTPException(status_code=403, detail="Forbidden")
-    
-
-    def verify_company_in_request_state(self, req: Request, db: Session):
-        company_id = getattr(req.state, "company_id", None)
-
-        if not company_id:
-            raise HTTPException(status_code=403, detail="Invalid credential")
-        else:
-            company_resource: Company = self.verify_resource(
-            service_key="companies_service",
-            params={
-                "db": db,
-                "company_id": company_id
-            },
-            not_found_message="Company not found"
-        )
-        
-        return company_resource

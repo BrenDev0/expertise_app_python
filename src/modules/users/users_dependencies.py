@@ -1,9 +1,9 @@
 from fastapi import Depends
-
-from src.core.services.http_service import HttpService
 from src.core.dependencies.container import Container
+from src.core.services.http_service import HttpService
 from src.core.services.encryption_service import EncryptionService
 from src.core.services.hashing_service import HashingService
+from src.core.dependencies.services import get_encryption_service, get_hashing_service
 
 from src.modules.users.users_controller import UsersController 
 from src.modules.users.application.users_service import UsersService
@@ -13,11 +13,6 @@ from src.modules.users.users_repository import UsersRepository
 from src.modules.users.domain.users_repository import UsersRepository
 from src.modules.users.infrastructure.sqlalchemy_user_repository import SqlAlchemyUsersRepository
 
-def get_encryption_serice() -> EncryptionService:
-    return Container.resolve("hashing_service")
-
-def get_hashing_service() -> HashingService:
-    return Container.resolve("hashing_service")
 
 def get_http_service() -> HttpService:
     return Container.resolve("http_service")
@@ -26,7 +21,7 @@ def get_users_repository() -> UsersRepository:
     return SqlAlchemyUsersRepository()
 
 def get_create_user_use_case(
-    encrytpion_service: EncryptionService = Depends(get_encryption_serice),
+    encrytpion_service: EncryptionService = Depends(get_encryption_service),
     hashing_service: HashingService = Depends(get_hashing_service)
 ) -> CreateUserUseCase:
     return CreateUserUseCase(
@@ -35,7 +30,7 @@ def get_create_user_use_case(
     )
 
 def get_update_user_use_case(
-    encrytpion_service: EncryptionService = Depends(get_encryption_serice),
+    encrytpion_service: EncryptionService = Depends(get_encryption_service),
     hashing_service: HashingService = Depends(get_hashing_service)
 ) -> UpdateUserUseCase:
     return UpdateUserUseCase(

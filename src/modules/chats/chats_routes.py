@@ -10,6 +10,7 @@ from src.core.domain.models.http_responses import CommonHttpResponse
 from src.core.middleware.middleware_service import security
 from src.core.middleware.hmac_verification import verify_hmac
 from uuid import UUID
+from src.modules.chats.chats_dependencies import get_chats_controller
 
 
 router = APIRouter(
@@ -18,16 +19,13 @@ router = APIRouter(
     dependencies=[Depends(security), Depends(verify_hmac)] 
 )
 
-def get_controller() -> ChatsController:
-    return Container.resolve("chats_controller")
-
 @router.post("/secure/create", status_code=201, response_model=ChatPublic)
 def secure_create(
     req: Request,
     data: ChatCreate = Body(...),
     _: None = Depends(auth_middleware),
     db: Session = Depends(get_db_session),
-    controller: ChatsController = Depends(get_controller)
+    controller: ChatsController = Depends(get_chats_controller)
 ):
     """
     ## Chat create request
@@ -42,7 +40,7 @@ def secure_collection(
     req: Request,
     _: None = Depends(auth_middleware), 
     db: Session = Depends(get_db_session),
-    controller: ChatsController = Depends(get_controller)
+    controller: ChatsController = Depends(get_chats_controller)
 ):
     """
     ## Chat collection request
@@ -59,7 +57,7 @@ def secure_update(
     data: ChatUpdate,
     _: None = Depends(auth_middleware),
     db: Session = Depends(get_db_session),
-    controller: ChatsController = Depends(get_controller)
+    controller: ChatsController = Depends(get_chats_controller)
 ): 
     """
     ## Update request
@@ -79,7 +77,7 @@ def secure_delete(
     req: Request,
     _: None = Depends(auth_middleware),
     db: Session = Depends(get_db_session),
-    controller: ChatsController = Depends(get_controller)
+    controller: ChatsController = Depends(get_chats_controller)
 ):
     """
     ## Delete request 

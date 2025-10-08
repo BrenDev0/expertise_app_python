@@ -6,7 +6,7 @@ from src.core.dependencies.container import Container
 from src.core.domain.models.http_responses import CommonHttpResponse
 from src.core.database.session import get_db_session
 from src.core.middleware.middleware_service import security
-from src.core.middleware.permissions import is_owner
+from src.core.middleware.permissions import is_owner, token_is_company_stamped
 from uuid import UUID
 from typing import List
 from src.core.middleware.hmac_verification import verify_hmac
@@ -15,7 +15,12 @@ from src.core.middleware.hmac_verification import verify_hmac
 router = APIRouter(
     prefix="/invites",
     tags=["Invites"],
-    dependencies=[Depends(security), Depends(verify_hmac), Depends(is_owner)]
+    dependencies=[
+        Depends(security), 
+        Depends(verify_hmac), 
+        Depends(is_owner), 
+        Depends(token_is_company_stamped)
+    ]
 )
 
 def get_controller() -> InvitesController:

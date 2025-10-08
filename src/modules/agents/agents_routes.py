@@ -12,6 +12,11 @@ from src.core.database.session import get_db_session
 from src.core.domain.models.http_responses import CommonHttpResponse
 from src.core.middleware.hmac_verification import verify_hmac
 from src.core.middleware.permissions import is_manager
+from src.core.middleware.permissions import token_is_company_stamped
+
+from src.modules.employees.employees_service import EmployeesService
+from src.modules.employees.employees_dependencies import get_employees_service
+from src.modules.agents.agents_dependencies import get_agents_controller
 
 router = APIRouter(
     prefix="/agents",
@@ -19,19 +24,16 @@ router = APIRouter(
     dependencies=[Depends(security), Depends(verify_hmac)]
 )
 
-def get_controller() -> AgentsController:
-    controller = Container.resolve("agents_controller")
-    return controller
-
-
 @router.put("/secure/access/{employee_id}", status_code=201, response_model=List[AgentPublic])
 def secure_upsert_access(
     employee_id: UUID,
     req: Request,
     data: AgentAccessCreate = Body(...),
     _: None = Depends(is_manager),
+    company: None = Depends(token_is_company_stamped),
+    employees_service: EmployeesService = Depends(get_employees_service),
     db: Session = Depends(get_db_session),
-    controller: AgentsController = Depends(get_controller)
+    controller: AgentsController = Depends(get_agents_controller)
 ):
     """
     ## Add agent access to employee
@@ -41,8 +43,9 @@ def secure_upsert_access(
     """
     return controller.add_access(
         employee_id=employee_id,
-        data=data,
         req=req,
+        data=data,
+        employees_service=employees_service,
         db=db
     )
 
@@ -52,7 +55,7 @@ def secure_resource(
     req: Request,
     _: None = Depends(auth_middleware),
     db: Session = Depends(get_db_session),
-    controller: AgentsController = Depends(get_controller)
+    controller: AgentsController = Depends(get_agents_controller)
 ):
     """
     # Resource request
@@ -70,8 +73,10 @@ def acess_collection(
     employee_id: UUID,
     req: Request,
     _: None = Depends(is_manager),
+    company = Depends(token_is_company_stamped),
+    employees_service: EmployeesService = Depends(get_employees_service),
     db: Session = Depends(get_db_session),
-    controller: AgentsController = Depends(get_controller)
+    controller: AgentsController = Depends(get_agents_controller)
 ):
     """
     ## Collection request
@@ -81,6 +86,7 @@ def acess_collection(
     return controller.agent_acccess_collection_request(
         employee_id=employee_id,
         req=req,
+        employees_service=employees_service,
         db=db
     )
 
@@ -90,7 +96,8 @@ def secure_collection(
     req: Request,
     _: None = Depends(auth_middleware),
     db: Session = Depends(get_db_session),
-    controller: AgentsController = Depends(get_controller)
+    employees_service: EmployeesService = Depends(get_employees_service),
+    controller: AgentsController = Depends(get_agents_controller)
 ):
     """
     ## Collection request
@@ -99,6 +106,7 @@ def secure_collection(
     """
     return controller.collection_request(
         req=req,
+        employees_service=employees_service,
         db=db
     )
 
@@ -107,7 +115,7 @@ def secure_read(
     req: Request,
     _: None = Depends(auth_middleware),
     db: Session = Depends(get_db_session),
-    controller: AgentsController = Depends(get_controller)
+    controller: AgentsController = Depends(get_agents_controller)
 ):
     """
     ## Read REquest 

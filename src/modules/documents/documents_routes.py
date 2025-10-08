@@ -5,7 +5,7 @@ from typing import List, Dict, Any
 
 from src.core.domain.models.http_responses import CommonHttpResponse
 
-from src.core.middleware.permissions import is_owner
+from src.core.middleware.permissions import is_owner, token_is_company_stamped
 from src.core.middleware.middleware_service import security
 from src.core.middleware.hmac_verification import verify_hmac
 
@@ -33,6 +33,7 @@ async def secure_upload(
     req: Request,
     file: UploadFile = File(...),
     _: None = Depends(is_owner),
+    company = Depends(token_is_company_stamped),
     db: Session = Depends(get_db_session),
     controller: DocumentsController = Depends(get_controller)
 ):
@@ -53,6 +54,7 @@ async def secure_upload(
 def secure_collection(
     req: Request,
     _: None = Depends(is_owner),
+    company = Depends(token_is_company_stamped),
     db: Session = Depends(get_db_session),
     controller: DocumentsController = Depends(get_controller)
 ):
@@ -69,6 +71,7 @@ def secure_delete(
     document_id: UUID,
     req: Request,
     _: None = Depends(is_owner),
+    company = Depends(token_is_company_stamped),
     db: Session = Depends(get_db_session),
     controller: DocumentsController = Depends(get_controller)
 ):

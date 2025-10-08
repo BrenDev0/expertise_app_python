@@ -1,56 +1,56 @@
-from src.core.services.http_service import HttpService
-from src.modules.users.domain.entities import User
-from src.modules.companies.companies_service import CompaniesService
-from src.modules.companies.companies_models import Company, CompanyCreate, CompanyPublic, CompanyUpdate
-from src.core.domain.models.http_responses import CommonHttpResponse, ResponseWithToken
 from fastapi import Request
 from sqlalchemy.orm import Session
 from uuid import UUID
+
+from src.core.domain.models.http_responses import CommonHttpResponse, ResponseWithToken
 from src.core.dependencies.container import Container
+
+
+from src.modules.users.domain.entities import User
+from src.modules.companies.domain.companies_models import CompanyCreate, CompanyPublic, CompanyUpdate
+from src.modules.companies.application.companies_service import CompaniesService
+from src.modules.companies.domain.enitities import Company
 from src.modules.documents.document_manager import DocumentManager
+from src.core.services.request_validation_service import RequestValidationService
+from src.core.services.webtoken_service import WebTokenService
 
 
 class CompaniesController:
     def __init__(
         self, 
-        http_service: HttpService, 
         companies_service: CompaniesService
     ):
-        self.__https_service = http_service
         self.__companies_service = companies_service
 
 
     def create_request(
         self,
         req: Request,
-        db: Session,
         data: CompanyCreate
     ) -> CompanyPublic: 
         user: User = req.state.user
 
-        new_company = self.__companies_service.create(db=db, data=data, user_id=user.user_id)
+        new_company = self.__companies_service.create(data=data, user_id=user.user_id)
 
         return self.__to_public(new_company)
     
     def resource_request(
         self,
-        req: Request,
-        db: Session
+        req: Request
     ) -> CompanyPublic:
         user: User = req.state.user
-        company: Company = self.__https_service.request_validation_service.verify_company_in_request_state(req=req, db=db)
+        company: Company = req.state.company
 
         return self.__to_public(company)
 
 
     def collection_request(
         self,
-        req: Request,
-        db: Session,
+        req: Request
     ):
         user: User = req.state.user
 
-        data = self.__companies_service.collection(db=db, user_id=user.user_id)
+        data = self.__companies_service.collection(user_id=user.user_id)
 
         return [
             self.__to_public(company) for company in data
@@ -60,23 +60,22 @@ class CompaniesController:
     def update_request(
         self,
         req: Request,
-        db: Session,
         data: CompanyUpdate
     ) -> CompanyPublic:
         user: User = req.state.user
 
-        company_resource: Company = self.__https_service.request_validation_service.verify_resource(
-            service_key="companies_service",
-            params={
-                "db": db,
-                "company_id": data.company_id
-            },
+        company_resource: Company = self.__companies_service.resource(
+            key="company_id",
+            value=data.company_id
+        )
+        RequestValidationService.verify_resource(
+            result=company_resource,
             not_found_message="Company not found"
         )
 
-        self.__https_service.request_validation_service.validate_action_authorization(user.user_id, company_resource.user_id)
+        RequestValidationService.verifiy_ownership(user.user_id, company_resource.user_id)
 
-        updated_company = self.__companies_service.update(db=db, company_id=company_resource.company_id, changes=data)
+        updated_company = self.__companies_service.update(company_id=company_resource.company_id, changes=data)
 
         return self.__to_public(updated_company)
     
@@ -88,18 +87,17 @@ class CompaniesController:
     ) -> CommonHttpResponse:
         user: User = req.state.user
    
-        company_resource: Company = self.__https_service.request_validation_service.verify_resource(
-            service_key="companies_service",
-            params={
-                "db": db,
-                "company_id": company_id
-            },
+        company_resource: Company = self.__companies_service.resource(
+            key="company_id",
+            value=company_id
+        )
+
+        RequestValidationService.verify_resource(
+            result=company_resource,
             not_found_message="Company not found"
         )
 
-        self.__https_service.request_validation_service.validate_action_authorization(user.user_id, company_resource.user_id)
-
-
+        RequestValidationService.verifiy_ownership(user.user_id, company_resource.user_id)
 
         ## delete company documents from all cloud providers and db
         document_manager: DocumentManager = Container.resolve("document_manager")
@@ -109,7 +107,7 @@ class CompaniesController:
             db=db
         )
     
-        self.__companies_service.delete(db=db, company_id=company_resource.company_id)
+        self.__companies_service.delete(company_id=company_resource.company_id)
      
         return CommonHttpResponse(
             detail="Company deleted"
@@ -120,27 +118,24 @@ class CompaniesController:
         self,
         company_id: UUID,
         req: Request,
-        db: Session
+        web_token_service: WebTokenService
     ) -> ResponseWithToken:
         user: User = req.state.user
 
-        company_resource: Company = self.__https_service.request_validation_service.verify_resource(
-            service_key="companies_service",
-            params={
-                "db": db,
-                "company_id": company_id
-            },
-            not_found_message="Company not found"
+        company_resource: Company = self.__companies_service.resource(
+            key="company_id",
+            value=company_id
         )
 
-        self.__https_service.request_validation_service.validate_action_authorization(user.user_id, company_resource.user_id)
+
+        RequestValidationService.verifiy_ownership(user.user_id, company_resource.user_id)
 
         token_payload = {
             "user_id": str(user.user_id),
             "company_id": str(company_resource.company_id)
         }
 
-        token = self.__https_service.webtoken_service.generate_token(token_payload, "7d")
+        token = web_token_service.generate_token(token_payload, "7d")
 
         return ResponseWithToken(
             detail="Login successful",

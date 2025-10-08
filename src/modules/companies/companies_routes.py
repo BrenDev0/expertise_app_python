@@ -1,16 +1,22 @@
 from fastapi import APIRouter, Request, Body, HTTPException, Depends
-from src.core.dependencies.container import Container
-from src.modules.companies.companies_controller import CompaniesController
-from src.modules.companies.companies_models import CompanyPublic, CompanyCreate, CompanyUpdate
-from src.core.domain.models.http_responses import CommonHttpResponse, ResponseWithToken
-from src.core.database.session import get_db_session
-from sqlalchemy.orm import Session
-from src.core.middleware.permissions import is_owner
-from src.core.middleware.middleware_service import security
 from uuid import UUID
 from typing import List
+
+
+from src.modules.companies.companies_controller import CompaniesController
+from src.modules.companies.domain.companies_models import CompanyPublic, CompanyCreate, CompanyUpdate
+from src.core.domain.models.http_responses import CommonHttpResponse, ResponseWithToken
+from src.modules.companies.companies_dependencies import get_companies_controller
+from src.core.dependencies.services import get_web_token_service
+from src.core.services.webtoken_service import WebTokenService
+
 from src.core.middleware.hmac_verification import verify_hmac
 from src.core.middleware.auth_middleware import auth_middleware
+from src.core.middleware.permissions import token_is_company_stamped
+from src.core.middleware.permissions import is_owner
+from src.core.middleware.middleware_service import security
+
+
 
 
 router = APIRouter(
@@ -19,17 +25,13 @@ router = APIRouter(
     dependencies=[Depends(security), Depends(verify_hmac)] # applied to all routes
 )
 
-def get_controller() -> CompaniesController:
-    controller = Container.resolve("companies_controller")
-    return controller
 
 @router.post("/secure/create", status_code=201, response_model=CompanyPublic)
 def secure_create(
     req: Request,
     data: CompanyCreate = Body(...),
     _: None = Depends(is_owner),
-    db: Session = Depends(get_db_session),
-    controller: CompaniesController = Depends(get_controller)
+    controller: CompaniesController = Depends(get_companies_controller)
 ):
     """
     ## Create request
@@ -39,7 +41,6 @@ def secure_create(
     """
     return controller.create_request(
         req=req,
-        db=db,
         data=data
     )
 
@@ -48,8 +49,8 @@ def secure_login(
     company_id: UUID,
     req: Request,
     _: None = Depends(is_owner),
-    db: Session = Depends(get_db_session),
-    controller: CompaniesController = Depends(get_controller)
+    web_token_service: WebTokenService = Depends(get_web_token_service),
+    controller: CompaniesController = Depends(get_companies_controller)
 ):
     """
     ## Exchange login token for company marked token
@@ -62,15 +63,14 @@ def secure_login(
     return controller.login(
         company_id=company_id,
         req=req,
-        db=db
+        web_token_service=web_token_service
     )
 
 @router.get("/secure/resource", status_code=200, response_model=CompanyPublic)
 def secure_resource(
     req: Request,
-    _: None = Depends(auth_middleware),
-    db: Session = Depends(get_db_session),
-    controller: CompaniesController = Depends(get_controller)
+    _: None = Depends(token_is_company_stamped),
+    controller: CompaniesController = Depends(get_companies_controller)
 ):
     """
     ## Resource request
@@ -78,8 +78,7 @@ def secure_resource(
     This endpoint gets the company that the user is currently working in.
     """
     return controller.resource_request(
-        req=req,
-        db=db
+        req=req
     )
 
 
@@ -87,8 +86,7 @@ def secure_resource(
 def secure_collection(
     req: Request,
     _: None = Depends(is_owner),
-    db: Session = Depends(get_db_session),
-    controller: CompaniesController = Depends(get_controller)
+    controller: CompaniesController = Depends(get_companies_controller)
 ):
     """
     ## Collection request
@@ -97,8 +95,7 @@ def secure_collection(
     Only admin level users have access to this endpoint.
     """
     return controller.collection_request(
-        req=req,
-        db=db
+        req=req
     )
 
 @router.patch("/secure", status_code=200, response_model=CompanyPublic)
@@ -106,8 +103,7 @@ def secure_update(
     req: Request,
     data: CompanyUpdate = Body(...),
     _: None = Depends(is_owner),
-    db: Session = Depends(get_db_session),
-    controller: CompaniesController = Depends(get_controller)
+    controller: CompaniesController = Depends(get_companies_controller)
 ):
     """
     ## Update request
@@ -117,7 +113,6 @@ def secure_update(
     """
     return controller.update_request(
         req=req,
-        db=db,
         data=data
     )
 
@@ -126,8 +121,7 @@ def secure_delete(
     company_id: UUID,
     req: Request,
     _: None = Depends(is_owner),
-    db: Session = Depends(get_db_session),
-    controller: CompaniesController = Depends(get_controller)
+    controller: CompaniesController = Depends(get_companies_controller)
 ):
     """
     ## Delete request
@@ -137,6 +131,5 @@ def secure_delete(
     """
     return controller.delete_request(
         company_id=company_id,
-        req=req,
-        db=db
+        req=req
     )

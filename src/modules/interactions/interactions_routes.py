@@ -6,6 +6,7 @@ from sqlalchemy.orm import Session
 from src.core.database.session import get_db_session
 from src.modules.chats.messages.messages_models import MessagePublic
 from src.core.middleware.auth_middleware import auth_middleware
+from src.core.middleware.permissions import token_is_company_stamped
 from src.core.middleware.middleware_service import security
 from uuid import UUID
 
@@ -25,7 +26,7 @@ async def internal_incomming_interaction(
     chat_id: UUID,
     req: Request,
     data: HumanToAgentRequest = Body(...),
-    _: None = Depends(auth_middleware),
+    _: None = Depends(token_is_company_stamped), # handles auth
     db: Session = Depends(get_db_session),
     controller: InteractionsController = Depends(get_controller)
 ):

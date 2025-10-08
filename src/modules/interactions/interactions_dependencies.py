@@ -6,7 +6,6 @@ def configure_interactions_dependencies(http_service: HttpService):
     state_service = Container.resolve("state_service")
     messages_service = Container.resolve("messages_service")
     controller = InteractionsController(
-        http_service=http_service,
         state_service=state_service,
         messages_service=messages_service
     )

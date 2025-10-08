@@ -15,7 +15,7 @@ from src.modules.documents.services.s3_service import S3Service
 from qdrant_client import QdrantClient
 from src.modules.documents.services.embeddings_service import EmbeddingService
 from src.modules.chats.chats_dependencies import configure_chats_dependencies
-from src.modules.companies.companies_dependencies import configure_companies_dependencies
+
 from src.modules.invites.invites_dependencies import configure_invites_dependencies
 from src.modules.documents.documents_dependencies import configure_documents_dependencies
 from src.modules.employees.employees_dependencies import configure_employee_dependencies
@@ -93,11 +93,7 @@ def configure_container():
     )
     Container.register("http_service", http_service)
 
-    middleware_service = MiddlewareService(
-        http_service=http_service
-    )
-    Container.register("middleware_service", middleware_service)
-
+ 
     ## Module # Must configure core dependencies above this line ##
 
     # single domain # 
@@ -109,12 +105,8 @@ def configure_container():
         http_service=http_service
     )
 
-    configure_companies_dependencies(
-        http_service=http_service
-    )
-
     configure_documents_dependencies(
-        http_service=http_service,
+        encrytption_service=encryption_service,
         data_handler=data_handler,
         s3_service=s3_service,
         embeddings_service=embeddings_service  
@@ -145,7 +137,7 @@ def configure_container():
 
     
     # multi domain # must configure single domain dependencies above this line #
-    configure_employee_dependencies(http_service=http_service)
+   
 
     configure_state_dependencies(redis_service=redis_service)
 

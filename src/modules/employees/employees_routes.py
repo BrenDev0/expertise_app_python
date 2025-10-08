@@ -12,6 +12,8 @@ from uuid import UUID
 from typing import List
 from src.core.middleware.hmac_verification import verify_hmac
 from src.core.middleware.permissions import is_manager
+from src.modules.employees.employees_dependencies import get_employees_controller
+from src.core.middleware.permissions import token_is_company_stamped
 
 router = APIRouter(
     prefix="/employees",
@@ -19,17 +21,13 @@ router = APIRouter(
     dependencies=[Depends(security), Depends(verify_hmac)]
 )
 
-def get_controller():
-    controller = Container.resolve("employees_controller")
-    return controller
-
 @router.post("/verified/create", status_code=201, response_model=ResponseWithToken)
 def verified_create(
     req: Request,
     data: EmployeeCreate,
     _: None = Depends(verification_middleware),
     db: Session = Depends(get_db_session),
-    controller: EmployeesController = Depends(get_controller)
+    controller: EmployeesController = Depends(get_employees_controller)
 ): 
     """
     ## Create request
@@ -47,9 +45,9 @@ def verified_create(
 @router.get("/secure/resource", status_code=200, response_model=EmployeePublic)
 def secure_resource(
     req: Request,
-    _: None = Depends(auth_middleware),
+    _: None = Depends(token_is_company_stamped),
     db: Session = Depends(get_db_session),
-    controller: EmployeesController = Depends(get_controller)
+    controller: EmployeesController = Depends(get_employees_controller)
 ): 
     """
     ## Resource request
@@ -66,8 +64,9 @@ def secure_resource(
 def secure_collection(
     req: Request,
     _: None = Depends(is_manager),
+    company = Depends(token_is_company_stamped),
     db: Session = Depends(get_db_session),
-    controller: EmployeesController = Depends(get_controller)
+    controller: EmployeesController = Depends(get_employees_controller)
 ): 
     """
     ## Collection request
@@ -86,8 +85,9 @@ def secure_update(
     req: Request,
     data: EmployeeUpdate = Body(...),
     _: None = Depends(is_manager),
+    company = Depends(token_is_company_stamped),
     db: Session = Depends(get_db_session),
-    controller: EmployeesController = Depends(get_controller)
+    controller: EmployeesController = Depends(get_employees_controller)
 ):
     """
     ## Update request
@@ -107,8 +107,9 @@ def secure_delete(
     employee_id: UUID,
     req: Request, 
     _: None = Depends(is_manager),
+    company = Depends(token_is_company_stamped),
     db: Session = Depends(get_db_session),
-    controller: EmployeesController = Depends(get_controller)
+    controller: EmployeesController = Depends(get_employees_controller)
 ): 
     """
     ## Delete request

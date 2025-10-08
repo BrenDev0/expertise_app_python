@@ -10,30 +10,33 @@ from uuid import UUID
 from typing import List
 from src.core.dependencies.container import Container
 from src.modules.state.state_service import StateService
+from src.modules.chats.chats_service import ChatsService
 import asyncio
+from src.core.services.request_validation_service import RequestValidationService
 
 class MessagesController:
-    def __init__(self, http_service: HttpService, messages_service: MessagesService):
-        self.__http_service: HttpService = http_service
+    def __init__(self, messages_service: MessagesService):
         self.__messages_service = messages_service
  
     async def create_request(
         self,
         chat_id: UUID,
         data: MessageCreate,
+        chats_service: ChatsService,
         db: Session
     ) -> CommonHttpResponse:
-        chat_resource: Chat = self.__http_service.request_validation_service.verify_resource(
-            service_key="chats_service",
-            params={
-                "db": db,
-                "chat_id": chat_id
-            },
+        chat_resource: Chat = chats_service.resource(
+            key="chat_id",
+            value=chat_id
+        )
+
+        RequestValidationService.verify_resource(
+            result=chat_resource,
             not_found_message="Chat not found"
         )
 
         if data.message_type == "human":
-            self.__http_service.request_validation_service.validate_action_authorization(chat_resource.user_id, data.sender)
+            RequestValidationService.verifiy_ownership(chat_resource.user_id, data.sender)
         
         message = self.__messages_service.create(
             db=db, 
@@ -61,19 +64,24 @@ class MessagesController:
 
     def collection_request(
         self, 
-        req: Request, 
-        db: Session, 
-        chat_id: UUID
+        chat_id: UUID,
+        req: Request,
+        chats_service: ChatsService, 
+        db: Session
     ) -> List[MessagePublic] :
         user: User = req.state.user
 
-        chat_resource: Chat = self.__http_service.request_validation_service.verify_resource(
-            "chats_service",
-            {"db": db, "chat_id": chat_id},
+        chat_resource: Chat = chats_service.resource(
+            key="chat_id",
+            value=chat_id
+        )
+
+        RequestValidationService.verify_resource(
+            result=chat_resource,
             not_found_message="Chat not found"
         )
     
-        self.__http_service.request_validation_service.validate_action_authorization(user.user_id, chat_resource.user_id)
+        RequestValidationService.verifiy_ownership(user.user_id, chat_resource.user_id)
         
         data = self.__messages_service.collection(db=db, key="chat_id", value=chat_resource.chat_id)
 

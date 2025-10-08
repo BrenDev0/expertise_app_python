@@ -11,8 +11,9 @@ from src.modules.users.domain.entities import User
 from src.modules.users.domain.models import UserPublic,UserCreate, UserLogin, VerifyEmail, UserLogin, UserUpdate, VerifiedUserUpdate
 from src.modules.employees.employees_models import Employee
 from src.modules.documents.document_manager import DocumentManager
-from src.modules.companies.companies_service import CompaniesService
-
+from src.modules.companies.application.companies_service import CompaniesService
+from src.core.services.request_validation_service import RequestValidationService
+from src.modules.employees.employees_service import EmployeesService
 
 class UsersController:
     def __init__(self, http_service: HttpService, users_service: UsersService):
@@ -23,7 +24,6 @@ class UsersController:
         self,
         req: Request,
         data: VerifyEmail,
-        db: Session,
         is_update: bool = False
     ) -> ResponseWithToken:
         token_payload = {}
@@ -65,12 +65,13 @@ class UsersController:
     ) -> ResponseWithToken:
         email_hash = self.__http_service.hashing_service.hash_for_search(data.email)
 
-        user_exists: User =  self.__http_service.request_validation_service.verify_resource(
-            service_key="users_service",
-            params={
-                "key": "email_hash",
-                "value": email_hash
-            },
+        user_exists = self.__users_service.resource(
+            key="email_hash",
+            value=email_hash
+        )
+
+        RequestValidationService.verify_resource(
+            result=user_exists,
             not_found_message="User profile not found"
         )
 
@@ -87,18 +88,14 @@ class UsersController:
             token=token
         ) 
 
-        
-        
-
     def create_request(
         self,
         req: Request,
-        db: Session,
         data: UserCreate
     ) -> ResponseWithToken:
         verification_code = req.state.verification_code
 
-        self.__http_service.request_validation_service.validate_action_authorization(verification_code, data.code)
+        RequestValidationService.verifiy_ownership(verification_code, data.code)
 
         new_user = self.__users_service.create(data=data, is_admin=True)
 
@@ -201,15 +198,19 @@ class UsersController:
     def login(
         self,
         db: Session,
-        data: UserLogin
+        data: UserLogin,
+        employees_service: EmployeesService
     ) -> ResponseWithToken:
         hashed_email = self.__http_service.hashing_service.hash_for_search(data=data.email)
 
-        user: User = self.__http_service.request_validation_service.verify_resource(
-            service_key="users_service",
-            params={"key": "email_hash", "value": hashed_email},
-            not_found_message="Incorrect email or password",
-            status_code=400
+        user = self.__users_service.resource(
+            key="email_hash",
+            value=hashed_email
+        )
+
+        RequestValidationService.verify_resource(
+            result=user,
+            not_found_message="Incorrect email or password"
         )
 
         self.__http_service.hashing_service.compare_password(
@@ -224,13 +225,14 @@ class UsersController:
         }
 
         if not user.is_admin:
-            employee_resource: Employee = self.__http_service.request_validation_service.verify_resource(
-                service_key="employees_service",
-                params={
-                    "db": db,
-                    "key": "user_id",
-                    "value": user.user_id
-                },
+            employee_resource = employees_service.resource(
+                db=db,
+                key="user_id",
+                value=user.user_id
+            )
+
+            RequestValidationService.verify_resource(
+                result=employee_resource,
                 not_found_message="Employee profile not found"
             )
 

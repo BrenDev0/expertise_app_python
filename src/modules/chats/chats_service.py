@@ -19,8 +19,8 @@ class ChatsService():
         return self._repository.create(db=db, data=chat)
 
     @service_error_handler(module=_MODULE)
-    def resource(self, db: Session, chat_id: UUID) -> Chat | None:
-        return self._repository.get_one(db=db, key="chat_id", value=chat_id)
+    def resource(self, db: Session, key: str, value: UUID | str) -> Chat | None:
+        return self._repository.get_one(db=db, key=key, value=value)
         
     @service_error_handler(module=_MODULE)
     def collection(self, db: Session, user_id: UUID) -> List[Chat]:

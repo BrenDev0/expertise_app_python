@@ -3,7 +3,7 @@ from src.modules.documents.documents_controller import DocumentsController
 from src.modules.documents.services.documents_service import DocumentsService
 from src.modules.documents.documents_models import Document, TenantTable
 from src.core.repository.base_repository import BaseRepository
-from src.core.services.http_service import HttpService
+from src.core.services.encryption_service import EncryptionService
 from src.core.services.data_handling_service import DataHandlingService
 from src.core.dependencies.container import Container
 from src.modules.documents.services.embeddings_service import EmbeddingService
@@ -12,7 +12,7 @@ from src.modules.documents.document_manager import DocumentManager
 
 
 def configure_documents_dependencies(
-    http_service: HttpService, 
+    encrytption_service: EncryptionService, 
     data_handler: DataHandlingService, 
     s3_service: S3Service, 
     embeddings_service: EmbeddingService
@@ -38,7 +38,7 @@ def configure_documents_dependencies(
 
 
     controller = DocumentsController(
-        http_service=http_service,
+        encryption_service=encrytption_service,
         document_manager=document_manager
     )
 

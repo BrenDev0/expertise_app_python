@@ -1,3 +1,5 @@
+from fastapi import Depends
+
 from src.core.dependencies.container import Container
 from src.core.services.http_service import HttpService
 from src.modules.invites.invites_controller import InvitesController
@@ -22,3 +24,19 @@ def configure_invites_dependencies(http_service: HttpService, data_handler: Data
 
     Container.register("invites_service", service)
     Container.register("invites_controller", controller)
+
+
+def get_data_handler() -> DataHandlingService:
+    return Container.resolve("data_handler")
+
+def get_invites_repository() -> BaseRepository:
+    return BaseRepository(Invite)
+
+def get_invites_service(
+    repository: BaseRepository = Depends(get_invites_repository),
+    data_hanlder: DataHandlingService = Depends(get_data_handler)
+) -> InvitesService:
+    return InvitesService(
+        repository=repository,
+        data_handler=data_hanlder
+    )

@@ -6,11 +6,13 @@ from src.core.dependencies.container import Container
 from src.modules.users.application.users_service import UsersService
 from src.modules.invites.invites_models import Invite, InviteCreate, InviteUpdate, InvitePublic
 from src.modules.users.domain.entities import User
-from src.modules.companies.companies_models import Company
+from src.modules.companies.domain.enitities import Company
 from typing import List
 from fastapi import Request, HTTPException
 from sqlalchemy.orm import Session
 from uuid import UUID
+
+from src.core.services.request_validation_service import RequestValidationService
 
 class InvitesController:
     def __init__(self, http_service: HttpService, invites_service: InvitesService, email_service: EmailService):
@@ -61,18 +63,19 @@ class InvitesController:
         db: Session
     ) -> InvitePublic:
         user: User = req.state.user
-        company: Company = self.__http_service.request_validation_service.verify_company_in_request_state(req=req, db=db)
+        company: Company = req.state.company
 
-        invite_resource: Invite = self.__http_service.request_validation_service.verify_resource(
-            service_key="invites_service",
-            params={
-                "db": db,
-                "invite_id": invite_id
-            },
-            not_found_message="Invite not found",
+        invite_resource = self.__invites_service.resource(
+            db=db,
+            invite_id=invite_id
         )
 
-        self.__http_service.request_validation_service.validate_action_authorization(company.company_id, invite_resource.company_id)
+        RequestValidationService.verify_resource(
+            result=invite_resource,
+            not_found_message="Invite not found"
+        )
+
+        RequestValidationService.verifiy_ownership(company.company_id, invite_resource.company_id)
 
         return self.__to_public(invite_resource)
     
@@ -82,7 +85,7 @@ class InvitesController:
         db: Session
     ) -> List[InvitePublic]:
         user: User = req.state.user
-        company: Company  = self.__http_service.request_validation_service.verify_company_in_request_state(req=req, db=db)
+        company: Company  = req.state.company
 
         data = self.__invites_service.collection(db=db, company_id=company.company_id)
 
@@ -99,18 +102,19 @@ class InvitesController:
         db: Session
     ) -> CommonHttpResponse: 
         user: User = req.state.user
-        company: Company = self.__http_service.request_validation_service.verify_company_in_request_state(req=req, db=db)
+        company: Company = req.state.company
 
-        invite_resource: Invite = self.__http_service.request_validation_service.verify_resource(
-            service_key="invites_service",
-            params={
-                "db": db,
-                "invite_id": invite_id
-            },
-            not_found_message="Invite not found",
+        invite_resource = self.__invites_service.resource(
+            db=db,
+            invite_id=invite_id
         )
 
-        self.__http_service.request_validation_service.validate_action_authorization(company.company_id, invite_resource.company_id)
+        RequestValidationService.verify_resource(
+            result=invite_resource,
+            not_found_message="Invite not found"
+        )
+
+        RequestValidationService.verifiy_ownership(company.company_id, invite_resource.company_id)
 
         self.__invites_service.update(db=db, invite_id=invite_id, changes=data)
 
@@ -125,18 +129,19 @@ class InvitesController:
         db: Session
     ) -> CommonHttpResponse: 
         user: User = req.state.user
-        company: Company  = self.__http_service.request_validation_service.verify_company_in_request_state(req=req, db=db)
+        company: Company  = req.state.company
 
-        invite_resource: Invite = self.__http_service.request_validation_service.verify_resource(
-            service_key="invites_service",
-            params={
-                "db": db,
-                "invite_id": invite_id
-            },
-            not_found_message="Invite not found",
+        invite_resource = self.__invites_service.resource(
+            db=db,
+            invite_id=invite_id
         )
 
-        self.__http_service.request_validation_service.validate_action_authorization(company.company_id, invite_resource.company_id)
+        RequestValidationService.verify_resource(
+            result=invite_resource,
+            not_found_message="Invite not found"
+        )
+
+        RequestValidationService.verifiy_ownership(company.company_id, invite_resource.company_id)
         
         self.__invites_service.delete(db=db, invite_id=invite_id)
 

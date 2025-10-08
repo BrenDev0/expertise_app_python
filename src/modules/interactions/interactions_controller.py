@@ -1,11 +1,10 @@
 from src.modules.state.state_models import WorkerState
-from src.core.domain.models.http_responses import CommonHttpResponse
-from src.core.services.http_service import HttpService
+
 from src.modules.interactions.interactions_models import HumanToAgentRequest
 from src.modules.state.state_service import StateService
 from src.modules.chats.messages.messages_service import MessagesService
 from src.modules.chats.messages.messages_models import MessagePublic
-from src.modules.companies.companies_models import Company
+from src.modules.companies.domain.enitities import Company
 from sqlalchemy.orm import Session
 from uuid import UUID
 from src.modules.users.domain.entities import User
@@ -16,15 +15,16 @@ from fastapi.encoders import jsonable_encoder
 from src.utils.http.hmac import get_hmac_headers
 import os
 import httpx
+from src.core.services.request_validation_service import RequestValidationService
+from src.modules.agents.agents_service import AgentsService
+from src.modules.chats.chats_service import ChatsService
 
 class InteractionsController:
     def __init__(
-        self, 
-        http_service: HttpService,
+        self,
         state_service: StateService,
         messages_service: MessagesService
     ):
-        self.__http_service = http_service
         self.__state_service = state_service
         self.__messages_service = messages_service
 
@@ -33,31 +33,37 @@ class InteractionsController:
         chat_id: UUID,
         req: Request,
         data: HumanToAgentRequest,
+        agents_service: AgentsService,
+        chats_service: ChatsService,
         db: Session
     )-> MessagePublic: 
         user: User = req.state.user
-        company: Company = self.__http_service.request_validation_service.verify_company_in_request_state(req=req, db=db)
+        company: Company = req.state.company
 
-        self.__http_service.request_validation_service.verify_resource(
-            service_key="agents_service",
-            params={
-                "db": db,
-                "agent_id": data.agent_id 
-            },
+        agent_resource = agents_service.resource(
+            db=db,
+            key="agent_id",
+            value=data.agent_id
+        )
+
+        RequestValidationService.verify_resource(
+            result=agent_resource,
             not_found_message="Agent not found"
         )
 
 
-        chat_resource: Chat = self.__http_service.request_validation_service.verify_resource(
-            service_key="chats_service",
-            params={
-                "db": db,
-                "chat_id": chat_id
-            },
+        chat_resource = chats_service.resource(
+            db=db,
+            key="chat_id",
+            value=chat_id
+        )
+
+        RequestValidationService.verify_resource(
+            result=chat_resource,
             not_found_message="Chat not found"
         )
 
-        self.__http_service.request_validation_service.validate_action_authorization(user.user_id, chat_resource.user_id)
+        RequestValidationService.verifiy_ownership(user.user_id, chat_resource.user_id)
         
         message = self.__messages_service.create(
             db=db,
@@ -66,8 +72,6 @@ class InteractionsController:
             message_type="human",
             text=data.input
         )
-
-
 
         worker_state: WorkerState = await self.__state_service.ensure_chat_state(
             db=db,

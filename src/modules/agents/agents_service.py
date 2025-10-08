@@ -11,11 +11,11 @@ class AgentsService:
         self.__repository = respository
 
     @service_error_handler(module=f"{__MODULE}.resource")
-    def resource(self, db: Session, agent_id: UUID) -> Agent | None:
+    def resource(self, db: Session, key: str, value: UUID | str) -> Agent | None:
         return self.__repository.get_one(
             db=db,
-            key="agent_id",
-            value=agent_id
+            key=key,
+            value=value
         )
     
     @service_error_handler(f"{__MODULE}.read")

@@ -8,11 +8,13 @@ from sqlalchemy.orm import Session
 
 from src.modules.documents.documents_models import Document, DocumentPublic
 from src.modules.users.domain.entities import User
-from src.modules.companies.companies_models import Company
+
+from src.modules.companies.domain.enitities import Company
 
 from src.modules.documents.document_manager import DocumentManager
 
-from src.core.services.http_service import HttpService
+from src.core.services.encryption_service import EncryptionService
+from src.core.services.request_validation_service import RequestValidationService
 from src.core.domain.models.http_responses import CommonHttpResponse
 
 
@@ -20,10 +22,10 @@ from src.core.domain.models.http_responses import CommonHttpResponse
 class DocumentsController:
     def __init__(
         self, 
-        http_service: HttpService, 
+        encryption_service: EncryptionService,
         document_manager: DocumentManager
     ):
-        self.__http_service = http_service
+        self.__encryption_service = encryption_service
         self.__document_manager = document_manager
        
 
@@ -34,18 +36,9 @@ class DocumentsController:
         file: UploadFile
     ):
         user: User = req.state.user
-        company: Company = self.__http_service.request_validation_service.verify_company_in_request_state(req=req, db=db)
+        company: Company = req.state.company
 
-        company_resource: Company = self.__http_service.request_validation_service.verify_resource(
-            service_key="companies_service",
-            params={
-                "db": db,
-                "company_id": company.company_id
-            },
-            not_found_message="Company not found"
-        )
-
-        self.__http_service.request_validation_service.validate_action_authorization(user.user_id, company_resource.user_id)
+        RequestValidationService.verifiy_ownership(user.user_id, company.user_id)
 
         allowed_mime_types = [
             "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",  # .xlsx
@@ -82,20 +75,12 @@ class DocumentsController:
         db: Session
     ):
         user: User = req.state.user
-        company: Company = self.__http_service.request_validation_service.verify_company_in_request_state(req=req, db=db)
+        company: Company = req.state.company
 
-        company_resource: Company = self.__http_service.request_validation_service.verify_resource(
-            service_key="companies_service",
-            params={
-                "db": db,
-                "company_id": company.company_id
-            },
-            not_found_message="Company not found"
-        )
 
-        self.__http_service.request_validation_service.validate_action_authorization(user.user_id, company_resource.user_id)
+        RequestValidationService.verifiy_ownership(user.user_id, company.user_id)
 
-        data = self.__document_manager.documents_service.collection(db=db, company_id=company_resource.company_id)
+        data = self.__document_manager.documents_service.collection(db=db, company_id=company.company_id)
 
         return [
             self.__to_public(doc) for doc in data
@@ -108,18 +93,20 @@ class DocumentsController:
         db: Session
     ) ->  CommonHttpResponse:
         user: User = req.state.user
-        company: Company = self.__http_service.request_validation_service.verify_company_in_request_state(req=req, db=db)
+        company: Company = req.state.company
 
-        document_resource: Document = self.__http_service.request_validation_service.verify_resource(
-            service_key="documents_service",
-            params={
-                "db": db,
-                "document_id": document_id
-            },
-            not_found_message="Document Not found"
+        document_resource: Document = self.__document_manager.documents_service.resource(
+            key="document_id",
+            value=document_id
         )
 
-        self.__http_service.request_validation_service.validate_action_authorization(user.user_id, document_resource.company.user_id)
+        RequestValidationService.verify_resource(
+            result=document_resource,
+            not_found_message="Document not found"
+        )
+        
+
+        RequestValidationService.verifiy_ownership(user.user_id, document_resource.company.user_id)
 
         self.__document_manager.document_level_deletion(
             document_id=document_resource.document_id,
@@ -139,7 +126,7 @@ class DocumentsController:
             company_id=str(data.company_id),
             filename=data.filename,
             file_type=data.file_type,
-            url=self.__http_service.encryption_service.decrypt(data.url),
+            url=self.__encryption_service.decrypt(data.url),
             uploaded_at=data.uploaded_at
         )
 

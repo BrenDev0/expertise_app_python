@@ -6,7 +6,7 @@ from src.modules.documents.services.documents_service import DocumentsService
 from src.modules.documents.services.embeddings_service import EmbeddingService
 from src.modules.documents.services.s3_service import S3Service
 from src.modules.documents.services.tenant_data_service import TenantDataService
-from src.modules.companies.companies_service import CompaniesService
+from src.modules.companies.application.companies_service import CompaniesService
 from src.modules.documents.documents_models import Document
 
 from src.core.utils.decorators.service_error_handler import service_error_handler
