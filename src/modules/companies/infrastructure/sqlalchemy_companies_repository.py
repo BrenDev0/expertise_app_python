@@ -20,6 +20,9 @@ class SqlAlchemyCompany(Base):
 
 
 class SqlAlchemyCompaniesRepsoitory(SqlAlchemyDataRepository[Company, SqlAlchemyCompany]):
+    def __init__(self):
+        super().__init__(SqlAlchemyCompany)
+
     def _to_entity(self, model: SqlAlchemyCompany) -> Company:
         return Company(
             company_id=model.company_id,
@@ -32,5 +35,5 @@ class SqlAlchemyCompaniesRepsoitory(SqlAlchemyDataRepository[Company, SqlAlchemy
         )
     
     def _to_model(self, entity: Company) -> SqlAlchemyCompany:
-        data = entity.model_dump(exclude={'company_id', 'created_at'} if not entity.user_id else set())
+        data = entity.model_dump(exclude={'company_id', 'created_at'} if not entity.company_id else set())
         return SqlAlchemyCompany(**data)

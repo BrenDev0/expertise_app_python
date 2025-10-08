@@ -10,7 +10,7 @@ from src.modules.invites.invites_service import InvitesService
 from src.modules.users.application.users_service import UsersService
 from src.core.services.encryption_service import EncryptionService
 
-from src.modules.users.users_dependencies import get_users_service
+from src.modules.users.interface.users_dependencies import get_users_service
 from src.modules.invites.invites_dependencies import get_invites_service
 from src.core.dependencies.services import get_encryption_service
 

@@ -7,9 +7,9 @@ from src.modules.companies.application.companies_service import CompaniesService
 from src.core.services.webtoken_service import WebTokenService
 from src.modules.users.application.users_service import UsersService
 
-from src.modules.companies.companies_dependencies import get_companies_service
+from src.modules.companies.interface.companies_dependencies import get_companies_service
 from src.core.dependencies.services import get_middleware_service, get_web_token_service
-from src.modules.users.users_dependencies import get_users_service
+from src.modules.users.interface.users_dependencies import get_users_service
 
 
 

@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Depends, Body, Request
-from src.modules.users.users_controller import UsersController
+from src.modules.users.interface.users_controller import UsersController
 from sqlalchemy.orm import Session
 
 from src.core.database.session import get_db_session
@@ -11,7 +11,7 @@ from src.core.middleware.verification_middleware import verification_middleware
 from src.core.middleware.hmac_verification import verify_hmac
 
 from src.modules.users.domain.models import UserCreate, UserPublic, UserLogin, VerifyEmail, UserUpdate, VerifiedUserUpdate
-from src.modules.users.users_dependencies import get_users_controller
+from src.modules.users.interface.users_dependencies import get_users_controller
 
 
 

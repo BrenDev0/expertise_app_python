@@ -3,10 +3,10 @@ from uuid import UUID
 from typing import List
 
 
-from src.modules.companies.companies_controller import CompaniesController
+from src.modules.companies.interface.companies_controller import CompaniesController
 from src.modules.companies.domain.companies_models import CompanyPublic, CompanyCreate, CompanyUpdate
 from src.core.domain.models.http_responses import CommonHttpResponse, ResponseWithToken
-from src.modules.companies.companies_dependencies import get_companies_controller
+from src.modules.companies.interface.companies_dependencies import get_companies_controller
 from src.core.dependencies.services import get_web_token_service
 from src.core.services.webtoken_service import WebTokenService
 

@@ -5,7 +5,7 @@ from src.core.services.encryption_service import EncryptionService
 from src.core.services.hashing_service import HashingService
 from src.core.services.http_service import HttpService
 from src.core.utils.logs.logger import Logger
-from src.core.middleware.middleware_service import MiddlewareService
+
 from src.core.services.request_validation_service import RequestValidationService
 from src.core.services.webtoken_service import WebTokenService
 from src.core.services.redis_service import RedisService
@@ -18,8 +18,7 @@ from src.modules.chats.chats_dependencies import configure_chats_dependencies
 
 from src.modules.invites.invites_dependencies import configure_invites_dependencies
 from src.modules.documents.documents_dependencies import configure_documents_dependencies
-from src.modules.employees.employees_dependencies import configure_employee_dependencies
-from src.modules.agents.agents_dependencies import configure_agents_dependencies
+
 from src.modules.interactions.interactions_dependencies import configure_interactions_dependencies
 from src.modules.state.state_dependencies  import configure_state_dependencies
 
@@ -97,10 +96,7 @@ def configure_container():
     ## Module # Must configure core dependencies above this line ##
 
     # single domain # 
-    configure_agents_dependencies(
-        http_service=http_service
-    )
-
+  
     configure_chats_dependencies(
         http_service=http_service
     )
@@ -119,21 +115,6 @@ def configure_container():
     )
 
 
-    
-
-    users_service = UsersService(
-        respository=SqlAlchemyUsersRepository(),
-        create_user_use_case=CreateUserUseCase(
-            encryption_service=encryption_service,
-            hashing_service=hashing_service
-        ),
-        update_user_use_case=UpdateUserUseCase(
-            encryption_service=encryption_service,
-            hashing_service=hashing_service
-        )
-    )
-
-    Container.register("users_service", users_service)
 
     
     # multi domain # must configure single domain dependencies above this line #

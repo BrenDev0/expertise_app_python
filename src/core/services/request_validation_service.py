@@ -1,8 +1,6 @@
 import uuid
-from fastapi import HTTPException, Request
+from fastapi import HTTPException
 from typing import Any, Union
-from src.modules.companies.domain.enitities import Company
-from sqlalchemy.orm import Session
 from uuid import UUID
 
 

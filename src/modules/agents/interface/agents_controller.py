@@ -1,23 +1,19 @@
-from fastapi import Request, HTTPException
+from fastapi import Request
 from sqlalchemy.orm import Session
 from uuid import UUID
 from  typing import List
 
-from src.core.domain.models.http_responses import CommonHttpResponse
-from src.core.services.http_service import HttpService
-from src.modules.agents.agents_models import Agent, AgentPublic
+
+from src.modules.agents.domain.models import AgentPublic
+from src.modules.agents.domain.entities import Agent
 from src.modules.users.domain.entities import User
-from src.modules.agents.agents_service import AgentsService
-from src.modules.agents.agent_access.agent_access_models import AgentAccessCreate, AgentAccessDelete, AgentAccess
-from src.modules.agents.agent_access.agent_access_service import AgentAccessService
+from src.modules.agents.application.agents_service import AgentsService
+from src.modules.agents.domain.models import AgentAccessCreate
+from src.modules.agents.application.agent_access_service import AgentAccessService
 from src.modules.employees.employees_models import Employee
 from src.modules.companies.domain.enitities import Company
 from src.core.services.request_validation_service import RequestValidationService
 from src.modules.employees.employees_service import EmployeesService
-from src.modules.employees.employees_dependencies import get_employees_service
-
-
-
 
 class AgentsController:
     def __init__(self, agents_service: AgentsService, agent_access_service: AgentAccessService):

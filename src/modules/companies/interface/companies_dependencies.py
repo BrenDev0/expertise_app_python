@@ -3,7 +3,7 @@ from fastapi import Depends
 from src.core.domain.repositories.data_repository import DataRepository
 from src.core.infrastructure.repositories.data.sqlalchemy.sqlalchemy_data_repository import SqlAlchemyDataRepository
 
-from src.modules.companies.companies_controller import CompaniesController
+from src.modules.companies.interface.companies_controller import CompaniesController
 from src.modules.companies.application.companies_service import CompaniesService
 from src.modules.companies.domain.enitities import Company
 

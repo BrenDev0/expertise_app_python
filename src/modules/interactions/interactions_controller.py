@@ -16,7 +16,7 @@ from src.utils.http.hmac import get_hmac_headers
 import os
 import httpx
 from src.core.services.request_validation_service import RequestValidationService
-from src.modules.agents.agents_service import AgentsService
+from src.modules.agents.application.agents_service import AgentsService
 from src.modules.chats.chats_service import ChatsService
 
 class InteractionsController:

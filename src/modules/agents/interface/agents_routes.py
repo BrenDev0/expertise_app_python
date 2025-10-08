@@ -1,22 +1,22 @@
-from fastapi import APIRouter, Depends, Request, Body
-from src.core.dependencies.container import Container
-from src.modules.agents.agents_models import AgentPublic
-from src.modules.agents.agent_access.agent_access_models import AgentAccessCreate, AgentAccessDelete, AgentAccess
-from src.core.middleware.middleware_service import security
-from src.core.middleware.auth_middleware import auth_middleware
-from src.modules.agents.agents_controller import AgentsController
 from typing import List
 from uuid import UUID
-from sqlalchemy.orm import Session
-from src.core.database.session import get_db_session
-from src.core.domain.models.http_responses import CommonHttpResponse
+from fastapi import APIRouter, Depends, Request, Body
+
+from src.modules.agents.domain.models import AgentPublic
+from src.modules.agents.domain.models import AgentAccessCreate
+from src.core.middleware.middleware_service import security
+from src.core.middleware.auth_middleware import auth_middleware
+from src.modules.agents.interface.agents_controller import AgentsController
+
+
+
 from src.core.middleware.hmac_verification import verify_hmac
 from src.core.middleware.permissions import is_manager
 from src.core.middleware.permissions import token_is_company_stamped
 
 from src.modules.employees.employees_service import EmployeesService
 from src.modules.employees.employees_dependencies import get_employees_service
-from src.modules.agents.agents_dependencies import get_agents_controller
+from src.modules.agents.interface.agents_dependencies import get_agents_controller
 
 router = APIRouter(
     prefix="/agents",
@@ -32,7 +32,6 @@ def secure_upsert_access(
     _: None = Depends(is_manager),
     company: None = Depends(token_is_company_stamped),
     employees_service: EmployeesService = Depends(get_employees_service),
-    db: Session = Depends(get_db_session),
     controller: AgentsController = Depends(get_agents_controller)
 ):
     """
@@ -45,8 +44,7 @@ def secure_upsert_access(
         employee_id=employee_id,
         req=req,
         data=data,
-        employees_service=employees_service,
-        db=db
+        employees_service=employees_service
     )
 
 @router.get("/secure/resource/{agent_id}", status_code=200, response_model=AgentPublic)
@@ -54,7 +52,6 @@ def secure_resource(
     agent_id: UUID,
     req: Request,
     _: None = Depends(auth_middleware),
-    db: Session = Depends(get_db_session),
     controller: AgentsController = Depends(get_agents_controller)
 ):
     """
@@ -64,8 +61,7 @@ def secure_resource(
     """
     return controller.resource_request(
         agent_id=agent_id,
-        req=req,
-        db=db 
+        req=req
     )
 
 @router.get("/secure/access/collection/{employee_id}", status_code=200, response_model=List[AgentPublic])
@@ -75,7 +71,6 @@ def acess_collection(
     _: None = Depends(is_manager),
     company = Depends(token_is_company_stamped),
     employees_service: EmployeesService = Depends(get_employees_service),
-    db: Session = Depends(get_db_session),
     controller: AgentsController = Depends(get_agents_controller)
 ):
     """
@@ -86,8 +81,7 @@ def acess_collection(
     return controller.agent_acccess_collection_request(
         employee_id=employee_id,
         req=req,
-        employees_service=employees_service,
-        db=db
+        employees_service=employees_service
     )
 
 
@@ -95,7 +89,6 @@ def acess_collection(
 def secure_collection(
     req: Request,
     _: None = Depends(auth_middleware),
-    db: Session = Depends(get_db_session),
     employees_service: EmployeesService = Depends(get_employees_service),
     controller: AgentsController = Depends(get_agents_controller)
 ):
@@ -106,15 +99,13 @@ def secure_collection(
     """
     return controller.collection_request(
         req=req,
-        employees_service=employees_service,
-        db=db
+        employees_service=employees_service
     )
 
 @router.get("/secure/read", status_code=200, response_model=List[AgentPublic])
 def secure_read(
     req: Request,
     _: None = Depends(auth_middleware),
-    db: Session = Depends(get_db_session),
     controller: AgentsController = Depends(get_agents_controller)
 ):
     """
@@ -123,4 +114,4 @@ def secure_read(
     This endpoint gets all agents in database.
     """
 
-    return controller.read_request(db=db)
+    return controller.read_request()

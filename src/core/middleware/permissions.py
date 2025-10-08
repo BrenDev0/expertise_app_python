@@ -11,7 +11,7 @@ from src.modules.companies.domain.enitities import Company
 from src.modules.companies.application.companies_service import CompaniesService
 from src.modules.employees.employees_service import EmployeesService
 
-from src.modules.companies.companies_dependencies import get_companies_service
+from src.modules.companies.interface.companies_dependencies import get_companies_service
 from src.modules.employees.employees_dependencies import get_employees_service
 
 def is_owner(req: Request, _: None = Depends(auth_middleware)):

@@ -5,11 +5,10 @@ from src.core.services.encryption_service import EncryptionService
 from src.core.services.hashing_service import HashingService
 from src.core.dependencies.services import get_encryption_service, get_hashing_service
 
-from src.modules.users.users_controller import UsersController 
+from src.modules.users.interface.users_controller import UsersController 
 from src.modules.users.application.users_service import UsersService
 from src.modules.users.application.use_cases.create_user import CreateUserUseCase
 from src.modules.users.application.use_cases.update_user import UpdateUserUseCase
-from src.modules.users.users_repository import UsersRepository
 from src.modules.users.domain.users_repository import UsersRepository
 from src.modules.users.infrastructure.sqlalchemy_user_repository import SqlAlchemyUsersRepository
 
