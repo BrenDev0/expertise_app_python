@@ -1,6 +1,6 @@
 import bcrypt
 import hashlib
-from fastapi import HTTPException
+from src.core.domain.models.errors import IncorrectPassword
 
 class HashingService:
     @staticmethod
@@ -16,10 +16,10 @@ class HashingService:
         return hashed.decode('utf-8')
 
     @staticmethod
-    def compare_password(password: str, hashed_password: str, status_code: int = 400, detail: str = "Incorrect password", throw_error: bool = True) -> bool:
+    def compare_password(password: str, hashed_password: str, detail: str = "Incorrect password", throw_error: bool = True) -> bool:
         if not bcrypt.checkpw(password.encode('utf-8'), hashed_password.encode('utf-8')):
             if throw_error:
-                raise HTTPException(status_code=status_code, detail=detail)
+                raise IncorrectPassword(detail=detail)
             else:
                 return False
         return True

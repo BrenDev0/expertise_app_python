@@ -4,7 +4,7 @@ from email.message import EmailMessage
 from typing import Dict, Any, Union
 from fastapi import HTTPException
 from uuid import UUID
-from src.core.decorators.service_error_handler import service_error_handler
+from src.core.utils.decorators.service_error_handler import service_error_handler
 
 
 class EmailService:
