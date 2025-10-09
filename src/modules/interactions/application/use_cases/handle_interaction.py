@@ -67,7 +67,7 @@ class HandleInteraction():
             text=input
         )
 
-        worker_state: WorkerState = await self.__state_service.ensure_chat_state(
+        worker_state: WorkerState = self.__state_service.ensure_chat_state(
             chat_id=str(chat_resource.chat_id),
             input=input,
             user_id=user.user_id,

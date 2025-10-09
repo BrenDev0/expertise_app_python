@@ -1,5 +1,4 @@
 from fastapi import Request
-from sqlalchemy.orm import Session
 from typing import List
 from uuid import UUID
 
@@ -20,13 +19,11 @@ class ChatsController:
     def create_request(
         self, 
         req: Request, 
-        data: ChatCreate,
-        db: Session
+        data: ChatCreate
     ) -> ChatPublic:
         user: User = req.state.user
 
-        chat: Chat = self.__chats_service.create(
-            db=db, 
+        chat: Chat = self.__chats_service.create( 
             title=data.title, 
             user_id=user.user_id
         )
@@ -35,12 +32,11 @@ class ChatsController:
  
     def collection_request(
         self, 
-        req: Request, 
-        db: Session
+        req: Request
     ) -> List[ChatPublic]:
         user: User = req.state.user
 
-        data = self.__chats_service.collection(db=db, user_id=user.user_id)
+        data = self.__chats_service.collection(user_id=user.user_id)
         
         return [self.__to_public(chat) for chat in data]
 
@@ -48,13 +44,11 @@ class ChatsController:
         self, 
         chat_id: UUID,
         req: Request, 
-        db: Session, 
         data: ChatUpdate, 
     ) -> CommonHttpResponse:
         user: User = req.state.user
 
         chat_resource: Chat = self.__chats_service.resource(
-            db=db,
             key="chat_id",
             value=chat_id
         )
@@ -66,7 +60,7 @@ class ChatsController:
 
         RequestValidationService.verifiy_ownership(user.user_id, chat_resource.user_id) 
 
-        self.__chats_service.update(db=db, chat_id=chat_resource.chat_id, changes=data)
+        self.__chats_service.update(chat_id=chat_resource.chat_id, changes=data)
 
         return CommonHttpResponse(
             detail="Chat updated"
@@ -76,13 +70,11 @@ class ChatsController:
     def delete_request(
         self,
         chat_id: UUID,
-        req: Request,
-        db: Session
+        req: Request
     ):
         user: User = req.state.user
 
         chat_resource: Chat = self.__chats_service.resource(
-            db=db, 
             key="chat_id",
             value=chat_id
         ) 
@@ -94,7 +86,7 @@ class ChatsController:
 
         RequestValidationService.verifiy_ownership(user.user_id, chat_resource.user_id) 
 
-        self.__chats_service.delete(db=db, chat_id=chat_resource.chat_id)
+        self.__chats_service.delete(chat_id=chat_resource.chat_id)
 
         return CommonHttpResponse(
             detail="Chat deleted"

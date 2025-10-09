@@ -17,7 +17,7 @@ class StateService:
 
 
     @service_error_handler(f"{__MODULE}.update_chat_state_history")
-    async def update_chat_state_history(
+    def update_chat_state_history(
         self,
         chat_id: UUID,
         message: Message,
@@ -25,7 +25,7 @@ class StateService:
     ):
         session_key = self.__get_chat_state_key(chat_id=chat_id)
         
-        session_data = await self.__repository.get_session(session_key)
+        session_data = self.__repository.get_session(session_key)
 
         if session_data:
             state = WorkerState(
@@ -43,12 +43,12 @@ class StateService:
                     chat_history.pop()  
 
             
-            await self.__repository.set_session(session_key, state.model_dump_json(), expire_seconds=7200) #2 hours 
+            self.__repository.set_session(session_key, state.model_dump_json(), expire_seconds=7200) #2 hours 
 
     @service_error_handler(f"{__MODULE}.ensure_chat_state")
-    async def ensure_chat_state(self, chat_id: UUID, input: str, user_id: UUID, company_id: UUID) -> WorkerState:
+    def ensure_chat_state(self, chat_id: UUID, input: str, user_id: UUID, company_id: UUID) -> WorkerState:
         session_key = self.__get_chat_state_key(chat_id=chat_id)
-        session = await self.__repository.get_session(session_key)
+        session = self.__repository.get_session(session_key)
         if session:
             state = WorkerState(**session)
             state.input = input
@@ -70,7 +70,7 @@ class StateService:
             company_id=str(company_id)
         )
 
-        await self.__redis_service.set_session(session_key, state.model_dump_json(), expire_seconds=7200) #2 hours 
+        self.__repository.set_session(session_key, state.model_dump_json(), expire_seconds=7200) #2 hours 
         return state
     
     @staticmethod

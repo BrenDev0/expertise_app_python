@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, Request, Body
+from fastapi import APIRouter, Depends, Request, Body, BackgroundTasks
 from typing import List
 from uuid import UUID
 
@@ -22,6 +22,7 @@ router = APIRouter(
 @router.post("/internal/{chat_id}", status_code=201, response_model=CommonHttpResponse)
 async def internal_create(
     chat_id: UUID,
+    bakcground_tasks: BackgroundTasks,
     data: MessageCreate = Body(...),
     _: None = Depends(verify_hmac), # server to server verification
     state_service: StateService = Depends(get_state_service),
@@ -31,6 +32,7 @@ async def internal_create(
     ## HMAC protected  for internal use only 
     """
     return await controller.create_request(
+        background_tasks=bakcground_tasks,
         chat_id=chat_id, 
         data=data, 
         state_service=state_service

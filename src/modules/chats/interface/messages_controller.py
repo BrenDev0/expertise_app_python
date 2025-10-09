@@ -1,6 +1,6 @@
 from uuid import UUID
 from typing import List
-from fastapi import Request
+from fastapi import Request, BackgroundTasks
 import asyncio
 
 from src.core.services.request_validation_service import RequestValidationService
@@ -14,9 +14,6 @@ from src.modules.users.domain.entities import User
 from src.modules.state.application.state_service import StateService
 from src.modules.chats.application.chats_service import ChatsService
 
-
-
-
 class MessagesController:
     def __init__(
         self, 
@@ -28,6 +25,7 @@ class MessagesController:
  
     async def create_request(
         self,
+        background_tasks: BackgroundTasks,
         chat_id: UUID,
         data: MessageCreate,
         state_service: StateService
@@ -53,14 +51,8 @@ class MessagesController:
             json_data=data.json_data
         )
 
-        ## handle state if exists
-        asyncio.create_task(
-            state_service.update_chat_state_history(
-                chat_resource.chat_id, 
-                message,
-                16
-            )
-        )
+        ## handle state if exists in background
+        background_tasks.add_task(state_service.update_chat_state_history, chat_resource.chat_id, message, 16)
 
         return CommonHttpResponse(
             detail="Message created"

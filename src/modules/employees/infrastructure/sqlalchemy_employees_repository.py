@@ -54,7 +54,7 @@ class SqlAlchemyEmployeesRepository(SqlAlchemyDataRepository[Employee, SqlAlchem
         )
     
     def _to_model(self, entity: Employee) -> SqlAlchemyEmployee:
-        data = entity.model_dump(exclude={'agent'})
+        data = entity.model_dump(exclude={'employee_id', 'user'} if not entity.employee_id else set())
         return SqlAlchemyEmployee(**data)
     
     def update(self, key: str, value: str | uuid.UUID, changes: dict) -> Optional[Employee]:
