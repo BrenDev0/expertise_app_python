@@ -7,7 +7,7 @@ class User(BaseModel):
     user_id: Optional[UUID] = None
     name: str
     phone: str
-    email: str
+    email: EmailStr
     email_hash: str
     password: str
     is_admin: bool = False
