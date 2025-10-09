@@ -11,7 +11,7 @@ from src.modules.agents.domain.models import AgentAccessCreate
 from src.modules.agents.application.agent_access_service import AgentAccessService
 from src.modules.employees.domain.entities import Employee
 from src.modules.companies.domain.enitities import Company
-from src.core.services.request_validation_service import RequestValidationService
+from src.core.interface.request_validation_service import RequestValidationService
 from src.modules.employees.application.employees_service import EmployeesService
 
 class AgentsController:

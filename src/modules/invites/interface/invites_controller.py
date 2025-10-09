@@ -14,7 +14,7 @@ from src.modules.users.domain.entities import User
 from src.modules.companies.domain.enitities import Company
 
 
-from src.core.services.request_validation_service import RequestValidationService
+from src.core.interface.request_validation_service import RequestValidationService
 
 class InvitesController:
     def __init__(

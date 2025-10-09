@@ -5,7 +5,7 @@ from fastapi import Request
 from src.core.domain.models.http_responses import CommonHttpResponse, ResponseWithToken
 from src.core.services.encryption_service import EncryptionService
 from src.core.services.webtoken_service import WebTokenService
-from src.core.services.request_validation_service import RequestValidationService
+from src.core.interface.request_validation_service import RequestValidationService
 
 from src.modules.employees.domain.employees_models import EmployeeCreate, EmployeeUpdate, EmployeePublic, EmployeeUser
 from src.modules.employees.domain.entities import Employee

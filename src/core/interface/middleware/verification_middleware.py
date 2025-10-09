@@ -4,7 +4,7 @@ from fastapi import Request, Depends, HTTPException
 from src.core.services.webtoken_service import WebTokenService
 from src.core.interface.middleware.middleware_service import MiddlewareService
 from src.modules.users.application.users_service import UsersService
-from src.core.services.request_validation_service import RequestValidationService
+from src.core.interface.request_validation_service import RequestValidationService
 
 from src.modules.users.interface.users_dependencies import get_users_service
 from src.core.dependencies.services import get_middleware_service, get_web_token_service
