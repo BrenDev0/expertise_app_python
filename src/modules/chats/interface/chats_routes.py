@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, Body, Request
+from fastapi import APIRouter, Depends, Body, Request, UploadFile, File
 from typing import List
 from uuid import UUID
 
@@ -32,6 +32,25 @@ def secure_create(
     The id returned is needed for all requests to the llm.
     """
     return controller.create_request(req=req, data=data)
+
+@router.post("/secure/context/{chat_id}", status_code=201, response_model=CommonHttpResponse)
+async def secure_add_chat_context(
+    chat_id: UUID,
+    req: Request,
+    _: None = Depends(auth_middleware),
+    file: UploadFile = File(...),
+    controller: ChatsController = Depends(get_chats_controller)
+): 
+    """
+    ## Add context to chat
+
+    This endpoint will add a tempory source of context for the agent that will last one request
+    """
+    return await controller.add_context(
+        chat_id=chat_id,
+        req=req,
+        file=file
+    )
 
 @router.get("/secure/collection", status_code=200, response_model=List[ChatPublic])
 def secure_collection( 
@@ -81,5 +100,24 @@ def secure_delete(
     return controller.delete_request(
         chat_id=chat_id,
         req=req
+    )
+
+@router.delete("/secure/context/{chat_id}/{filename}", status_code=200, response_model=CommonHttpResponse)
+def secure_remove_chat_context(
+    chat_id: UUID,
+    filename: str,
+    req: Request,
+    _: None = Depends(auth_middleware),
+    controller: ChatsController = Depends(get_chats_controller)
+):
+    """
+    ## Remove context from chat
+
+    This endpoint will remove the file noted in the params from the vecotr base
+    """
+    return controller.remove_context(
+        req=req,
+        chat_id=chat_id,
+        filename=filename
     )
     

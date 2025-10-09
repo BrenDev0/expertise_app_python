@@ -4,12 +4,19 @@ from qdrant_client.http.models import (
     Distance, VectorParams, Filter, FieldCondition, 
     MatchValue, PointStruct, FilterSelector
 )
+import os
 from qdrant_client.http.exceptions import UnexpectedResponse
 from src.core.domain.repositories.vector_respository import VectorRepository
 from src.core.domain.services.embedding_service import DocumentChunk
 from src.core.utils.decorators.service_error_handler import service_error_handler
 from typing import List, Dict, Any, Optional
 import uuid
+
+def get_qdrant_client():
+    return QdrantClient(
+        url=os.getenv("QDRANT_URL"),
+        api_key=os.getenv("QDRANT_API_KEY")
+    )
 
 class QdrantVectorStore(VectorRepository):
     __MODULE = "qdrant.vector_store"

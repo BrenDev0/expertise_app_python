@@ -12,9 +12,9 @@ from src.core.services.encryption_service import EncryptionService
 from src.core.domain.repositories.vector_respository import VectorRepository
 from src.core.domain.services.embedding_service import EmbeddingService
 from src.core.infrastructure.services.embedding.openai_embedding_service import OpenAIEmbeddingService 
-from src.core.infrastructure.repositories.vector.qdrant_vector_repository import QdrantVectorStore
+from src.core.infrastructure.repositories.vector.qdrant_vector_repository import QdrantVectorStore, get_qdrant_client
 from src.core.domain.repositories.file_repository import FileRepository
-from  src.core.infrastructure.repositories.file.s3_file_repository import S3FileRepository
+from  src.core.infrastructure.repositories.file.s3_file_repository import S3FileRepository, get_s3_client
 from src.core.domain.repositories.data_repository import DataRepository
 
 from src.modules.documents.application.documents_service import DocumentsService
@@ -32,29 +32,20 @@ def get_embedding_service() -> EmbeddingService:
         api_key=os.getenv("OPENAI_API_KEY")
     )
 
-def get_file_repository() -> FileRepository:
-    s3_client = boto3.client(
-        's3',
-        aws_access_key_id=os.getenv('AWS_ACCESS_KEY_ID'),
-        aws_secret_access_key=os.getenv('AWS_SECRET_ACCESS_KEY'),
-        region_name=os.getenv('AWS_REGION', 'us-east-1')
-    )
-
-    bucket_name = os.getenv('AWS_BUCKET_NAME')
-    
+def get_file_repository(
+    client = Depends(get_s3_client)
+) -> FileRepository:    
     return S3FileRepository(
-        client=s3_client,
-        bucket_name=bucket_name
+        client=client,
+        bucket_name=os.getenv('AWS_BUCKET_NAME')
     )
 
 
-def get_vector_repository() -> VectorRepository:
-    from qdrant_client import QdrantClient
-    qdrant_client = QdrantClient(
-        url=os.getenv("QDRANT_URL"),
-        api_key=os.getenv("QDRANT_API_KEY")
-    )
-    return QdrantVectorStore(qdrant_client)
+def get_vector_repository(
+    client = Depends(get_qdrant_client)
+) -> VectorRepository:
+    
+    return QdrantVectorStore(client)
 
 
 def get_documents_repository() -> DataRepository:
