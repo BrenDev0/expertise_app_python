@@ -34,8 +34,12 @@ class UsersService:
     
     @service_error_handler(module=__MODULE)
     def update(self, user_id: UUID, changes: Union[UserUpdate, VerifiedUserUpdate, InternalUserUpdate]) -> User:
-        processed_changes = self.__update_user_use_case.execute(changes=changes)
-        return self.__repository.update(key="user_id", value=user_id, changes=processed_changes)
+        if not isinstance(changes, InternalUserUpdate):
+            processed_changes = self.__update_user_use_case.execute(changes=changes)
+            return self.__repository.update(key="user_id", value=user_id, changes=processed_changes)
+
+        else: 
+            return self.__repository.update(key="user_id", value=user_id, changes=changes.model_dump())
     
     @service_error_handler(module=__MODULE)
     def delete(self, user_id: UUID) -> User | None:
