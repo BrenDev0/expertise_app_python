@@ -1,4 +1,4 @@
-from typing import Dict, Any
+from typing import Dict, Any, Union
 from src.modules.users.domain.models import UserUpdate, VerifiedUserUpdate
 from src.core.services.encryption_service import EncryptionService
 from src.core.services.hashing_service import HashingService
@@ -12,7 +12,7 @@ class UpdateUserUseCase:
         self.__encryption_service = encryption_service
         self.__hashing_service = hashing_service
 
-    def execute(self, changes: UserUpdate | VerifiedUserUpdate) -> Dict[str, Any]:
+    def execute(self, changes: Union[UserUpdate, VerifiedUserUpdate]) -> Dict[str, Any]:
         """
         Business rule: Update user data with proper encryption and hashing
         """
