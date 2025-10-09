@@ -1,8 +1,8 @@
 from uuid import UUID
-from typing import List
+from typing import List, Union
 
 from src.modules.users.domain.entities import User
-from src.modules.users.domain.models import UserCreate, UserUpdate, VerifiedUserUpdate
+from src.modules.users.domain.models import UserCreate, UserUpdate, VerifiedUserUpdate, InternalUserUpdate
 from src.modules.users.domain.users_repository import UsersRepository
 from src.modules.users.application.use_cases.create_user import CreateUserUseCase
 from src.modules.users.application.use_cases.update_user import UpdateUserUseCase
@@ -29,16 +29,16 @@ class UsersService:
         return self.__repository.create(data=new_user)
     
     @service_error_handler(module=__MODULE)
-    def resource(self, key: str,  value: UUID | str) -> User:
+    def resource(self, key: str,  value: UUID | str) -> User | None:
         return self.__repository.get_one(key=key, value=value)
     
     @service_error_handler(module=__MODULE)
-    def update(self, user_id: UUID, changes: UserUpdate | VerifiedUserUpdate) -> User:
+    def update(self, user_id: UUID, changes: Union[UserUpdate, VerifiedUserUpdate, InternalUserUpdate]) -> User:
         processed_changes = self.__update_user_use_case.execute(changes=changes)
         return self.__repository.update(key="user_id", value=user_id, changes=processed_changes)
     
     @service_error_handler(module=__MODULE)
-    def delete(self, user_id: UUID) -> User| None:
+    def delete(self, user_id: UUID) -> User | None:
         return self.__repository.delete(key="user_id", value=user_id)
     
     

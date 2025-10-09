@@ -26,7 +26,6 @@ dependencies = [
     "pytest-asyncio>=1.1.0",
     "qdrant-client>=1.15.1",
     "redis>=4.2.0",
-    "sentence-transformers>=5.1.1",
     "sqlalchemy>=2.0.43",
     "types-boto3[essential]>=1.40.15",
 ]
