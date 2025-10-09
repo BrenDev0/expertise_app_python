@@ -1,16 +1,16 @@
 from fastapi import APIRouter, Depends, Body, Request
 
 from src.core.domain.models.http_responses import CommonHttpResponse, ResponseWithToken
-from src.core.middleware.middleware_service import security
-from src.core.middleware.auth_middleware import auth_middleware
-from src.core.middleware.verification_middleware import verification_middleware
-from src.core.middleware.hmac_verification import verify_hmac
+from src.core.interface.middleware.middleware_service import security
+from src.core.interface.middleware.auth_middleware import auth_middleware
+from src.core.interface.middleware.verification_middleware import verification_middleware
+from src.core.interface.middleware.hmac_verification import verify_hmac
 
 from src.modules.users.domain.models import UserCreate, UserPublic, UserLogin, VerifyEmail, UserUpdate, VerifiedUserUpdate
 from src.modules.users.interface.users_controller import UsersController
 from src.modules.users.interface.users_dependencies import get_users_controller
-
-
+from src.modules.employees.application.employees_service import EmployeesService
+from src.modules.employees.interface.employees_dependencies import get_employees_service
 
 router = APIRouter(
     prefix="/users",
@@ -145,6 +145,7 @@ def secure_delete(
 @router.post("/login", status_code=200, response_model=ResponseWithToken)
 def login(
     data: UserLogin = Body(...),
+    employees_service: EmployeesService = Depends(get_employees_service),
     controller: UsersController = Depends(get_users_controller)
 ):
     """
@@ -153,7 +154,8 @@ def login(
     This endpoint retruns a valid webtoken needed for all requests to secure routes.
     """
     return controller.login(
-        data=data
+        data=data,
+        employees_service=employees_service
     )
 
 

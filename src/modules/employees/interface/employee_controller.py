@@ -5,17 +5,17 @@ from fastapi import Request
 from src.core.domain.models.http_responses import CommonHttpResponse, ResponseWithToken
 from src.core.services.encryption_service import EncryptionService
 from src.core.services.webtoken_service import WebTokenService
+from src.core.services.request_validation_service import RequestValidationService
 
 from src.modules.employees.domain.employees_models import EmployeeCreate, EmployeeUpdate, EmployeePublic, EmployeeUser
 from src.modules.employees.domain.entities import Employee
 from src.modules.employees.application.employees_service import EmployeesService
-from src.modules.users.application.users_service import UsersService
 from src.modules.invites.application.invites_service import InvitesService
-from src.modules.users.domain.entities import User
-from src.modules.companies.domain.enitities import Company
 from src.modules.invites.domain.entities import Invite
+from src.modules.users.domain.entities import User
+from src.modules.users.application.users_service import UsersService
+from src.modules.companies.domain.enitities import Company
 
-from src.core.services.request_validation_service import RequestValidationService
 
 class EmployeesController:
     def __init__(self, 
@@ -112,7 +112,7 @@ class EmployeesController:
         req: Request,
         data: EmployeeUpdate,
     ) -> EmployeePublic:
-        company: Company = self.__http_service.request_validation_service.verify_company_in_request_state(req=req,)
+        company: Company = req.state.company
 
         employee_resource: Employee = self.__employees_service.resource(
             key="employee_id",
@@ -159,6 +159,7 @@ class EmployeesController:
         )
 
     def __to_public(self, data: Employee) -> EmployeePublic:
+        print(data.model_dump())
         user_public = EmployeeUser(
             user_id=str(data.user.user_id),
             name=self.__encryption_service.decrypt(data.user.name),

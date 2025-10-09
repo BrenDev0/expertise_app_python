@@ -4,15 +4,13 @@ from fastapi import APIRouter, Depends, Request, Body
 
 from src.modules.agents.domain.models import AgentPublic
 from src.modules.agents.domain.models import AgentAccessCreate
-from src.core.middleware.middleware_service import security
-from src.core.middleware.auth_middleware import auth_middleware
+from src.core.interface.middleware.middleware_service import security
+from src.core.interface.middleware.auth_middleware import auth_middleware
 from src.modules.agents.interface.agents_controller import AgentsController
 
-
-
-from src.core.middleware.hmac_verification import verify_hmac
-from src.core.middleware.permissions import is_manager
-from src.core.middleware.permissions import token_is_company_stamped
+from src.core.interface.middleware.hmac_verification import verify_hmac
+from src.core.interface.middleware.permissions import is_manager
+from src.core.interface.middleware.permissions import token_is_company_stamped
 
 from src.modules.employees.application.employees_service import EmployeesService
 from src.modules.employees.interface.employees_dependencies import get_employees_service

@@ -10,4 +10,4 @@ class Company(BaseModel):
     company_location: str
     company_subscription: str = "Free"
     s3_path: Optional[str] = None
-    created_at: datetime
+    created_at: Optional[datetime] = None

@@ -1,14 +1,12 @@
 from fastapi import Request
-
 from sqlalchemy.orm import Session
 from typing import List
 from uuid import UUID
 
-
-from src.modules.chats.domain.chats_models import Chat, ChatPublic
+from src.modules.chats.domain.entities import Chat
 from src.modules.users.domain.entities import User
 from src.modules.chats.application.chats_service import ChatsService
-from src.modules.chats.domain.chats_models import  Chat, ChatCreate, ChatUpdate
+from src.modules.chats.domain.chats_models import ChatCreate, ChatUpdate, ChatPublic
 from src.core.domain.models.http_responses import CommonHttpResponse
 
 from src.core.services.request_validation_service import RequestValidationService

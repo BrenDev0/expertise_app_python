@@ -1,14 +1,14 @@
 from fastapi import APIRouter, Depends, Body, Request
 from typing import List
-from src.core.middleware.auth_middleware import auth_middleware
+from uuid import UUID
 
+from src.core.domain.models.http_responses import CommonHttpResponse
+from src.core.interface.middleware.middleware_service import security
+from src.core.interface.middleware.hmac_verification import verify_hmac
+from src.core.interface.middleware.auth_middleware import auth_middleware
 
 from src.modules.chats.interface.chats_controller import ChatsController
-from src.modules.chats.domain.chats_models import ChatPublic,  ChatUpdate, ChatCreate
-from src.core.domain.models.http_responses import CommonHttpResponse
-from src.core.middleware.middleware_service import security
-from src.core.middleware.hmac_verification import verify_hmac
-from uuid import UUID
+from src.modules.chats.domain.chats_models import ChatPublic, ChatUpdate, ChatCreate
 from src.modules.chats.interface.chats_dependencies import get_chats_controller
 
 

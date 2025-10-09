@@ -3,22 +3,33 @@ from  fastapi import Request, HTTPException
 from src.core.domain.models.http_responses import CommonHttpResponse, ResponseWithToken
 from src.core.dependencies.container import Container
 from src.core.services.email_service import EmailService
+from src.core.services.encryption_service import EncryptionService
+from src.core.services.webtoken_service import WebTokenService
+from src.core.services.hashing_service import HashingService
+from src.core.services.request_validation_service import RequestValidationService
+from src.core.domain.models.errors import IncorrectPassword
 
 from src.modules.users.application.users_service import UsersService
 from src.modules.users.domain.entities import User
 from src.modules.users.domain.models import UserPublic,UserCreate, UserLogin, VerifyEmail, UserLogin, UserUpdate, VerifiedUserUpdate
 from src.modules.users.application.use_cases.delete_user_documents import DeleteUserDocuments
-from src.core.services.request_validation_service import RequestValidationService
 from src.modules.employees.application.employees_service import EmployeesService
+
 
 class UsersController:
     def __init__(
         self, 
         users_service: UsersService,
-        delete_user_documents: DeleteUserDocuments
+        delete_user_documents: DeleteUserDocuments,
+        encryption_service: EncryptionService,
+        hashing_service: HashingService,
+        web_token_service: WebTokenService
     ):
         self.__delete_user_documents = delete_user_documents
         self.__users_service = users_service
+        self.__encryption_service = encryption_service
+        self.__hashing_service = hashing_service
+        self.__web_token_service = web_token_service
 
     def verify_email(
         self,
@@ -36,7 +47,7 @@ class UsersController:
             
             token_payload["user_id"] = str(user.user_id)
 
-        hashed_email = self.__http_service.hashing_service.hash_for_search(data.email)
+        hashed_email = self.__hashing_service.hash_for_search(data.email)
         email_type = "NEW" if not is_update else "UPDATE"
         user_exists = self.__users_service.resource(key="email_hash", value=hashed_email)
 
@@ -49,7 +60,7 @@ class UsersController:
 
         token_payload["verification_code"] = verification_code
 
-        token = self.__http_service.webtoken_service.generate_token(token_payload, "15m")
+        token = self.__web_token_service.generate_token(token_payload, "15m")
 
        
         return ResponseWithToken(
@@ -62,7 +73,7 @@ class UsersController:
         req: Request,
         data: VerifyEmail,
     ) -> ResponseWithToken:
-        email_hash = self.__http_service.hashing_service.hash_for_search(data.email)
+        email_hash = self.__hashing_service.hash_for_search(data.email)
 
         user_exists = self.__users_service.resource(
             key="email_hash",
@@ -77,7 +88,7 @@ class UsersController:
         email_service: EmailService = Container.resolve("email_service")
         verification_code = email_service.handle_request(email=data.email, type_="RECOVERY")
 
-        token = self.__http_service.webtoken_service.generate_token({
+        token = self.__web_token_service.generate_token({
             "verification_code": verification_code,
             "user_id": str(user_exists.user_id)
         }, "15m")
@@ -98,7 +109,7 @@ class UsersController:
 
         new_user = self.__users_service.create(data=data, is_admin=True)
 
-        token = self.__http_service.webtoken_service.generate_token({
+        token = self.__web_token_service.generate_token({
             "user_id": str(new_user.user_id)
         }, "7d")
 
@@ -130,7 +141,7 @@ class UsersController:
         if not user or data.code != verification_code: 
             raise HTTPException(status_code=403, detail="Unauthorized")
 
-        requested_same_password = self.__http_service.hashing_service.compare_password(data.password, user.password, throw_error=False)
+        requested_same_password = self.__hashing_service.compare_password(data.password, user.password, throw_error=False)
         if requested_same_password:
             raise HTTPException(status_code=400, detail="New password must not match current password")
         
@@ -151,9 +162,13 @@ class UsersController:
             if not data.old_password:
                 raise HTTPException(status_code=400, detail="Previous password required to update password")
             
-            self.__http_service.hashing_service.compare_password(data.old_password, user.password)
+            try:
+                self.__hashing_service.compare_password(data.old_password, user.password)
+                
+            except IncorrectPassword as e:
+                raise HTTPException(status_code=401, detail=str(e))
 
-            requested_same_password = self.__http_service.hashing_service.compare_password(data.password, user.password, throw_error=False)
+            requested_same_password = self.__hashing_service.compare_password(data.password, user.password, throw_error=False)
             if requested_same_password:
                 raise HTTPException(status_code=400, detail="New password must not match current password")
         
@@ -185,7 +200,7 @@ class UsersController:
         data: UserLogin,
         employees_service: EmployeesService
     ) -> ResponseWithToken:
-        hashed_email = self.__http_service.hashing_service.hash_for_search(data=data.email)
+        hashed_email = self.__hashing_service.hash_for_search(data=data.email)
 
         user = self.__users_service.resource(
             key="email_hash",
@@ -197,12 +212,14 @@ class UsersController:
             not_found_message="Incorrect email or password"
         )
 
-        self.__http_service.hashing_service.compare_password(
-            password=data.password, 
-            hashed_password=user.password,
-            status_code=400,
-            detail="Incorrect email or password"
-        )
+        try:
+            self.__hashing_service.compare_password(
+                password=data.password, 
+                hashed_password=user.password,
+                detail="Incorrect email or password"
+            )
+        except IncorrectPassword as e:
+            raise HTTPException(status_code=401, detail=str(e))
 
         token_payload = {
             "user_id": str(user.user_id)
@@ -221,7 +238,7 @@ class UsersController:
 
             token_payload["company_id"] = str(employee_resource.company_id)
 
-        token = self.__http_service.webtoken_service.generate_token(token_payload, "7d")
+        token = self.__web_token_service.generate_token(token_payload, "7d")
 
         response = ResponseWithToken(
             detail="Login Successful",
@@ -236,9 +253,9 @@ class UsersController:
 
     def __to_public(self, data: User) ->  UserPublic:
         data.user_id = str(data.user_id)
-        data.name = self.__http_service.encryption_service.decrypt(data.name)
-        data.email = self.__http_service.encryption_service.decrypt(data.email)
-        data.phone = self.__http_service.encryption_service.decrypt(data.phone)
+        data.name = self.__encryption_service.decrypt(data.name)
+        data.email = self.__encryption_service.decrypt(data.email)
+        data.phone = self.__encryption_service.decrypt(data.phone)
 
         user = UserPublic.model_validate(data, from_attributes=True)
         return user

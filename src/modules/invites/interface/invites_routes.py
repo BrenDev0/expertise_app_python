@@ -3,9 +3,9 @@ from uuid import UUID
 from typing import List
 
 from src.core.domain.models.http_responses import CommonHttpResponse
-from src.core.middleware.middleware_service import security
-from src.core.middleware.permissions import is_owner, token_is_company_stamped
-from src.core.middleware.hmac_verification import verify_hmac
+from src.core.interface.middleware.middleware_service import security
+from src.core.interface.middleware.permissions import is_owner, token_is_company_stamped
+from src.core.interface.middleware.hmac_verification import verify_hmac
 
 from src.modules.invites.interface.invites_controller import InvitesController
 from src.modules.invites.domain.invites_models import InviteCreate, InvitePublic, InviteUpdate

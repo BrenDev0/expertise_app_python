@@ -1,31 +1,38 @@
-from src.modules.chats.application.messages_service import MessagesService
-from src.modules.users.domain.entities import User
-from src.modules.chats.domain.messages_models import Message, MessagePublic, MessageCreate
-from src.modules.chats.domain.chats_models import  Chat
-from fastapi import Request
-from src.core.domain.models.http_responses import CommonHttpResponse
-from src.core.services.http_service import HttpService
-from sqlalchemy.orm import Session
 from uuid import UUID
 from typing import List
+from fastapi import Request
+import asyncio
+
+from src.core.services.request_validation_service import RequestValidationService
+from src.core.domain.models.http_responses import CommonHttpResponse
 from src.core.dependencies.container import Container
+
+from src.modules.chats.application.messages_service import MessagesService
+from src.modules.chats.domain.messages_models import MessagePublic, MessageCreate
+from src.modules.chats.domain.entities import Chat, Message
+from src.modules.users.domain.entities import User
 from src.modules.state.application.state_service import StateService
 from src.modules.chats.application.chats_service import ChatsService
-import asyncio
-from src.core.services.request_validation_service import RequestValidationService
+
+
+
 
 class MessagesController:
-    def __init__(self, messages_service: MessagesService):
+    def __init__(
+        self, 
+        messages_service: MessagesService,
+        chats_service: ChatsService
+    ):
         self.__messages_service = messages_service
+        self.__chats_service = chats_service
  
     async def create_request(
         self,
         chat_id: UUID,
         data: MessageCreate,
-        chats_service: ChatsService,
-        db: Session
+        state_service: StateService
     ) -> CommonHttpResponse:
-        chat_resource: Chat = chats_service.resource(
+        chat_resource = self.__chats_service.resource(
             key="chat_id",
             value=chat_id
         )
@@ -39,7 +46,6 @@ class MessagesController:
             RequestValidationService.verifiy_ownership(chat_resource.user_id, data.sender)
         
         message = self.__messages_service.create(
-            db=db, 
             chat_id=chat_resource.chat_id, 
             sender_id=data.sender, 
             message_type=data.message_type, 
@@ -47,9 +53,7 @@ class MessagesController:
             json_data=data.json_data
         )
 
-
         ## handle state if exists
-        state_service: StateService = Container.resolve("state_service")
         asyncio.create_task(
             state_service.update_chat_state_history(
                 chat_resource.chat_id, 
@@ -65,13 +69,11 @@ class MessagesController:
     def collection_request(
         self, 
         chat_id: UUID,
-        req: Request,
-        chats_service: ChatsService, 
-        db: Session
+        req: Request
     ) -> List[MessagePublic] :
         user: User = req.state.user
 
-        chat_resource: Chat = chats_service.resource(
+        chat_resource = self.__chats_service.resource(
             key="chat_id",
             value=chat_id
         )
@@ -83,20 +85,18 @@ class MessagesController:
     
         RequestValidationService.verifiy_ownership(user.user_id, chat_resource.user_id)
         
-        data = self.__messages_service.collection(db=db, key="chat_id", value=chat_resource.chat_id)
+        data = self.__messages_service.collection(key="chat_id", value=chat_resource.chat_id)
 
         return [self.__to_public(message) for message in data]
     
     def search_request(
         self,
         req: Request,
-        query: str,
-        db: Session
+        query: str
     ) -> List[MessagePublic]:
         user: User = req.state.user
 
         data = self.__messages_service.query(
-            db=db,
             content=query,
             user_id=user.user_id
         )

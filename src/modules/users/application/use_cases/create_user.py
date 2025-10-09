@@ -10,7 +10,7 @@ class CreateUserUseCase:
         encryption_service: EncryptionService,
         hashing_service: HashingService
     ):
-        self.__encryption_service = encryption_service,
+        self.__encryption_service = encryption_service
         self.__hashing_service = hashing_service
 
     def execute(self, data: UserCreate, is_admin: bool = False) -> User:

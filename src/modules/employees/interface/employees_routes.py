@@ -2,19 +2,18 @@ from fastapi import Request, Depends, APIRouter, Body
 from uuid import UUID
 from typing import List
 
-from src.core.middleware.verification_middleware import verification_middleware
-from src.core.middleware.middleware_service import security
+from src.core.interface.middleware.verification_middleware import verification_middleware
+from src.core.interface.middleware.middleware_service import security
+from src.core.interface.middleware.hmac_verification import verify_hmac
+from src.core.interface.middleware.permissions import is_manager
+from src.core.interface.middleware.permissions import token_is_company_stamped
 from src.core.domain.models.http_responses import CommonHttpResponse, ResponseWithToken
-from src.core.middleware.hmac_verification import verify_hmac
-from src.core.middleware.permissions import is_manager
-from src.core.middleware.hmac_verification import verify_hmac
-from src.core.middleware.permissions import is_manager
-from src.core.middleware.permissions import token_is_company_stamped
+from src.core.dependencies.services import get_web_token_service
+from src.core.services.webtoken_service import WebTokenService
 
 from src.modules.employees.domain.employees_models import EmployeePublic, EmployeeCreate, EmployeeUpdate
 from src.modules.employees.interface.employee_controller import EmployeesController
 from src.modules.employees.interface.employees_dependencies import get_employees_controller
-
 
 router = APIRouter(
     prefix="/employees",
@@ -27,6 +26,7 @@ def verified_create(
     req: Request,
     data: EmployeeCreate,
     _: None = Depends(verification_middleware),
+    web_token_service: WebTokenService = Depends(get_web_token_service),
     controller: EmployeesController = Depends(get_employees_controller)
 ): 
     """
@@ -38,7 +38,8 @@ def verified_create(
     """
     return controller.create_request(
         req=req,
-        data=data
+        data=data,
+        web_token_service=web_token_service
     )
 
 @router.get("/secure/resource", status_code=200, response_model=EmployeePublic)

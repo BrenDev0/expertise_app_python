@@ -2,9 +2,7 @@ from fastapi import Request
 from uuid import UUID
 
 from src.core.domain.models.http_responses import CommonHttpResponse, ResponseWithToken
-from src.core.dependencies.container import Container
 
-from src.modules.companies.application.use_cases.delete_company_documents import DeleteCompanyDocuments
 from src.modules.users.domain.entities import User
 from src.modules.companies.domain.companies_models import CompanyCreate, CompanyPublic, CompanyUpdate
 from src.modules.companies.application.companies_service import CompaniesService
@@ -16,12 +14,9 @@ from src.core.services.webtoken_service import WebTokenService
 class CompaniesController:
     def __init__(
         self, 
-        companies_service: CompaniesService,
-        delete_company_documents: DeleteCompanyDocuments
+        companies_service: CompaniesService
     ):
         self.__companies_service = companies_service
-        self.__delete_company_documents = delete_company_documents
-
 
     def create_request(
         self,
@@ -98,12 +93,7 @@ class CompaniesController:
 
         RequestValidationService.verifiy_ownership(user.user_id, company_resource.user_id)
 
-        ## delete company documents from all cloud providers and db
-        self.__delete_company_documents.execute(
-            user=user,
-            company_id=company_resource.company_id
-        )
-    
+        ## delete company documents from all cloud providers, employees and company from db 
         self.__companies_service.delete(company_id=company_resource.company_id)
      
         return CommonHttpResponse(

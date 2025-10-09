@@ -1,6 +1,6 @@
 from fastapi import Request, Depends, HTTPException
 
-from src.core.middleware.middleware_service import MiddlewareService
+from src.core.interface.middleware.middleware_service import MiddlewareService
 
 from src.modules.companies.domain.enitities import Company
 from src.modules.companies.application.companies_service import CompaniesService

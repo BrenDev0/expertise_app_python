@@ -19,7 +19,7 @@ class DeleteUserDocuments():
         self.__companies_service = companies_service
         self.__vector_respository = vector_repository
         self.__file_repository = file_repository
-        self.__documents_service = documents_service,
+        self.__documents_service = documents_service
         self.__tenant_data_service = tenent_data_service
 
     def execute(

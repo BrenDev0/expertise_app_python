@@ -20,12 +20,10 @@ class CreateInviteRequest():
         email_service: EmailService
     ):
         self.__hashing_service = hashing_service
-        self.__web_token_service = web_token_service,
-        self.__users_service = users_service,
-        self.__invites_service = invites_service,
+        self.__web_token_service = web_token_service
+        self.__users_service = users_service
+        self.__invites_service = invites_service
         self.__email_service = email_service
-
-
 
     def exectute(
         self,

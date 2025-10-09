@@ -2,16 +2,17 @@ from fastapi import APIRouter, Depends, Request, Body
 from typing import List
 from uuid import UUID
 
-from src.core.middleware.auth_middleware import auth_middleware
-from src.core.middleware.hmac_verification import verify_hmac
+from src.core.interface.middleware.auth_middleware import auth_middleware
+from src.core.interface.middleware.hmac_verification import verify_hmac
 from src.core.domain.models.http_responses import CommonHttpResponse
-from src.core.middleware.middleware_service import security
+from src.core.interface.middleware.middleware_service import security
 
 from src.modules.chats.interface.messages_controller import MessagesController
 from src.modules.chats.domain.messages_models import MessagePublic, MessageCreate
 from src.modules.chats.interface.chats_dependencies import get_chats_service
 from src.modules.chats.interface.messages_dependencies import get_messages_controller
-from src.modules.chats.application.chats_service import ChatsService
+from src.modules.state.interface.state_dependencies import get_state_service
+from src.modules.state.application.state_service import StateService
 
 router = APIRouter(
     prefix="/messages",
@@ -23,7 +24,7 @@ async def internal_create(
     chat_id: UUID,
     data: MessageCreate = Body(...),
     _: None = Depends(verify_hmac), # server to server verification
-    chats_service: ChatsService = Depends(get_chats_service),
+    state_service: StateService = Depends(get_state_service),
     controller: MessagesController = Depends(get_messages_controller)
 ):
     """
@@ -32,7 +33,7 @@ async def internal_create(
     return await controller.create_request(
         chat_id=chat_id, 
         data=data, 
-        chats_service=chats_service
+        state_service=state_service
     )
 
 
@@ -41,7 +42,6 @@ def secure_collection(
     chat_id: UUID,
     req: Request,
     _=Depends(auth_middleware), 
-    chats_service: ChatsService = Depends(get_chats_service),
     controller: MessagesController = Depends(get_messages_controller)
 ):
     """
@@ -51,8 +51,7 @@ def secure_collection(
     """
     return controller.collection_request(
         req=req,  
-        chat_id=chat_id,
-        chats_service=chats_service
+        chat_id=chat_id
     )
 
 @router.get("/secure/search", status_code=200, response_model=List[MessagePublic], dependencies=[Depends(security)])

@@ -1,23 +1,18 @@
-from fastapi import APIRouter, Request, Body, HTTPException, Depends
+from fastapi import APIRouter, Request, Body, Depends
 from uuid import UUID
 from typing import List
 
+from src.core.dependencies.services import get_web_token_service
+from src.core.services.webtoken_service import WebTokenService
+from src.core.interface.middleware.hmac_verification import verify_hmac
+from src.core.interface.middleware.permissions import token_is_company_stamped
+from src.core.interface.middleware.permissions import is_owner
+from src.core.interface.middleware.middleware_service import security
+from src.core.domain.models.http_responses import CommonHttpResponse, ResponseWithToken
 
 from src.modules.companies.interface.companies_controller import CompaniesController
 from src.modules.companies.domain.companies_models import CompanyPublic, CompanyCreate, CompanyUpdate
-from src.core.domain.models.http_responses import CommonHttpResponse, ResponseWithToken
 from src.modules.companies.interface.companies_dependencies import get_companies_controller
-from src.core.dependencies.services import get_web_token_service
-from src.core.services.webtoken_service import WebTokenService
-
-from src.core.middleware.hmac_verification import verify_hmac
-from src.core.middleware.auth_middleware import auth_middleware
-from src.core.middleware.permissions import token_is_company_stamped
-from src.core.middleware.permissions import is_owner
-from src.core.middleware.middleware_service import security
-
-
-
 
 router = APIRouter(
     prefix="/companies",

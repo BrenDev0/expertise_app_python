@@ -4,7 +4,6 @@ from sqlalchemy import Column, String, DateTime, func, ForeignKey
 from sqlalchemy.orm import relationship
 from sqlalchemy.dialects.postgresql import UUID
 
-
 from src.modules.documents.domain.entities import Document
 from src.modules.companies.domain.enitities import Company
 from  src.modules.companies.infrastructure.sqlalchemy_companies_repository import SqlAlchemyCompany
@@ -23,7 +22,7 @@ class SqlAlchemyDocument(Base):
     url = Column(String, nullable=False)
     uploaded_at = Column(DateTime(timezone=True), nullable=False, server_default=func.now())
 
-    company = relationship("Company")
+    company = relationship("SqlAlchemyCompany")
 
 
 class SqlAlchemyDocumentsRepsoitory(SqlAlchemyDataRepository[Document, SqlAlchemyDocument]):
@@ -34,7 +33,7 @@ class SqlAlchemyDocumentsRepsoitory(SqlAlchemyDataRepository[Document, SqlAlchem
         return Document(
             document_id=model.document_id,
             company_id=model.company_id,
-            file_name=model.filename,
+            filename=model.filename,
             file_type=model.file_type,
             url=model.url,
             uploaded_at=model.uploaded_at,

@@ -1,5 +1,5 @@
-from sqlalchemy import String, Column, Boolean, ForeignKey, UniqueConstraint
-from sqlalchemy.orm import relationship
+from sqlalchemy import String, Column, Boolean, ForeignKey, UniqueConstraint, update
+from sqlalchemy.orm import relationship, joinedload
 from sqlalchemy.dialects.postgresql import UUID
 import uuid
 from typing import Optional
@@ -27,7 +27,7 @@ class SqlAlchemyEmployee(Base):
 
 class SqlAlchemyEmployeesRepository(SqlAlchemyDataRepository[Employee, SqlAlchemyEmployee]):
     def __init__(self):
-        super().__init__(Employee)
+        super().__init__(SqlAlchemyEmployee)
 
     def _to_entity(self, model: SqlAlchemyEmployee) -> Employee:
         return Employee(
@@ -56,3 +56,24 @@ class SqlAlchemyEmployeesRepository(SqlAlchemyDataRepository[Employee, SqlAlchem
     def _to_model(self, entity: Employee) -> SqlAlchemyEmployee:
         data = entity.model_dump(exclude={'agent'})
         return SqlAlchemyEmployee(**data)
+    
+    def update(self, key: str, value: str | uuid.UUID, changes: dict) -> Optional[Employee]:
+        stmt = update(self.model).where(getattr(self.model, key) == value).values(**changes).returning(*self.model.__table__.c)
+
+        with self._get_session() as db:
+            result = db.execute(stmt)
+            db.commit()
+            
+            updated_rows = result.fetchall()
+            
+            if not updated_rows:
+                return None
+            
+            employee_id = updated_rows[0]._mapping['employee_id']
+            
+            # Fetch the complete entity with relationships
+            updated_model = db.query(self.model).options(
+                joinedload(SqlAlchemyEmployee.user)
+            ).filter(self.model.employee_id == employee_id).first()
+            
+            return self._to_entity(updated_model) if updated_model else None

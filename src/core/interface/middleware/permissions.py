@@ -1,6 +1,6 @@
 from fastapi import HTTPException, Depends, Request
 from src.modules.users.domain.entities import User
-from src.core.middleware.auth_middleware import auth_middleware
+from src.core.interface.middleware.auth_middleware import auth_middleware
 
 from src.modules.employees.domain.entities import Employee
 from sqlalchemy.orm import Session
