@@ -19,6 +19,7 @@ class UserPublic(UsersConfig):
     email: EmailStr
     is_admin: bool
     created_at: datetime 
+    last_login: datetime
 
 class UserUpdate(UsersConfig):
     name: Optional[str] = None

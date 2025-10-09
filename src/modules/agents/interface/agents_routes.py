@@ -12,8 +12,6 @@ from src.core.interface.middleware.hmac_verification import verify_hmac
 from src.core.interface.middleware.permissions import is_manager
 from src.core.interface.middleware.permissions import token_is_company_stamped
 
-from src.modules.employees.application.employees_service import EmployeesService
-from src.modules.employees.interface.employees_dependencies import get_employees_service
 from src.modules.agents.interface.agents_dependencies import get_agents_controller
 
 router = APIRouter(
@@ -29,7 +27,6 @@ def secure_upsert_access(
     data: AgentAccessCreate = Body(...),
     _: None = Depends(is_manager),
     company: None = Depends(token_is_company_stamped),
-    employees_service: EmployeesService = Depends(get_employees_service),
     controller: AgentsController = Depends(get_agents_controller)
 ):
     """
@@ -41,8 +38,7 @@ def secure_upsert_access(
     return controller.add_access(
         employee_id=employee_id,
         req=req,
-        data=data,
-        employees_service=employees_service
+        data=data
     )
 
 @router.get("/secure/resource/{agent_id}", status_code=200, response_model=AgentPublic)
@@ -68,7 +64,6 @@ def acess_collection(
     req: Request,
     _: None = Depends(is_manager),
     company = Depends(token_is_company_stamped),
-    employees_service: EmployeesService = Depends(get_employees_service),
     controller: AgentsController = Depends(get_agents_controller)
 ):
     """
@@ -78,8 +73,7 @@ def acess_collection(
     """  
     return controller.agent_acccess_collection_request(
         employee_id=employee_id,
-        req=req,
-        employees_service=employees_service
+        req=req
     )
 
 
@@ -87,7 +81,6 @@ def acess_collection(
 def secure_collection(
     req: Request,
     _: None = Depends(auth_middleware),
-    employees_service: EmployeesService = Depends(get_employees_service),
     controller: AgentsController = Depends(get_agents_controller)
 ):
     """
@@ -96,8 +89,7 @@ def secure_collection(
     This endpoint returns all agents the current user has access to.
     """
     return controller.collection_request(
-        req=req,
-        employees_service=employees_service
+        req=req
     )
 
 @router.get("/secure/read", status_code=200, response_model=List[AgentPublic])

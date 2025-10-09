@@ -12,12 +12,12 @@ class DeleteDocument():
         vector_repository: VectorRepository,
         file_repository: FileRepository,
         documents_service: DocumentsService,
-        tenent_data_service: TenantDataService
+        tenant_data_service: TenantDataService
     ):
-        self.__vector_respository = vector_repository
+        self.__vector_repository = vector_repository
         self.__file_repository = file_repository
-        self.__documents_service = documents_service,
-        self.__tenant_data_service = tenent_data_service
+        self.__documents_service = documents_service
+        self.__tenant_data_service = tenant_data_service
 
     def execute(
         self,
@@ -26,7 +26,7 @@ class DeleteDocument():
         user_id: UUID,
         filename: str,
     ):
-        
+            
         self.__file_repository.delete_document_data(
             user_id=user_id, 
             company_id=company_id, 
@@ -38,11 +38,17 @@ class DeleteDocument():
                 document_id=document_id
             )
         else:
-            self.__vector_respository.delete_document_data(
-                user_id=str(user_id),
+            namespace = f"expertise_user_{user_id}_company_{company_id}"
+            
+            result = self.__vector_repository.delete_embeddings(
+                namespace=namespace,
+                document_id=str(document_id),
+                # Additional filters for safety
                 company_id=str(company_id),
-                filename=filename
+                user_id=str(user_id)
             )
+            
+            print(f"Vector deletion result: {result}")
 
         self.__documents_service.delete(
             key="document_id",

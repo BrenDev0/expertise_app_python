@@ -12,3 +12,4 @@ class User(BaseModel):
     password: str
     is_admin: bool = False
     created_at: Optional[datetime] = None
+    last_login: Optional[datetime] = None

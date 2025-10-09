@@ -10,6 +10,8 @@ from src.core.services.encryption_service import EncryptionService
 
 
 from src.core.domain.repositories.vector_respository import VectorRepository
+from src.core.domain.services.embedding_service import EmbeddingService
+from src.core.infrastructure.services.embedding.openai_embedding_service import OpenAIEmbeddingService 
 from src.core.infrastructure.repositories.vector.qdrant_vector_repository import QdrantVectorStore
 from src.core.domain.repositories.file_repository import FileRepository
 from  src.core.infrastructure.repositories.file.s3_file_repository import S3FileRepository
@@ -21,8 +23,14 @@ from src.modules.documents.infrastructure.sqlalchemy_documents_repository import
 from src.modules.documents.infrastructure.sqlalchemy_tennent_tables_repository import SqlAlchemyTennentTableRepsoitory
 from src.modules.documents.domain.tenant_tables_repository import TenentTablesRepository
 from src.modules.documents.application.use_cases.delete_document import DeleteDocument
+from src.modules.documents.application.use_cases.upload_document import UploadDocument
 
 
+
+def get_embedding_service() -> EmbeddingService:
+    return OpenAIEmbeddingService(
+        api_key=os.getenv("OPENAI_API_KEY")
+    )
 
 def get_file_repository() -> FileRepository:
     s3_client = boto3.client(
@@ -39,6 +47,7 @@ def get_file_repository() -> FileRepository:
         bucket_name=bucket_name
     )
 
+
 def get_vector_repository() -> VectorRepository:
     from qdrant_client import QdrantClient
     qdrant_client = QdrantClient(
@@ -47,11 +56,16 @@ def get_vector_repository() -> VectorRepository:
     )
     return QdrantVectorStore(qdrant_client)
 
+
 def get_documents_repository() -> DataRepository:
     return SqlAlchemyDocumentsRepsoitory()
 
+
+
 def get_tenant_table_repository() -> TenentTablesRepository:
     return SqlAlchemyTennentTableRepsoitory()
+
+
 
 def get_documents_service(
     repository: DataRepository = Depends(get_documents_repository),
@@ -61,6 +75,7 @@ def get_documents_service(
         respository=repository,
         encryption_service=encryption_service
     )
+
 
 def get_tenant_data_service(
     repository: TenentTablesRepository = Depends(get_tenant_table_repository)
@@ -80,7 +95,24 @@ def get_delete_document_use_case(
         vector_repository=vector_repository,
         file_repository=file_repository,
         documents_service=documents_service,
-        tenent_data_service=tenant_data_service
+        tenant_data_service=tenant_data_service
+    )
+
+
+
+def get_upload_document_use_case(
+    file_repository: FileRepository = Depends(get_file_repository),
+    vector_repository: VectorRepository = Depends(get_vector_repository),
+    embedding_service: EmbeddingService = Depends(get_embedding_service),
+    tenant_data_service: TenantDataService = Depends(get_tenant_data_service),
+    documents_service: DocumentsService = Depends(get_documents_service),
+) -> UploadDocument:
+    return UploadDocument(
+        vector_repository=vector_repository,
+        embedding_service=embedding_service,
+        file_repository=file_repository,
+        documents_service=documents_service,
+        tenant_data_service=tenant_data_service
     )
 
 

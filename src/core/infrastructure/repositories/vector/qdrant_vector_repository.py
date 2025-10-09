@@ -130,7 +130,7 @@ class QdrantVectorStore(VectorRepository):
             try:
                 self._client.create_payload_index(
                     collection_name=collection_name, 
-                    field_name="filename", 
+                    field_name="document_id", 
                     field_schema="keyword"
                 )
                 self._client.create_payload_index(

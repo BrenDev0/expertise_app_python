@@ -1,4 +1,4 @@
-from fastapi import APIRouter, UploadFile, Request, File,  Depends
+from fastapi import APIRouter, UploadFile, Request, File,  Depends, BackgroundTasks
 from uuid import UUID
 from typing import List
 
@@ -10,6 +10,8 @@ from src.core.interface.middleware.hmac_verification import verify_hmac
 from src.modules.documents.domain.documents_models import DocumentPublic
 from src.modules.documents.interface.documents_controller import DocumentsController
 from src.modules.documents.interface.documents_dependencies import get_documents_controller
+from src.modules.documents.application.use_cases.upload_document import UploadDocument
+from src.modules.documents.interface.documents_dependencies import get_upload_document_use_case
 
 
 
@@ -21,10 +23,12 @@ router = APIRouter(
 
 @router.post("/secure/upload", status_code=201, response_model=CommonHttpResponse)
 async def secure_upload(
+    background_tasks: BackgroundTasks,
     req: Request,
     file: UploadFile = File(...),
     _: None = Depends(is_owner),
     company = Depends(token_is_company_stamped),
+    upload_document_use_case: UploadDocument = Depends(get_upload_document_use_case),
     controller: DocumentsController = Depends(get_documents_controller)
 ):
     """
@@ -34,8 +38,10 @@ async def secure_upload(
     Only admin level users have access to this endpoint. 
     """
     return await controller.upload_request(
+        background_tasks=background_tasks,
         req=req,
-        file=file
+        file=file,
+        upload_document=upload_document_use_case
     )
 
 

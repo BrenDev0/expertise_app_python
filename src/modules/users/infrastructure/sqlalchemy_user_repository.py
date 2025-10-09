@@ -18,6 +18,7 @@ class SqlAlchemyUser(Base):
     password = Column(String, nullable=False)
     is_admin = Column(Boolean, nullable=False, default=False)
     created_at = Column(DateTime(timezone=True), nullable=False, server_default=func.now())
+    last_login = Column(DateTime(timezone=True), nullable=True, server_default=func.now())
 
 
 class SqlAlchemyUsersRepository(SqlAlchemyDataRepository[User, SqlAlchemyUser], UsersRepository):
@@ -33,7 +34,8 @@ class SqlAlchemyUsersRepository(SqlAlchemyDataRepository[User, SqlAlchemyUser], 
             email_hash=model.email_hash,
             password=model.password,
             is_admin=model.is_admin,
-            created_at=model.created_at
+            created_at=model.created_at,
+            last_login=model.last_login
         )
     
     def _to_model(self, entity: User) -> SqlAlchemyUser:

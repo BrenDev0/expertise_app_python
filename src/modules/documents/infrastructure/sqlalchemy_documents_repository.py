@@ -55,5 +55,5 @@ class SqlAlchemyDocumentsRepsoitory(SqlAlchemyDataRepository[Document, SqlAlchem
     
     
     def _to_model(self, entity: Document) -> SqlAlchemyDocument:
-        data = entity.model_dump(exclude={'document_id', 'uploaded_at'} if not entity.document_id else set())
+        data = entity.model_dump(exclude={'document_id', 'uploaded_at', 'company'} if not entity.document_id else set())
         return SqlAlchemyDocument(**data)
