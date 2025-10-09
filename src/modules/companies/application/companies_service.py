@@ -7,7 +7,7 @@ from src.core.utils.decorators.service_error_handler import service_error_handle
 from src.core.dependencies.container import Container
 
 from src.modules.users.application.users_service import UsersService
-from src.modules.employees.employees_service import EmployeesService
+from src.modules.employees.application.employees_service import EmployeesService
 from src.modules.companies.domain.companies_models import CompanyCreate, CompanyUpdate
 from src.modules.companies.domain.enitities import Company
 

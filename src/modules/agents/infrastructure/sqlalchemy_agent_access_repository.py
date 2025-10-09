@@ -8,8 +8,7 @@ from typing import List, Optional
 from src.modules.agents.domain.entities import AgentAccess, Agent
 from src.modules.agents.domain.agent_access_repository import AgentAccessRepository
 
-from src.core.infrastructure.repositories.data.sqlalchemy.entities import Base
-from src.core.infrastructure.repositories.data.sqlalchemy.sqlalchemy_data_repository import SqlAlchemyDataRepository
+from src.core.infrastructure.repositories.data.sqlalchemy_data_repository import SqlAlchemyDataRepository, Base
 
 
 class SqlAlchemyAgentAccess(Base):

@@ -11,21 +11,9 @@ from src.core.services.webtoken_service import WebTokenService
 from src.core.services.redis_service import RedisService
 import boto3
 import os
-from src.modules.documents.services.s3_service import S3Service
-from qdrant_client import QdrantClient
-from src.modules.documents.services.embeddings_service import EmbeddingService
-from src.modules.chats.chats_dependencies import configure_chats_dependencies
 
-from src.modules.invites.invites_dependencies import configure_invites_dependencies
-from src.modules.documents.documents_dependencies import configure_documents_dependencies
 
-from src.modules.interactions.interactions_dependencies import configure_interactions_dependencies
-from src.modules.state.state_dependencies  import configure_state_dependencies
 
-from src.modules.users.application.users_service import UsersService
-from src.modules.users.infrastructure.sqlalchemy_user_repository import SqlAlchemyUsersRepository
-from src.modules.users.application.use_cases.create_user import CreateUserUseCase
-from src.modules.users.application.use_cases.update_user import UpdateUserUseCase
 
 
 def configure_container():
@@ -34,14 +22,6 @@ def configure_container():
     # Independent #
     email_service = EmailService()
     Container.register("email_service", email_service)
-
-    qdrant_client = QdrantClient(
-        url=os.getenv("QDRANT_URL"),
-        api_key=os.getenv("QDRANT_API_KEY")
-    )
-
-    embeddings_service = EmbeddingService(client=qdrant_client)
-    Container.register("embeddings_service", embeddings_service)
 
     encryption_service = EncryptionService()
     Container.register("encryption_service", encryption_service)
@@ -96,32 +76,9 @@ def configure_container():
     ## Module # Must configure core dependencies above this line ##
 
     # single domain # 
-  
-    configure_chats_dependencies(
-        http_service=http_service
-    )
-
-    configure_documents_dependencies(
-        encrytption_service=encryption_service,
-        data_handler=data_handler,
-        s3_service=s3_service,
-        embeddings_service=embeddings_service  
-    )
-
-    configure_invites_dependencies(
-        http_service=http_service,
-        data_handler=data_handler,
-        email_service=email_service
-    )
-
-
-
     
     # multi domain # must configure single domain dependencies above this line #
    
-
-    configure_state_dependencies(redis_service=redis_service)
-
     ## multi server dependencies ##
-    configure_interactions_dependencies(http_service=http_service)
+
 

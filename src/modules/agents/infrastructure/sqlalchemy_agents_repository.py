@@ -1,10 +1,10 @@
 import uuid 
-from sqlalchemy import Column, String, DateTime, func, ForeignKey
+from sqlalchemy import Column, String
 from sqlalchemy.dialects.postgresql import UUID
 
 from src.modules.agents.domain.entities import Agent
-from src.core.infrastructure.repositories.data.sqlalchemy.entities import Base
-from src.core.infrastructure.repositories.data.sqlalchemy.sqlalchemy_data_repository import SqlAlchemyDataRepository
+
+from src.core.infrastructure.repositories.data.sqlalchemy_data_repository import SqlAlchemyDataRepository, Base
 
 
 class SqlAlchemyAgent(Base):
@@ -26,6 +26,7 @@ class SqlAlchemyAgentsRepsoitory(SqlAlchemyDataRepository[Agent, SqlAlchemyAgent
         return Agent(
             agent_id=model.agent_id,
             agent_name=model.agent_name,
+            agent_username=model.agent_username,
             profile_pic=model.profile_pic,
             endpoint=model.endpoint
         )

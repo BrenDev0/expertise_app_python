@@ -1,12 +1,12 @@
-from abc import ABC, abstractmethod
+from abc import abstractmethod
 from src.core.domain.repositories.data_repository import DataRepository
-from typing import List, TypeVar
+from typing import List
 from uuid import UUID
 
+from src.modules.users.domain.entities import User
 
-T = TypeVar('T')
 
-class UsersRepository(DataRepository[T]):
+class UsersRepository(DataRepository[User]):
     @abstractmethod
-    def bulk_delete(self, ids: List[UUID]) -> List[T] | None:
+    def bulk_delete(self, ids: List[UUID]) -> List[User] | None:
         raise NotImplementedError

@@ -10,12 +10,12 @@ from src.modules.agents.infrastructure.sqlalchemy_agents_repository import SqlAl
 from src.modules.agents.infrastructure.sqlalchemy_agent_access_repository import SqlAlchemyAgentAccessRepository
 
 from src.modules.agents.domain.agent_access_repository import AgentAccessRepository
-from src.modules.agents.domain.entities import Agent
+
 
 
 
 def get_agents_repository() -> DataRepository:
-    return SqlAlchemyAgentsRepsoitory(Agent)
+    return SqlAlchemyAgentsRepsoitory()
 
 def get_access_repository() -> AgentAccessRepository:
     return SqlAlchemyAgentAccessRepository()

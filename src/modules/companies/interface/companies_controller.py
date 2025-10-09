@@ -1,16 +1,14 @@
 from fastapi import Request
-from sqlalchemy.orm import Session
 from uuid import UUID
 
 from src.core.domain.models.http_responses import CommonHttpResponse, ResponseWithToken
 from src.core.dependencies.container import Container
 
-
+from src.modules.companies.application.use_cases.delete_company_documents import DeleteCompanyDocuments
 from src.modules.users.domain.entities import User
 from src.modules.companies.domain.companies_models import CompanyCreate, CompanyPublic, CompanyUpdate
 from src.modules.companies.application.companies_service import CompaniesService
 from src.modules.companies.domain.enitities import Company
-from src.modules.documents.document_manager import DocumentManager
 from src.core.services.request_validation_service import RequestValidationService
 from src.core.services.webtoken_service import WebTokenService
 
@@ -18,9 +16,11 @@ from src.core.services.webtoken_service import WebTokenService
 class CompaniesController:
     def __init__(
         self, 
-        companies_service: CompaniesService
+        companies_service: CompaniesService,
+        delete_company_documents: DeleteCompanyDocuments
     ):
         self.__companies_service = companies_service
+        self.__delete_company_documents = delete_company_documents
 
 
     def create_request(
@@ -82,8 +82,7 @@ class CompaniesController:
     def delete_request(
         self,
         company_id: UUID,
-        req: Request,
-        db: Session
+        req: Request
     ) -> CommonHttpResponse:
         user: User = req.state.user
    
@@ -100,11 +99,9 @@ class CompaniesController:
         RequestValidationService.verifiy_ownership(user.user_id, company_resource.user_id)
 
         ## delete company documents from all cloud providers and db
-        document_manager: DocumentManager = Container.resolve("document_manager")
-        document_manager.company_level_deletion(
-            company_id=company_resource.company_id,
-            user_id=company_resource.user_id,
-            db=db
+        self.__delete_company_documents.execute(
+            user=user,
+            company_id=company_resource.company_id
         )
     
         self.__companies_service.delete(company_id=company_resource.company_id)

@@ -1,5 +1,5 @@
 from src.core.domain.repositories.file_repository import FileRepository
-from src.core.decorators.service_error_handler import service_error_handler
+from src.core.utils.decorators.service_error_handler import service_error_handler
 from uuid import UUID
 from typing import Optional
 import io

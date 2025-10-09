@@ -1,12 +1,11 @@
 from sqlalchemy import Column, String, Boolean, DateTime, func, delete
 from sqlalchemy.dialects.postgresql import UUID
-from src.core.database.database_models import Base 
 import uuid
 from typing import List
 
 from src.modules.users.domain.entities import User
 from src.modules.users.domain.users_repository import UsersRepository
-from src.core.infrastructure.repositories.data.sqlalchemy.sqlalchemy_data_repository import SqlAlchemyDataRepository
+from src.core.infrastructure.repositories.data.sqlalchemy_data_repository import SqlAlchemyDataRepository, Base
 
 class SqlAlchemyUser(Base):
     __tablename__ = "users"

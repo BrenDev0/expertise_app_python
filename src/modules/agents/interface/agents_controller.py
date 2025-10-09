@@ -10,10 +10,10 @@ from src.modules.users.domain.entities import User
 from src.modules.agents.application.agents_service import AgentsService
 from src.modules.agents.domain.models import AgentAccessCreate
 from src.modules.agents.application.agent_access_service import AgentAccessService
-from src.modules.employees.employees_models import Employee
+from src.modules.employees.domain.entities import Employee
 from src.modules.companies.domain.enitities import Company
 from src.core.services.request_validation_service import RequestValidationService
-from src.modules.employees.employees_service import EmployeesService
+from src.modules.employees.application.employees_service import EmployeesService
 
 class AgentsController:
     def __init__(self, agents_service: AgentsService, agent_access_service: AgentAccessService):

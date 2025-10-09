@@ -1,7 +1,5 @@
 from  fastapi import Request, HTTPException
-from sqlalchemy.orm import Session
 
-from src.core.services.http_service import HttpService
 from src.core.domain.models.http_responses import CommonHttpResponse, ResponseWithToken
 from src.core.dependencies.container import Container
 from src.core.services.email_service import EmailService
@@ -9,15 +7,17 @@ from src.core.services.email_service import EmailService
 from src.modules.users.application.users_service import UsersService
 from src.modules.users.domain.entities import User
 from src.modules.users.domain.models import UserPublic,UserCreate, UserLogin, VerifyEmail, UserLogin, UserUpdate, VerifiedUserUpdate
-from src.modules.employees.employees_models import Employee
-from src.modules.documents.document_manager import DocumentManager
-from src.modules.companies.application.companies_service import CompaniesService
+from src.modules.users.application.use_cases.delete_user_documents import DeleteUserDocuments
 from src.core.services.request_validation_service import RequestValidationService
-from src.modules.employees.employees_service import EmployeesService
+from src.modules.employees.application.employees_service import EmployeesService
 
 class UsersController:
-    def __init__(self, http_service: HttpService, users_service: UsersService):
-        self.__http_service = http_service
+    def __init__(
+        self, 
+        users_service: UsersService,
+        delete_user_documents: DeleteUserDocuments
+    ):
+        self.__delete_user_documents = delete_user_documents
         self.__users_service = users_service
 
     def verify_email(
@@ -61,7 +61,6 @@ class UsersController:
         self,
         req: Request,
         data: VerifyEmail,
-        db: Session
     ) -> ResponseWithToken:
         email_hash = self.__http_service.hashing_service.hash_for_search(data.email)
 
@@ -111,8 +110,7 @@ class UsersController:
 
     def resource_request(
         self, 
-        req: Request,
-        db: Session
+        req: Request
     ) -> UserPublic:
         user: User = req.state.user
         
@@ -124,8 +122,7 @@ class UsersController:
     def verified_update_request(
         self,
         req: Request,
-        data: VerifiedUserUpdate,
-        db: Session
+        data: VerifiedUserUpdate
     ) -> CommonHttpResponse:
         verification_code = req.state.verification_code
         user: User = getattr(req.state, "user", None)
@@ -137,7 +134,7 @@ class UsersController:
         if requested_same_password:
             raise HTTPException(status_code=400, detail="New password must not match current password")
         
-        self.__users_service.update(db=db, user_id=user.user_id, changes=data)
+        self.__users_service.update(user_id=user.user_id, changes=data)
 
         return CommonHttpResponse(
             detail="User profile updated"
@@ -147,7 +144,6 @@ class UsersController:
         self,
         req: Request,
         data: UserUpdate,
-        db: Session,
     ) -> CommonHttpResponse:
         user: User = req.state.user
 
@@ -170,23 +166,12 @@ class UsersController:
 
     def delete_request(
         self,
-        req: Request,
-        db: Session
+        req: Request
     ) -> CommonHttpResponse:
         user: User = req.state.user
         
         if user.is_admin:
-            ## delete bucket and vector base data 
-            document_manager: DocumentManager = Container.resolve("document_manager")
-            document_manager.user_level_deletion(user_id=user.user_id, db=db)
-
-            ## delete companies and employee accounts
-            companies_service: CompaniesService = Container.resolve("companies_service")
-            companies = companies_service.collection(db=db, user_id=user.user_id)
-
-            if len(companies) != 0:
-                for company in companies:
-                    companies_service.delete(db=db, company_id=company.company_id)
+            self.__delete_user_documents.execute()
 
 
         self.__users_service.delete(user_id=user.user_id) 
@@ -197,7 +182,6 @@ class UsersController:
 
     def login(
         self,
-        db: Session,
         data: UserLogin,
         employees_service: EmployeesService
     ) -> ResponseWithToken:
@@ -226,7 +210,6 @@ class UsersController:
 
         if not user.is_admin:
             employee_resource = employees_service.resource(
-                db=db,
                 key="user_id",
                 value=user.user_id
             )

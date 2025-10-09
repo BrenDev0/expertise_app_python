@@ -14,8 +14,8 @@ from src.core.middleware.hmac_verification import verify_hmac
 from src.core.middleware.permissions import is_manager
 from src.core.middleware.permissions import token_is_company_stamped
 
-from src.modules.employees.employees_service import EmployeesService
-from src.modules.employees.employees_dependencies import get_employees_service
+from src.modules.employees.application.employees_service import EmployeesService
+from src.modules.employees.interface.employees_dependencies import get_employees_service
 from src.modules.agents.interface.agents_dependencies import get_agents_controller
 
 router = APIRouter(

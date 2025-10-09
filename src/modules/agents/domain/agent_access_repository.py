@@ -28,6 +28,3 @@ class AgentAccessRepository(DataRepository[AgentAccess]):
     def get_agents_by_user(self, user_id: UUID) -> List[AgentAccess]:
         raise NotImplementedError
     
-    @abstractmethod
-    def _agent_to_entity(self, agent_model) -> Optional[Agent]:
-        raise NotImplementedError

@@ -3,8 +3,7 @@ from sqlalchemy import Column, String, DateTime, func, ForeignKey
 from sqlalchemy.dialects.postgresql import UUID
 
 from src.modules.companies.domain.enitities import Company
-from src.core.infrastructure.repositories.data.sqlalchemy.entities import Base
-from src.core.infrastructure.repositories.data.sqlalchemy.sqlalchemy_data_repository import SqlAlchemyDataRepository
+from src.core.infrastructure.repositories.data.sqlalchemy_data_repository import SqlAlchemyDataRepository, Base
 
 
 class SqlAlchemyCompany(Base):

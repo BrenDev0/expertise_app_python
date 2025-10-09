@@ -2,13 +2,13 @@ from fastapi import FastAPI
 from contextlib import asynccontextmanager
 from fastapi.middleware.cors import CORSMiddleware
 from src.modules.agents.interface import agents_routes
-from src.modules.chats import chats_routes 
+from src.modules.chats.interface import chats_routes 
 from src.modules.companies.interface import companies_routes
-from src.modules.documents import documents_routes
-from src.modules.employees import employees_routes
-from src.modules.interactions import interactions_routes
-from src.modules.invites import invites_routes
-from src.modules.chats.messages import messages_routes
+from src.modules.documents.interface import documents_routes
+from src.modules.employees.interface import employees_routes
+from src.modules.interactions.interface import interactions_routes
+from src.modules.invites.interface import invites_routes
+from src.modules.chats.interface import messages_routes
 from src.modules.users.interface import users_routes
 from src.core.dependencies.configure_container import configure_container
 

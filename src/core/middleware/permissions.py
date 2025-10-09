@@ -2,17 +2,16 @@ from fastapi import HTTPException, Depends, Request
 from src.modules.users.domain.entities import User
 from src.core.middleware.auth_middleware import auth_middleware
 
-from src.modules.employees.employees_models import Employee
-from src.core.database.session import get_db_session
+from src.modules.employees.domain.entities import Employee
 from sqlalchemy.orm import Session
 
 from src.core.services.request_validation_service import RequestValidationService
 from src.modules.companies.domain.enitities import Company
 from src.modules.companies.application.companies_service import CompaniesService
-from src.modules.employees.employees_service import EmployeesService
+from src.modules.employees.application.employees_service import EmployeesService
 
 from src.modules.companies.interface.companies_dependencies import get_companies_service
-from src.modules.employees.employees_dependencies import get_employees_service
+from src.modules.employees.interface.employees_dependencies import get_employees_service
 
 def is_owner(req: Request, _: None = Depends(auth_middleware)):
     user: User = req.state.user
@@ -24,7 +23,6 @@ def is_owner(req: Request, _: None = Depends(auth_middleware)):
 def is_manager(
     req: Request,
     _: None = Depends(auth_middleware),
-    db: Session = Depends(get_db_session),
     employees_service: EmployeesService = Depends(get_employees_service)
 ):
     user: User = req.state.user
@@ -34,7 +32,6 @@ def is_manager(
     
     else:
         employee_resource: Employee = employees_service.resource(
-            db=db,
             key="user_id",
             value=user.user_id
         )

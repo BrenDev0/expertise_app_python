@@ -1,16 +1,13 @@
 from fastapi import APIRouter, Depends, Body, Request
-from src.modules.users.interface.users_controller import UsersController
-from sqlalchemy.orm import Session
 
-from src.core.database.session import get_db_session
 from src.core.domain.models.http_responses import CommonHttpResponse, ResponseWithToken
-from src.core.dependencies.container import Container
 from src.core.middleware.middleware_service import security
 from src.core.middleware.auth_middleware import auth_middleware
 from src.core.middleware.verification_middleware import verification_middleware
 from src.core.middleware.hmac_verification import verify_hmac
 
 from src.modules.users.domain.models import UserCreate, UserPublic, UserLogin, VerifyEmail, UserUpdate, VerifiedUserUpdate
+from src.modules.users.interface.users_controller import UsersController
 from src.modules.users.interface.users_dependencies import get_users_controller
 
 
@@ -25,7 +22,7 @@ router = APIRouter(
 def verify_email(
     req: Request,
     data: VerifyEmail = Body(...),
-    db: Session = Depends(get_db_session),
+
     controller: UsersController = Depends(get_users_controller)
 ):
     """
@@ -37,8 +34,7 @@ def verify_email(
 
     return controller.verify_email(
         req=req,
-        data=data,
-        db=db,
+        data=data
     )
 
 @router.post("/secure/verify-email", status_code=200, response_model=ResponseWithToken, dependencies=[Depends(security)])
@@ -46,7 +42,6 @@ def secure_verify_email(
     req: Request,
     data: VerifyEmail = Body(...),
     _: None = Depends(auth_middleware),
-    db: Session = Depends(get_db_session),
     controller: UsersController = Depends(get_users_controller)
 ):
     """
@@ -58,7 +53,6 @@ def secure_verify_email(
     return controller.verify_email(
         req=req,
         data=data,
-        db=db,
         is_update=True
     )
 
@@ -67,7 +61,6 @@ def verifies_create(
     req: Request,
     _: None = Depends(verification_middleware),
     data: UserCreate = Body(...),
-    db: Session = Depends(get_db_session),
     controller: UsersController = Depends(get_users_controller)
 ):
     """
@@ -79,7 +72,6 @@ def verifies_create(
     """
     return controller.create_request(
         req=req, 
-        db=db, 
         data=data,
     )
 
@@ -88,7 +80,6 @@ def verifies_create(
 def secure_resource(
     req: Request,
     _: None = Depends(auth_middleware),
-    db: Session = Depends(get_db_session),
     controller: UsersController = Depends(get_users_controller)
 ):
     """
@@ -98,7 +89,6 @@ def secure_resource(
     """
     return controller.resource_request(
         req=req,
-        db=db
     )
 
 @router.patch("/secure/update", status_code=200, response_model=CommonHttpResponse, dependencies=[Depends(security)])
@@ -106,7 +96,6 @@ def secure_update(
     req: Request,
     data: UserUpdate,
     _: None = Depends(auth_middleware),
-    db: Session = Depends(get_db_session),
     controller: UsersController = Depends(get_users_controller)
 ):
     """
@@ -117,8 +106,7 @@ def secure_update(
     """
     return controller.update_request(
         req=req,
-        data=data,
-        db=db
+        data=data
     )
 
 @router.patch("/verified/update", status_code=200, response_model=CommonHttpResponse, dependencies=[Depends(security)])
@@ -126,7 +114,6 @@ def verified_update(
     req: Request,
     data: VerifiedUserUpdate = Body(...),
     _: None = Depends(verification_middleware),
-    db: Session = Depends(get_db_session),
     controller: UsersController = Depends(get_users_controller)
 ):
     """
@@ -136,15 +123,13 @@ def verified_update(
     """
     return controller.verified_update_request(
         req=req,
-        data=data,
-        db=db
+        data=data
     )
 
 @router.delete("/secure/delete", status_code=200, response_model=CommonHttpResponse, dependencies=[Depends(security)])
 def secure_delete(
     req: Request,
     _: None = Depends(auth_middleware),
-    db: Session = Depends(get_db_session),
     controller: UsersController = Depends(get_users_controller)
 ):
     """
@@ -154,13 +139,11 @@ def secure_delete(
     """
     
     return controller.delete_request(
-        req=req,
-        db=db
+        req=req
     )
 
 @router.post("/login", status_code=200, response_model=ResponseWithToken)
 def login(
-    db: Session = Depends(get_db_session),
     data: UserLogin = Body(...),
     controller: UsersController = Depends(get_users_controller)
 ):
@@ -170,7 +153,6 @@ def login(
     This endpoint retruns a valid webtoken needed for all requests to secure routes.
     """
     return controller.login(
-        db=db, 
         data=data
     )
 
@@ -179,7 +161,6 @@ def login(
 def account_recovery(
     req: Request,
     data: VerifyEmail = Body(...),
-    db: Session = Depends(get_db_session),
     controller: UsersController = Depends(get_users_controller)
 ):
     """
@@ -190,6 +171,5 @@ def account_recovery(
     """
     return controller.account_recovery_request(
         req=req,
-        data=data,
-        db=db
+        data=data
     )
