@@ -8,7 +8,7 @@ from src.modules.chats.application.chats_service import ChatsService
 from src.modules.chats.domain.chats_models import ChatCreate, ChatUpdate, ChatPublic
 from src.core.domain.models.http_responses import CommonHttpResponse
 
-from src.core.services.request_validation_service import RequestValidationService
+from src.core.interface.request_validation_service import RequestValidationService
 
 
 

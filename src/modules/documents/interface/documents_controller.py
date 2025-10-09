@@ -2,7 +2,7 @@ from uuid import UUID
 from fastapi import Request, UploadFile, HTTPException,BackgroundTasks
 
 from src.core.services.encryption_service import EncryptionService
-from src.core.services.request_validation_service import RequestValidationService
+from src.core.interface.request_validation_service import RequestValidationService
 from src.core.domain.models.http_responses import CommonHttpResponse
 
 from src.modules.documents.domain.documents_models import  DocumentPublic

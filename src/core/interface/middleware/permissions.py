@@ -5,7 +5,7 @@ from src.core.interface.middleware.auth_middleware import auth_middleware
 from src.modules.employees.domain.entities import Employee
 from sqlalchemy.orm import Session
 
-from src.core.services.request_validation_service import RequestValidationService
+from src.core.interface.request_validation_service import RequestValidationService
 from src.modules.companies.domain.enitities import Company
 from src.modules.companies.application.companies_service import CompaniesService
 from src.modules.employees.application.employees_service import EmployeesService

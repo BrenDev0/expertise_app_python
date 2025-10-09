@@ -1,4 +1,5 @@
 from  fastapi import Request, HTTPException
+from datetime import datetime
 
 from src.core.domain.models.http_responses import CommonHttpResponse, ResponseWithToken
 from src.core.dependencies.container import Container
@@ -6,12 +7,12 @@ from src.core.services.email_service import EmailService
 from src.core.services.encryption_service import EncryptionService
 from src.core.services.webtoken_service import WebTokenService
 from src.core.services.hashing_service import HashingService
-from src.core.services.request_validation_service import RequestValidationService
+from src.core.interface.request_validation_service import RequestValidationService
 from src.core.domain.models.errors import IncorrectPassword
 
 from src.modules.users.application.users_service import UsersService
 from src.modules.users.domain.entities import User
-from src.modules.users.domain.models import UserPublic,UserCreate, UserLogin, VerifyEmail, UserLogin, UserUpdate, VerifiedUserUpdate
+from src.modules.users.domain.models import UserPublic,UserCreate, UserLogin, VerifyEmail, UserLogin, UserUpdate, VerifiedUserUpdate, InternalUserUpdate
 from src.modules.users.application.use_cases.delete_user_documents import DeleteUserDocuments
 from src.modules.employees.application.employees_service import EmployeesService
 
@@ -237,6 +238,12 @@ class UsersController:
             )
 
             token_payload["company_id"] = str(employee_resource.company_id)
+
+        last_login_update = InternalUserUpdate(
+            last_login=datetime.now()
+        )
+        
+        self.__users_service.update(user.user_id, last_login_update)
 
         token = self.__web_token_service.generate_token(token_payload, "7d")
 

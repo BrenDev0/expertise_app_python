@@ -14,7 +14,7 @@ from src.modules.chats.application.chats_service import ChatsService
 
 from src.core.utils.http.hmac import get_hmac_headers
 
-from src.core.services.request_validation_service import RequestValidationService
+from src.core.interface.request_validation_service import RequestValidationService
 
 
 class HandleInteraction():

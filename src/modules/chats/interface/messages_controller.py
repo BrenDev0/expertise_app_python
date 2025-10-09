@@ -3,7 +3,7 @@ from typing import List
 from fastapi import Request, BackgroundTasks
 import asyncio
 
-from src.core.services.request_validation_service import RequestValidationService
+from src.core.interface.request_validation_service import RequestValidationService
 from src.core.domain.models.http_responses import CommonHttpResponse
 from src.core.dependencies.container import Container
 

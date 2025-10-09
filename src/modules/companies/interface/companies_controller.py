@@ -7,7 +7,7 @@ from src.modules.users.domain.entities import User
 from src.modules.companies.domain.companies_models import CompanyCreate, CompanyPublic, CompanyUpdate
 from src.modules.companies.application.companies_service import CompaniesService
 from src.modules.companies.domain.enitities import Company
-from src.core.services.request_validation_service import RequestValidationService
+from src.core.interface.request_validation_service import RequestValidationService
 from src.core.services.webtoken_service import WebTokenService
 
 
