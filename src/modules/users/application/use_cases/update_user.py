@@ -25,7 +25,7 @@ class UpdateUserUseCase:
                 data[key] = self.__encryption_service.encrypt(value)
 
         # Hash email for search if email is being updated
-        if changes.email:
+        if getattr(changes, "email", None):
             email_hash = self.__hashing_service.hash_for_search(changes.email)
             data["email_hash"] = email_hash
         
