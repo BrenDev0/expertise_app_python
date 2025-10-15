@@ -81,6 +81,7 @@ def acess_collection(
 def secure_collection(
     req: Request,
     _: None = Depends(auth_middleware),
+    company = Depends(token_is_company_stamped),
     controller: AgentsController = Depends(get_agents_controller)
 ):
     """
