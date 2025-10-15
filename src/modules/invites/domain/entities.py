@@ -10,5 +10,5 @@ class Invite(BaseModel):
     name: str
     phone: str
     position: Optional[str] = None
-    is_manager: bool = False
+    is_manager: bool
     created_at: Optional[datetime] = None
