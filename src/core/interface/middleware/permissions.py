@@ -57,7 +57,8 @@ def token_is_company_stamped(
 
         RequestValidationService.verify_resource(
             result=company_resource,
-            status_code="company not found"
+            status_code=404,
+            not_found_message="Company not found"
         )
 
     req.state.company = company_resource
