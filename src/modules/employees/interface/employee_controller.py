@@ -161,7 +161,6 @@ class EmployeesController:
         )
 
     def __to_public(self, data: Employee) -> EmployeePublic:
-        print(data.model_dump())
         user_public = EmployeeUser(
             user_id=str(data.user.user_id),
             name=self.__encryption_service.decrypt(data.user.name),
