@@ -8,4 +8,3 @@ class WorkerState(BaseModel):
     company_id: UUID
     chat_history: List[Dict[str, Any]]
     user_id: UUID
-    voice: bool
