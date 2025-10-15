@@ -47,7 +47,7 @@ class EmployeesController:
         )
 
         user_data = self.__invites_service.extract_user_data_from_invite(data=invitation_resource, password=data.password)
-        self.__invites_service.delete(invite_id=invitation_resource.invite_id)
+        
 
         new_user = self.__users_service.create(data=user_data)
 
@@ -57,6 +57,8 @@ class EmployeesController:
             position=invitation_resource.position,
             is_manager=invitation_resource.is_manager
         )
+
+        self.__invites_service.delete(invite_id=invitation_resource.invite_id)
 
         token_payload = {
             "user_id": str(new_user.user_id), 
