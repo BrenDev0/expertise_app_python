@@ -29,7 +29,8 @@ class InvitesService:
             name=encrypted_name,
             email=encrypted_email,
             phone=encrypted_phone,
-            position=data.position
+            position=data.position,
+            is_manager=data.is_manager
         )
 
         return self.__repository.create(data=invite)

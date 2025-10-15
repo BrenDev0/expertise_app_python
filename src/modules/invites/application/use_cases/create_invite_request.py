@@ -37,7 +37,7 @@ class CreateInviteRequest():
         if email_in_use:
             raise EmailAlreadyInUseError(data.email)
 
-        invite: Invite = self.__invites_service.create(data=data, company_id=company.company_id)
+        invite = self.__invites_service.create(data=data, company_id=company.company_id)
 
         token = self.__web_token_service.generate_token({
             "verification_code": str(invite.invite_id) 
