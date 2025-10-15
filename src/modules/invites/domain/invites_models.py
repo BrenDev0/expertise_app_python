@@ -6,9 +6,6 @@ from typing import Optional
 from  datetime import datetime
 
 
-
-
-
 class InviteConfig(BaseModel):
     model_config = ConfigDict(
         populate_by_name=True,
@@ -22,7 +19,7 @@ class InviteCreate(InviteConfig):
     name: str
     phone: str
     position: Optional[str] = None
-    is_manager: bool = False
+    is_manager: bool
 
 class InviteUpdate(InviteConfig):
     company_id: Optional[uuid.UUID] = None
