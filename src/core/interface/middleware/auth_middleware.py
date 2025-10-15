@@ -6,6 +6,7 @@ from src.modules.companies.domain.enitities import Company
 from src.modules.companies.application.companies_service import CompaniesService
 from src.core.services.webtoken_service import WebTokenService
 from src.modules.users.application.users_service import UsersService
+from src.core.interface.request_validation_service import RequestValidationService
 
 from src.modules.companies.interface.companies_dependencies import get_companies_service
 from src.core.dependencies.services import get_middleware_service, get_web_token_service
@@ -34,6 +35,12 @@ async def auth_middleware(
         key="user_id",
         value=user_id
     )
+
+    RequestValidationService.verify_resource(
+            result=user,
+            status_code=403,
+            not_found_message="Forbidden"
+        )
 
     request.state.user = user
     

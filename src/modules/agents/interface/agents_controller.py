@@ -134,7 +134,7 @@ class AgentsController:
         data = self.__agent_access_service.collection(user_id=employee_resource.user_id)
 
         return [
-            self.__to_public(data=agent) for agent in data
+            self.__to_public(data=access.agent) for access in data
         ]
     
     def read_request(
