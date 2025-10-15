@@ -67,7 +67,8 @@ class StateService:
                     for msg in chat_history if msg.text
             ],
             user_id=str(user_id),
-            company_id=str(company_id)
+            company_id=str(company_id),
+            voice=False
         )
 
         self.__repository.set_session(session_key, state.model_dump_json(), expire_seconds=7200) #2 hours 
