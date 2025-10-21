@@ -1,7 +1,6 @@
 from src.core.services.webtoken_service import WebTokenService
 from src.core.services.hashing_service import HashingService
 from src.core.domain.models.errors import EmailAlreadyInUseError
-from src.core.domain.models.http_responses import CommonHttpResponse
 
 from src.modules.users.domain.entities import User
 from src.modules.companies.domain.enitities import Company
@@ -31,7 +30,7 @@ class CreateInviteRequest():
         data: InviteCreate,
         user: User,
         company: Company
-    ) -> CommonHttpResponse:
+    ) -> str:
         hashed_email = self.__hashing_service.hash_for_search(data=data.email)
         
         email_in_use = self.__users_service.resource(key="email_hash", value=hashed_email)
@@ -51,6 +50,4 @@ class CreateInviteRequest():
             custom_code=token
         )
 
-        return CommonHttpResponse(
-            detail="Email sent"
-        )
+        return token
