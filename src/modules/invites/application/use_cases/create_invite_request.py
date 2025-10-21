@@ -30,7 +30,7 @@ class CreateInviteRequest():
         data: InviteCreate,
         user: User,
         company: Company
-    ) -> str :
+    ) -> str:
         hashed_email = self.__hashing_service.hash_for_search(data=data.email)
         
         email_in_use = self.__users_service.resource(key="email_hash", value=hashed_email)
@@ -43,12 +43,11 @@ class CreateInviteRequest():
             "verification_code": str(invite.invite_id) 
         }, "24h")
 
-        print(token)
 
-        # self.__email_service.handle_request(
-        #     email=data.email,
-        #     type_="INVITE", 
-        #     custom_code=token
-        # )
+        self.__email_service.handle_request(
+            email=data.email,
+            type_="INVITE", 
+            custom_code=token
+        )
 
         return token

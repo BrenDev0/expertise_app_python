@@ -44,16 +44,10 @@ class InvitesController:
             )
         
         except EmailAlreadyInUseError as e:
-            raise HTTPException(status_code=401, detail=str(e))
+            raise HTTPException(status_code=400, detail=str(e))
  
-        # self.__email_service.handle_request(
-        #     email=data.email,
-        #     type_="INVITE", 
-        #     custom_code=token
-        # )
-
         return CommonHttpResponse(
-            detail=token
+            detail="Email sent"
         )
     
     def resource_request(
