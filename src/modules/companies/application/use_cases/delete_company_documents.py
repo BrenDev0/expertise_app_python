@@ -25,7 +25,7 @@ class DeleteCompanyDocuments():
 
     def execute(
         self,
-        user: User,
+        user_id: UUID,
         company_id: UUID
     ):
         self.__tenant_data_service.delete_companies_tables(
@@ -33,12 +33,12 @@ class DeleteCompanyDocuments():
         )
 
         self.__file_repository.delete_company_data(
-            user_id=user.user_id,
+            user_id=user_id,
             company_id=company_id
         )
 
         self.__vector_respository.delete_company_data(
-            user_id=user.user_id,
+            user_id=user_id,
             company_id=company_id
         )
 
