@@ -52,7 +52,7 @@ class CompaniesService:
     def delete(self, company_id: UUID, user_id: UUID) -> Company:
         ## delete company documents from all cloud providers and db
         self.__delete_company_documents.execute(
-            user=user_id,
+            user_id=user_id,
             company_id=company_id
         )
 
