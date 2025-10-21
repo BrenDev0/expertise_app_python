@@ -94,7 +94,7 @@ class CompaniesController:
         RequestValidationService.verifiy_ownership(user.user_id, company_resource.user_id)
 
         ## delete company documents from all cloud providers, employees and company from db 
-        self.__companies_service.delete(company_id=company_resource.company_id)
+        self.__companies_service.delete(company_id=company_resource.company_id, user_id=user.user_id)
      
         return CommonHttpResponse(
             detail="Company deleted"
