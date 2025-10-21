@@ -6,8 +6,6 @@ from src.core.domain.repositories.vector_respository import VectorRepository
 from src.core.domain.repositories.file_repository import FileRepository
 from src.modules.documents.application.tenant_data_service import TenantDataService
 
-from src.modules.users.domain.entities import User
-
 
 class DeleteCompanyDocuments():
     def __init__(
@@ -37,9 +35,8 @@ class DeleteCompanyDocuments():
             company_id=company_id
         )
 
-        self.__vector_respository.delete_company_data(
-            user_id=user_id,
-            company_id=company_id
+        self.__vector_respository.delete_namespace(
+            namespace=f"expertise_user_{user_id}_company_{company_id}"
         )
 
         self.__documents_service.delete(
