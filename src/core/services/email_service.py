@@ -51,7 +51,7 @@ class EmailService:
         return code 
     
     def invitation_email_builder(self, email: str, token: str) -> dict:
-        invite_url = f"https://expertise-sigma.vercel.app/invite/{token}"
+        invite_url = f"https://expertise-sigma.vercel.app/confirm-password/{token}"
         html = f"""<!DOCTYPE html>
             <html lang="es">
             <head>
