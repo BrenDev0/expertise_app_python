@@ -52,7 +52,6 @@ def secure_resource(
     ## Resource request
 
     This enpoint will get an employee by id.
-    Only admin level users, and manager level employees have access to this endpoint. 
     """
     return controller.resource_request(
         req=req,
