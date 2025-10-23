@@ -39,7 +39,7 @@ class UsersService:
             return self.__repository.update(key="user_id", value=user_id, changes=processed_changes)
 
         else: 
-            return self.__repository.update(key="user_id", value=user_id, changes=changes.model_dump())
+            return self.__repository.update(key="user_id", value=user_id, changes=changes.model_dump(exclude_unset=True))
     
     @service_error_handler(module=__MODULE)
     def delete(self, user_id: UUID) -> User | None:
