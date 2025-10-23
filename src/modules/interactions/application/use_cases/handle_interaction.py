@@ -17,7 +17,7 @@ from src.core.utils.http.hmac import get_hmac_headers
 from src.core.interface.request_validation_service import RequestValidationService
 
 
-class HandleInteraction():
+class HandleInteraction:
     def __init__(
         self,
         agents_service: AgentsService,
