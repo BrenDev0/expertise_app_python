@@ -9,6 +9,7 @@ from  datetime import datetime
 class DocumentConfig(BaseModel):
     model_config = ConfigDict(
         populate_by_name=True,
+        str_min_length=1,
         serialize_by_alias=True,
         alias_generator=to_camel,
         extra='forbid'
