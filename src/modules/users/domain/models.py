@@ -7,9 +7,10 @@ from typing import Optional
 class UsersConfig(BaseModel):
       model_config = ConfigDict(
         populate_by_name=True,
+        min_anystr_length=1,
         serialize_by_alias=True,
         alias_generator=to_camel,
-        extra="forbid" 
+        extra="forbid"
     )
 
 class UserPublic(UsersConfig):
