@@ -36,8 +36,6 @@ async def auth_middleware(
         value=user_id
     )
 
-    print(user, "user::::::::::")
-
     RequestValidationService.verify_resource(
             result=user,
             status_code=403,

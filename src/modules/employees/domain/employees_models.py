@@ -8,6 +8,7 @@ class EmployeeConfig(BaseModel):
     model_config = ConfigDict(
         populate_by_name=True,
         serialize_by_alias=True,
+        str_min_length=1,
         alias_generator=to_camel,
         extra="forbid"
     )
