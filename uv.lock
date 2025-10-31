@@ -130,6 +130,7 @@ dependencies = [
     { name = "redis" },
     { name = "sqlalchemy" },
     { name = "types-boto3", extra = ["essential"] },
+    { name = "uvicorn" },
 ]
 
 [package.metadata]
@@ -157,6 +158,7 @@ requires-dist = [
     { name = "redis", specifier = ">=4.2.0" },
     { name = "sqlalchemy", specifier = ">=2.0.43" },
     { name = "types-boto3", extras = ["essential"], specifier = ">=1.40.15" },
+    { name = "uvicorn", specifier = ">=0.35.0" },
 ]
 
 [[package]]

@@ -28,4 +28,5 @@ dependencies = [
     "redis>=4.2.0",
     "sqlalchemy>=2.0.43",
     "types-boto3[essential]>=1.40.15",
+    "uvicorn>=0.35.0",
 ]

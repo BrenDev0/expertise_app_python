@@ -1,0 +1,13 @@
+version: "3.8"
+
+services:
+  expertise:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: expertise
+    env_file:
+      - .env
+    restart: always
+    ports:
+      - "8000:8000"
