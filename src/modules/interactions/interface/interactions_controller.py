@@ -30,7 +30,8 @@ class InteractionsController:
             chat_id=chat_id,
             input=data.input,
             company=company,
-            user=user
+            user=user,
+            voice=data.voice
         )
 
         return MessagePublic.model_validate(message, from_attributes=True)

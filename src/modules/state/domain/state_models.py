@@ -1,5 +1,5 @@
 from pydantic import BaseModel
-from typing import List, Dict, Any
+from typing import List, Dict, Any, Optional
 from uuid import UUID
 
 class WorkerState(BaseModel):
@@ -8,3 +8,4 @@ class WorkerState(BaseModel):
     company_id: UUID
     chat_history: List[Dict[str, Any]]
     user_id: UUID
+    voice: Optional[bool] = False

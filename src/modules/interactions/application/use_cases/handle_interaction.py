@@ -36,7 +36,8 @@ class HandleInteraction:
         chat_id: UUID,
         input: str,
         company: Company,
-        user: User
+        user: User,
+        voice: bool = False
     ) -> Message:
         agent_resource = self.__agents_service.resource(
             key="agent_id",
@@ -71,7 +72,9 @@ class HandleInteraction:
             chat_id=str(chat_resource.chat_id),
             input=input,
             user_id=user.user_id,
-            company_id=company.company_id
+            company_id=company.company_id,
+            voice=voice
+    
         )
 
         await self.__send_to_agent(

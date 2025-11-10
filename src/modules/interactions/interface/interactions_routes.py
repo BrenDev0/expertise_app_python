@@ -17,7 +17,7 @@ router = APIRouter(
 )
 
 @router.post("/secure/incomming/{chat_id}", status_code=200, response_model=MessagePublic)
-async def internal_incomming_interaction(
+async def sercure_incomming_interaction(
     chat_id: UUID,
     req: Request,
     data: HumanToAgentRequest = Body(...),
@@ -25,7 +25,7 @@ async def internal_incomming_interaction(
     controller: InteractionsController = Depends(get_interactions_controller)
 ):
     """
-    ## HMAC protected for internal use only
+    ## Agent interactions
     """
 
     return await controller.incoming_interaction(
