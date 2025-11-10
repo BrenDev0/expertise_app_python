@@ -87,11 +87,11 @@ class HandleInteraction:
         agent_id: UUID
     ):
         hmac_headers = get_hmac_headers(os.getenv("HMAC_SECRET"))
-        agent_host = os.getenv("AGENTS_HOST")
+        aws_host = os.getenv("AWS_HOST")
         
         async with httpx.AsyncClient() as client:
             response = await client.post(
-                f"https://{agent_id}{agent_host}/interactions/internal/interact",
+                f"https://{aws_host}/{agent_id}/interactions/internal/interact",
                 headers=hmac_headers,
                 json=jsonable_encoder(state)
             )
