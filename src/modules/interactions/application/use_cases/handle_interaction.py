@@ -94,7 +94,7 @@ class HandleInteraction:
         
         async with httpx.AsyncClient() as client:
             response = await client.post(
-                f"https://{aws_host}/{agent_id}/interactions/internal/interact",
+                f"https://{agent_id}.up.railway.app/interactions/internal/interact",
                 headers=hmac_headers,
                 json=jsonable_encoder(state)
             )

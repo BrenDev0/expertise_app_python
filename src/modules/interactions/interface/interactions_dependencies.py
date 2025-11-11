@@ -1,6 +1,5 @@
 from fastapi import Depends
 
-
 from src.modules.interactions.interface.interactions_controller import InteractionsController
 from src.modules.state.application.state_service import StateService
 from  src.modules.chats.application.messages_service import MessagesService
