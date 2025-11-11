@@ -11,6 +11,6 @@ wheels/
 .venv
 
 .env
-
+manifests
 dev.py
 app_expertise.egg-info

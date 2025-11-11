@@ -36,7 +36,8 @@ class HandleInteraction:
         chat_id: UUID,
         input: str,
         company: Company,
-        user: User
+        user: User,
+        voice: bool = False
     ) -> Message:
         agent_resource = self.__agents_service.resource(
             key="agent_id",
@@ -71,7 +72,9 @@ class HandleInteraction:
             chat_id=str(chat_resource.chat_id),
             input=input,
             user_id=user.user_id,
-            company_id=company.company_id
+            company_id=company.company_id,
+            voice=voice
+    
         )
 
         await self.__send_to_agent(
@@ -87,11 +90,11 @@ class HandleInteraction:
         agent_id: UUID
     ):
         hmac_headers = get_hmac_headers(os.getenv("HMAC_SECRET"))
-        agent_host = os.getenv("AGENTS_HOST")
+        aws_host = os.getenv("AWS_HOST")
         
         async with httpx.AsyncClient() as client:
             response = await client.post(
-                f"https://{agent_id}{agent_host}/interactions/internal/interact",
+                f"https://{agent_id}.up.railway.app/interactions/internal/interact",
                 headers=hmac_headers,
                 json=jsonable_encoder(state)
             )

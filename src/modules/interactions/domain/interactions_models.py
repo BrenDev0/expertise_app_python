@@ -1,7 +1,7 @@
 from pydantic import BaseModel, ConfigDict
 from  pydantic.alias_generators import to_camel
 from uuid import UUID
-from typing import Union, Dict, List, Any
+from typing import Union, Optional, List, Any
 
 class InteractionConfig(BaseModel):
     model_config = ConfigDict(
@@ -13,6 +13,7 @@ class InteractionConfig(BaseModel):
 class HumanToAgentRequest(InteractionConfig):
     agent_id: UUID
     input: str
+    voice: Optional[bool] = False
   
 class AgentToHumanRequest(InteractionConfig):
     human_message: str

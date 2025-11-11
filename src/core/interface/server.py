@@ -35,7 +35,7 @@ async def health():
     ## Health check 
     This endpoints verifies server status.
     """
-    return {"status": "ok"}
+    return {"status": "expertise ok"}
 
 app.include_router(agents_routes.router)
 app.include_router(chats_routes.router)

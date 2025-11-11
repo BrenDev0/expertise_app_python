@@ -46,7 +46,7 @@ class StateService:
             self.__repository.set_session(session_key, state.model_dump_json(), expire_seconds=7200) #2 hours 
 
     @service_error_handler(f"{__MODULE}.ensure_chat_state")
-    def ensure_chat_state(self, chat_id: UUID, input: str, user_id: UUID, company_id: UUID) -> WorkerState:
+    def ensure_chat_state(self, chat_id: UUID, input: str, user_id: UUID, company_id: UUID, voice: bool = False) -> WorkerState:
         session_key = self.__get_chat_state_key(chat_id=chat_id)
         session = self.__repository.get_session(session_key)
         if session:
@@ -67,7 +67,8 @@ class StateService:
                     for msg in chat_history if msg.text
             ],
             user_id=str(user_id),
-            company_id=str(company_id)
+            company_id=str(company_id),
+            voice=voice
         )
 
         self.__repository.set_session(session_key, state.model_dump_json(), expire_seconds=7200) #2 hours 
