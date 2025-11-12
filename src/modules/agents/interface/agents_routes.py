@@ -11,6 +11,7 @@ from src.modules.agents.interface.agents_controller import AgentsController
 from src.core.interface.middleware.hmac_verification import verify_hmac
 from src.core.interface.middleware.permissions import is_manager
 from src.core.interface.middleware.permissions import token_is_company_stamped
+from src.core.interface.middleware.eao_middleware import eao_partition, eao_restrictions
 
 from src.modules.agents.interface.agents_dependencies import get_agents_controller
 
@@ -27,6 +28,7 @@ def secure_upsert_access(
     data: AgentAccessCreate = Body(...),
     _: None = Depends(is_manager),
     company: None = Depends(token_is_company_stamped),
+    __: None = Depends(eao_partition),
     controller: AgentsController = Depends(get_agents_controller)
 ):
     """
@@ -46,6 +48,7 @@ def secure_resource(
     agent_id: UUID,
     req: Request,
     _: None = Depends(auth_middleware),
+    __: None = Depends(eao_restrictions),
     controller: AgentsController = Depends(get_agents_controller)
 ):
     """
@@ -64,6 +67,7 @@ def acess_collection(
     req: Request,
     _: None = Depends(is_manager),
     company = Depends(token_is_company_stamped),
+    __: None = Depends(eao_partition),
     controller: AgentsController = Depends(get_agents_controller)
 ):
     """
@@ -82,6 +86,7 @@ def secure_collection(
     req: Request,
     _: None = Depends(auth_middleware),
     company = Depends(token_is_company_stamped),
+    __: None = Depends(eao_partition),
     controller: AgentsController = Depends(get_agents_controller)
 ):
     """
@@ -97,6 +102,7 @@ def secure_collection(
 def secure_read(
     req: Request,
     _: None = Depends(auth_middleware),
+    __: None = Depends(eao_partition),
     controller: AgentsController = Depends(get_agents_controller)
 ):
     """

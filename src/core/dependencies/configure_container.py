@@ -8,10 +8,3 @@ def configure_container():
 
     email_service = EmailService()
     Container.register("email_service", email_service)
-   
-
-
- 
-
-
-
