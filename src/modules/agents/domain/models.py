@@ -16,8 +16,8 @@ class AgentPublic(AgentConfig):
     agent_id: uuid.UUID
     agent_name: str
     agent_username: str
-    profile_pic: str
-    endpoint: str
+    profile_pic: Optional[str] = None
+    description: Optional[str] = None
 
 
 class AgentAccessConfig(BaseModel):
