@@ -5,6 +5,8 @@ from fastapi import Request, HTTPException
 from src.core.services.webtoken_service import WebTokenService
 from sqlalchemy.orm import Session
 from fastapi.security import HTTPBearer
+import logging
+logger = logging.getLogger(__name__)
 
 
 
@@ -26,11 +28,11 @@ class MiddlewareService:
 
             return payload
         except jwt.ExpiredSignatureError:
-            print("token expired")
+            logger.warning("token expired")
             raise HTTPException(status_code=403, detail="Expired Token")
         
         except jwt.InvalidTokenError:
-            print("token invalid")
+            logger.warning("token invalid")
             raise HTTPException(status_code=401, detail="Invalid token")
         
         except ValueError as e:

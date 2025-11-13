@@ -1,4 +1,6 @@
 from uuid import UUID
+import logging
+logger = logging.getLogger(__name__)
 
 from src.modules.documents.application.documents_service import DocumentsService
 from src.core.domain.repositories.vector_respository import VectorRepository
@@ -71,7 +73,7 @@ class UploadDocument():
                 file_type=content_type
             )
             
-            print(f"Stored {len(embedding_result.chunks)} chunks in Qdrant")
-            print(f"Result: {result}")
+            logger.info(f"Stored {len(embedding_result.chunks)} chunks in Qdrant")
+            logger.info(f"Result: {result}")
 
         return new_document
