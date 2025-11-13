@@ -42,7 +42,8 @@ class SqlAlchemyAgentAccessRepository(SqlAlchemyDataRepository[AgentAccess, SqlA
             agent_id=agent_model.agent_id,
             agent_name=agent_model.agent_name,
             agent_username=agent_model.agent_username,
-            description=getattr(agent_model, 'description', None)
+            description=getattr(agent_model, 'description', None),
+            profile_pic=agent_model.profile_pic
         )
     
     def _to_model(self, entity: AgentAccess) -> SqlAlchemyAgentAccess:
