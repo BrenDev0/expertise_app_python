@@ -1,4 +1,6 @@
 from uuid import UUID
+import logging
+logger = logging.getLogger(__name__)
 
 from src.core.domain.repositories.vector_respository import VectorRepository
 from src.core.domain.services.embedding_service import EmbeddingService
@@ -35,8 +37,8 @@ class ChatContextService():
             filename=filename
         )
         
-        print(f"Stored {len(embedding_result.chunks)} chunks in Qdrant")
-        print(f"Result: {result}")
+        logger.info(f"Stored {len(embedding_result.chunks)} chunks in Qdrant")
+        logger.info(f"Result: {result}")
 
     
     def remove_context(
@@ -50,7 +52,7 @@ class ChatContextService():
             namespace=namespace,
             filename=filename
         )
-        print(results)
+        logger.debug(results)
 
     
     

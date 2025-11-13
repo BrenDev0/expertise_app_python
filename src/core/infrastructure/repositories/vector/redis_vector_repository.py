@@ -5,6 +5,8 @@ from redis import Redis
 from typing import Dict, List, Any
 from uuid import uuid4
 import os
+import logging
+logger = logging.getLogger(__name__)
 
 from src.core.domain.repositories.vector_respository import VectorRepository
 
@@ -88,7 +90,7 @@ class RedisVectorRepository(VectorRepository):
                             deleted_count += 1
                             
                 except Exception as e:
-                    print(f"Error processing key {key}: {e}")
+                    logger.error(f"Error processing key {key}: {e}")
                     continue
             
             return {

@@ -1,6 +1,8 @@
 from fastapi import Request, UploadFile
 from typing import List
 from uuid import UUID
+import logging
+logger = logging.getLogger(__name__)
 
 from src.modules.chats.domain.entities import Chat
 from src.modules.users.domain.entities import User
@@ -89,7 +91,7 @@ class ChatsController:
         user: User = req.state.user
 
         chat_resource = self.__verify_chat_and_ownership(chat_id=chat_id, user=user)
-        print(file.filename)
+        logger.debug(file.filename)
         filename = file.filename.lower().replace(" ", "_")
         file_bytes = await file.read()
         

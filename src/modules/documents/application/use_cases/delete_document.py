@@ -1,4 +1,6 @@
 from uuid import UUID
+import logging
+logger = logging.getLogger(__name__)
 
 from src.modules.documents.application.documents_service import DocumentsService
 from src.core.domain.repositories.vector_respository import VectorRepository
@@ -48,7 +50,7 @@ class DeleteDocument():
                 user_id=str(user_id)
             )
             
-            print(f"Vector deletion result: {result}")
+            logger.info(f"Vector deletion result: {result}")
 
         self.__documents_service.delete(
             key="document_id",

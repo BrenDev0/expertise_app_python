@@ -2,6 +2,8 @@ import os
 import jwt
 import time
 from typing import Union, Dict, Any
+import logging
+logger = logging.getLogger(__name__)
 
 
 class WebTokenService:
@@ -18,7 +20,7 @@ class WebTokenService:
 
             return jwt.encode(payload_with_exp, self.token_key, algorithm="HS256")
         except Exception as e:
-            print("Error generating token:", e)
+            logger.error("Error generating token:", e)
             raise
 
     def decode_token(self, token: str) -> Union[Dict[str, Any], None]:

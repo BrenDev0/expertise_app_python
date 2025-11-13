@@ -3,6 +3,8 @@ import io
 import chardet
 from typing import List
 from uuid import UUID
+import logging
+logger = logging.getLogger(__name__)
 
 from src.modules.documents.domain.tenant_tables_repository import TenentTablesRepository
 from src.modules.documents.domain.entities import TenantTable
@@ -93,7 +95,7 @@ class TenantDataService:
             comapny_id=company_id
         )
         for table in tables:
-            print(table.table_name)
+            logger.debug(table.table_name)
 
         if len(tables) != 0:
             for table in tables:
