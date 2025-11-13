@@ -28,7 +28,7 @@ def secure_upsert_access(
     data: AgentAccessCreate = Body(...),
     _: None = Depends(is_manager),
     company: None = Depends(token_is_company_stamped),
-    __: None = Depends(eao_partition),
+    __: None = Depends(eao_restrictions),
     controller: AgentsController = Depends(get_agents_controller)
 ):
     """
@@ -75,6 +75,10 @@ def acess_collection(
 
     This endpoint returns all agents the employee id has access to.
     """  
+    eao_agent = getattr(req.state, "eao_agent", None)
+    if eao_agent:
+        return [eao_agent]
+
     return controller.agent_acccess_collection_request(
         employee_id=employee_id,
         req=req
@@ -94,6 +98,10 @@ def secure_collection(
 
     This endpoint returns all agents the current user has access to.
     """
+    eao_agent = getattr(req.state, "eao_agent", None)
+    if eao_agent:
+        return [eao_agent]
+
     return controller.collection_request(
         req=req
     )
@@ -110,5 +118,8 @@ def secure_read(
 
     This endpoint gets all agents in database.
     """
+    eao_agent = getattr(req.state, "eao_agent", None)
+    if eao_agent:
+        return [eao_agent]
 
     return controller.read_request()

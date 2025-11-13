@@ -11,16 +11,15 @@ def eao_partition(
   _: None = Depends(auth_middleware)
 ):
     user: User = req.state.user
-    company_id = req.state.company
+    company_id = getattr(req.state, "company", None)
     eao_user_id = os.getenv("EAO_USER_ID")
-    eao_companies = os.getenv("EAO_COMPANIES")
+    eao_companies = [company.strip() for company in os.getenv("EAO_COMPANIES", "").split(",") if company.strip()]
 
     eao_agent = AgentPublic(
         agent_id=os.getenv("EAO_AGENT_ID"),
         agent_name="Technician",
         agent_username="tech_assistant",
-        profile_pic="",
-        endpoint=""
+        description="Technician"
     )
     
     is_eao = False
@@ -30,10 +29,7 @@ def eao_partition(
         is_eao = True
 
     if is_eao:
-        return JSONResponse(
-            status_code=200,
-            content=[eao_agent.model_dump()]
-        )
+        req.state.eao_agent = eao_agent
     
     
     return None
@@ -44,9 +40,9 @@ def eao_restrictions(
     _: None = Depends(auth_middleware)
 ):
     user: User = req.state.user
-    company_id = req.state.company
+    company_id = getattr(req.state, "company", None)
     eao_user_id = os.getenv("EAO_USER_ID")
-    eao_companies = os.getenv("EAO_COMPANIES")
+    eao_companies = [company.strip() for company in os.getenv("EAO_COMPANIES", "").split(",") if company.strip()]
 
     is_eao = False
     if company_id and company_id in eao_companies:

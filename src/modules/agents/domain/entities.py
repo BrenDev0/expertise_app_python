@@ -6,8 +6,7 @@ class Agent(BaseModel):
     agent_id: Optional[UUID] = None
     agent_name: str
     agent_username: str
-    profile_pic: str
-    endpoint: Optional[str] = None
+    description: Optional[str] = None
 
 class AgentAccess(BaseModel):
     agent_id: Optional[UUID] = None

@@ -13,8 +13,7 @@ class SqlAlchemyAgent(Base):
     agent_id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, unique=True, nullable=False)
     agent_name = Column(String, nullable=False)
     agent_username = Column(String, nullable=False)
-    profile_pic = Column(String, nullable=False)
-    endpoint = Column(String, nullable=False)
+    description = Column(String, nullable=True)
 
 
 
@@ -27,8 +26,7 @@ class SqlAlchemyAgentsRepsoitory(SqlAlchemyDataRepository[Agent, SqlAlchemyAgent
             agent_id=model.agent_id,
             agent_name=model.agent_name,
             agent_username=model.agent_username,
-            profile_pic=model.profile_pic,
-            endpoint=model.endpoint
+            description=model.description
         )
     
     def _to_model(self, entity: Agent) -> SqlAlchemyAgent:
