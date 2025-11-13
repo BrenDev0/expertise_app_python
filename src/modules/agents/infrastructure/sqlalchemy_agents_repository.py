@@ -14,6 +14,7 @@ class SqlAlchemyAgent(Base):
     agent_name = Column(String, nullable=False)
     agent_username = Column(String, nullable=False)
     description = Column(String, nullable=True)
+    profile_pic = Column(String, nullable=True)
 
 
 
@@ -26,7 +27,8 @@ class SqlAlchemyAgentsRepsoitory(SqlAlchemyDataRepository[Agent, SqlAlchemyAgent
             agent_id=model.agent_id,
             agent_name=model.agent_name,
             agent_username=model.agent_username,
-            description=model.description
+            description=model.description,
+            profile_pic=model.profile_pic
         )
     
     def _to_model(self, entity: Agent) -> SqlAlchemyAgent:
