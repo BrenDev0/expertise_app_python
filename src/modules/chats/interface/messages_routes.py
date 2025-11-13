@@ -6,6 +6,7 @@ from src.core.interface.middleware.auth_middleware import auth_middleware
 from src.core.interface.middleware.hmac_verification import verify_hmac
 from src.core.domain.models.http_responses import CommonHttpResponse
 from src.core.interface.middleware.middleware_service import security
+from src.core.interface.middleware.eao_middleware import eao_admin_restrictions
 
 from src.modules.chats.interface.messages_controller import MessagesController
 from src.modules.chats.domain.messages_models import MessagePublic, MessageCreate
@@ -16,7 +17,8 @@ from src.modules.state.application.state_service import StateService
 
 router = APIRouter(
     prefix="/messages",
-    tags=["Messages"]
+    tags=["Messages"],
+    dependencies=[Depends(verify_hmac), Depends(eao_admin_restrictions)]
 )
 
 @router.post("/internal/{chat_id}", status_code=201, response_model=CommonHttpResponse)
@@ -24,7 +26,6 @@ async def internal_create(
     chat_id: UUID,
     bakcground_tasks: BackgroundTasks,
     data: MessageCreate = Body(...),
-    _: None = Depends(verify_hmac), # server to server verification
     state_service: StateService = Depends(get_state_service),
     controller: MessagesController = Depends(get_messages_controller)
 ):

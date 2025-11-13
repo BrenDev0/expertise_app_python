@@ -52,3 +52,18 @@ def eao_restrictions(
 
     if is_eao:
         raise HTTPException(status_code=403, detail="EAO clients do not have access to this route")
+
+
+def eao_admin_restrictions(
+    req: Request,
+    _: None = Depends(auth_middleware)
+):
+    user: User = req.state.user
+    eao_user_id = os.getenv("EAO_USER_ID")
+
+    is_eao_admin = False
+    if str(user.user_id) == eao_user_id:
+        is_eao_admin = True
+
+    if is_eao_admin:
+        raise HTTPException(status_code=403, detail="EAO admin does not have access to this route")

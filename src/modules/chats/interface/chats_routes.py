@@ -6,6 +6,7 @@ from src.core.domain.models.http_responses import CommonHttpResponse
 from src.core.interface.middleware.middleware_service import security
 from src.core.interface.middleware.hmac_verification import verify_hmac
 from src.core.interface.middleware.auth_middleware import auth_middleware
+from src.core.interface.middleware.eao_middleware import eao_admin_restrictions
 
 from src.modules.chats.interface.chats_controller import ChatsController
 from src.modules.chats.domain.chats_models import ChatPublic, ChatUpdate, ChatCreate
@@ -15,7 +16,7 @@ from src.modules.chats.interface.chats_dependencies import get_chats_controller
 router = APIRouter(
     prefix="/chats",
     tags=["Chats"],
-    dependencies=[Depends(security), Depends(verify_hmac)] 
+    dependencies=[Depends(security), Depends(verify_hmac), Depends(eao_admin_restrictions)] 
 )
 
 @router.post("/secure/create", status_code=201, response_model=ChatPublic)
