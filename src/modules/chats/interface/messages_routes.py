@@ -18,7 +18,7 @@ from src.modules.state.application.state_service import StateService
 router = APIRouter(
     prefix="/messages",
     tags=["Messages"],
-    dependencies=[Depends(verify_hmac), Depends(eao_admin_restrictions)]
+    dependencies=[Depends(verify_hmac)]
 )
 
 @router.post("/internal/{chat_id}", status_code=201, response_model=CommonHttpResponse)
@@ -44,7 +44,8 @@ async def internal_create(
 def secure_collection( 
     chat_id: UUID,
     req: Request,
-    _=Depends(auth_middleware), 
+    _: None = Depends(auth_middleware), 
+    __: None = Depends(eao_admin_restrictions),
     controller: MessagesController = Depends(get_messages_controller)
 ):
     """
@@ -62,6 +63,7 @@ def secure_serch(
     query: str,
     req: Request,
     _: None = Depends(auth_middleware),
+    __: None = Depends(eao_admin_restrictions),
     controller: MessagesController = Depends(get_messages_controller)
 ):
     """
