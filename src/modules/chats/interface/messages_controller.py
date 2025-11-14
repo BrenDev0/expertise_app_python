@@ -5,7 +5,6 @@ import asyncio
 
 from src.core.interface.request_validation_service import RequestValidationService
 from src.core.domain.models.http_responses import CommonHttpResponse
-from src.core.dependencies.container import Container
 
 from src.modules.chats.application.messages_service import MessagesService
 from src.modules.chats.domain.messages_models import MessagePublic, MessageCreate

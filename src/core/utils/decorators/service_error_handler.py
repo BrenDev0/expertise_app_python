@@ -1,7 +1,6 @@
 # core/decorators/error_handling.py
 from functools import wraps
 from typing import Callable, Any
-from src.core.dependencies.container import Container
 import logging
 
 
