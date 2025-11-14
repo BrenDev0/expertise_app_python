@@ -1,9 +1,8 @@
 # core/decorators/error_handling.py
 from functools import wraps
+from typing import Callable, Any
 import logging
 from typing import Callable, Any
-
-
 
 def service_error_handler(module: str) -> Callable:
     def decorator(func: Callable) -> Callable:
