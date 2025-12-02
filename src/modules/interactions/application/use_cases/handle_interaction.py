@@ -2,7 +2,7 @@ from fastapi.encoders import jsonable_encoder
 from uuid import UUID
 import os
 import httpx
-
+import logging
 from src.modules.state.domain.state_models import WorkerState
 from src.modules.state.application.state_service import StateService
 from src.modules.chats.application.messages_service import MessagesService
@@ -15,7 +15,7 @@ from src.modules.chats.application.chats_service import ChatsService
 from src.core.utils.http.hmac import get_hmac_headers
 
 from src.core.interface.request_validation_service import RequestValidationService
-
+logger = logging.getLogger(__name__)
 
 class HandleInteraction:
     def __init__(
@@ -74,9 +74,8 @@ class HandleInteraction:
             user_id=user.user_id,
             company_id=company.company_id,
             voice=voice
-    
         )
-
+    
         await self.__send_to_agent(
             state=worker_state,
             agent_id=agent_id
