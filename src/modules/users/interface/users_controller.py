@@ -2,7 +2,6 @@ from  fastapi import Request, HTTPException
 from datetime import datetime
 
 from src.core.domain.models.http_responses import CommonHttpResponse, ResponseWithToken
-from src.core.dependencies.container import Container
 from src.core.services.email_service import EmailService
 from src.core.services.encryption_service import EncryptionService
 from src.core.services.webtoken_service import WebTokenService
@@ -36,6 +35,7 @@ class UsersController:
         self,
         req: Request,
         data: VerifyEmail,
+        email_service: EmailService,
         is_update: bool = False
     ) -> ResponseWithToken:
         token_payload = {}
@@ -55,8 +55,6 @@ class UsersController:
         if user_exists:
             raise HTTPException(status_code=400, detail="Email in use")
         
-        email_service: EmailService = Container.resolve("email_service")
-
         verification_code = email_service.handle_request(email=data.email, type_=email_type)
 
         token_payload["verification_code"] = verification_code
@@ -73,6 +71,7 @@ class UsersController:
         self,
         req: Request,
         data: VerifyEmail,
+        email_service: EmailService
     ) -> ResponseWithToken:
         email_hash = self.__hashing_service.hash_for_search(data.email)
 
@@ -86,7 +85,6 @@ class UsersController:
             not_found_message="User profile not found"
         )
 
-        email_service: EmailService = Container.resolve("email_service")
         verification_code = email_service.handle_request(email=data.email, type_="RECOVERY")
 
         token = self.__web_token_service.generate_token({

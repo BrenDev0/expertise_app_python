@@ -11,6 +11,8 @@ from src.modules.users.interface.users_controller import UsersController
 from src.modules.users.interface.users_dependencies import get_users_controller
 from src.modules.employees.application.employees_service import EmployeesService
 from src.modules.employees.interface.employees_dependencies import get_employees_service
+from src.core.services.email_service import EmailService
+from src.core.dependencies.services import get_email_service
 
 router = APIRouter(
     prefix="/users",
@@ -22,7 +24,7 @@ router = APIRouter(
 def verify_email(
     req: Request,
     data: VerifyEmail = Body(...),
-
+    email_service: EmailService = Depends(get_email_service),
     controller: UsersController = Depends(get_users_controller)
 ):
     """
@@ -34,13 +36,15 @@ def verify_email(
 
     return controller.verify_email(
         req=req,
-        data=data
+        data=data,
+        email_service=email_service
     )
 
 @router.post("/secure/verify-email", status_code=200, response_model=ResponseWithToken, dependencies=[Depends(security)])
 def secure_verify_email(
     req: Request,
     data: VerifyEmail = Body(...),
+    email_service: EmailService = Depends(get_email_service),
     _: None = Depends(auth_middleware),
     controller: UsersController = Depends(get_users_controller)
 ):
@@ -53,6 +57,7 @@ def secure_verify_email(
     return controller.verify_email(
         req=req,
         data=data,
+        email_service=email_service,
         is_update=True
     )
 
