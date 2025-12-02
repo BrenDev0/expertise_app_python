@@ -26,7 +26,6 @@ class InteractionsController:
         user: User = req.state.user
         company: Company = req.state.company
 
-        logger.info(f"INCOMMING request::::::: {data.model_dump()}")
         message = await self.__handle_interaction.execute(
             agent_id=data.agent_id,
             chat_id=chat_id,
