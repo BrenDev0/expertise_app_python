@@ -52,6 +52,7 @@ class StateService:
         if session:
             state = WorkerState(**session)
             state.input = input
+            state.voice = voice
             return state
         
         # Not found: build from DB
