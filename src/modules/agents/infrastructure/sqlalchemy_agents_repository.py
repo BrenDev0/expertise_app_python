@@ -1,5 +1,5 @@
 import uuid 
-from sqlalchemy import Column, String
+from sqlalchemy import Column, String, ARRAY
 from sqlalchemy.dialects.postgresql import UUID
 
 from src.modules.agents.domain.entities import Agent
@@ -15,6 +15,8 @@ class SqlAlchemyAgent(Base):
     agent_username = Column(String, nullable=False)
     description = Column(String, nullable=True)
     profile_pic = Column(String, nullable=True)
+    greeting = Column(ARRAY(String), nullable=True, default=list)
+
 
 
 
@@ -28,7 +30,8 @@ class SqlAlchemyAgentsRepsoitory(SqlAlchemyDataRepository[Agent, SqlAlchemyAgent
             agent_name=model.agent_name,
             agent_username=model.agent_username,
             description=model.description,
-            profile_pic=model.profile_pic
+            profile_pic=model.profile_pic,
+            greetings=model.greeting
         )
     
     def _to_model(self, entity: Agent) -> SqlAlchemyAgent:

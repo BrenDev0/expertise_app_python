@@ -18,6 +18,7 @@ class AgentPublic(AgentConfig):
     agent_username: str
     description: Optional[str] = None
     profile_pic: Optional[str] = None
+    greetings: Optional[List] = None
 
 
 class AgentAccessConfig(BaseModel):
