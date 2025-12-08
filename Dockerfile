@@ -10,6 +10,11 @@ RUN uv sync --locked --no-cache
 FROM python:3.12-slim
 WORKDIR /app
 COPY --from=builder /app/.venv ./.venv
+
+
+ENV PATH="/app/.venv/bin:$PATH"
+
 COPY src/ ./src/
+
 EXPOSE 8000
 CMD ["python", "-m", "src.core.main"]
