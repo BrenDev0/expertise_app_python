@@ -12,4 +12,4 @@ WORKDIR /app
 COPY --from=builder /app/.venv ./.venv
 COPY src/ ./src/
 EXPOSE 8000
-CMD ["/app/.venv/bin/uvicorn", "src.core.interface.server:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["python", "-m", "src.core.main"]
