@@ -11,42 +11,37 @@ from src.modules.invites.interface import invites_routes
 from src.modules.chats.interface import messages_routes
 from src.modules.users.interface import users_routes
 
-logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
-)
 
-logging.getLogger("httpx").setLevel(logging.WARNING) 
-logging.getLogger("httpcore").setLevel(logging.WARNING) 
+def create_fastapi_app():
 
+    app = FastAPI()
 
-app = FastAPI()
+    # CORS setup
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=["http://localhost:3000", "https://expertise-ai-tan.vercel.app"],
+        allow_credentials=True,
+        allow_methods=["*"],
+        allow_headers=["*"],
+    )
 
-# CORS setup
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["http://localhost:3000", "https://expertise-ai-tan.vercel.app"],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
+    @app.get("/health", tags=["Internal"])
+    async def health():
+        """
+        ## Health check 
+        This endpoints verifies server status.
+        """
+        return {"status": "expertise ok"}
 
-@app.get("/health", tags=["Internal"])
-async def health():
-    """
-    ## Health check 
-    This endpoints verifies server status.
-    """
-    return {"status": "expertise ok"}
+    app.include_router(agents_routes.router)
+    app.include_router(chats_routes.router)
+    app.include_router(companies_routes.router)
+    app.include_router(documents_routes.router)
+    app.include_router(employees_routes.router)
+    app.include_router(interactions_routes.router)
+    app.include_router(invites_routes.router)
+    app.include_router(messages_routes.router)
+    app.include_router(users_routes.router)
 
-app.include_router(agents_routes.router)
-app.include_router(chats_routes.router)
-app.include_router(companies_routes.router)
-app.include_router(documents_routes.router)
-app.include_router(employees_routes.router)
-app.include_router(interactions_routes.router)
-app.include_router(invites_routes.router)
-app.include_router(messages_routes.router)
-app.include_router(users_routes.router)
-
+    return app
 
