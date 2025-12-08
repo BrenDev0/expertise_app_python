@@ -10,6 +10,11 @@ RUN uv sync --locked
 FROM python:3.12-slim
 WORKDIR /app
 COPY --from=builder /app/.venv ./.venv
+
+
+ENV PATH="/app/.venv/bin:$PATH"
+
 COPY src/ ./src/
+
 EXPOSE 8000
 CMD ["/app/.venv/bin/uvicorn", "src.core.interface.server:app", "--host", "0.0.0.0", "--port", "8000"]

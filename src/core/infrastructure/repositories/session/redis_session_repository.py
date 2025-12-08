@@ -1,10 +1,10 @@
+from dotenv import load_dotenv
+load_dotenv()
 import json
 from typing import Any, Optional
 from redis import Redis
 import os
-from dotenv import load_dotenv
 from uuid import UUID
-load_dotenv()
 
 class RedisSessionRepository:
     def __init__(self):
