@@ -1,6 +1,6 @@
-import logging
 from dotenv import load_dotenv
 load_dotenv()
+import logging
 import os
 import uvicorn
 from src.core.interface.server import create_fastapi_app
