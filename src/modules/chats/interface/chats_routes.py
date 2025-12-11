@@ -18,7 +18,7 @@ router = APIRouter(
     dependencies=[Depends(security), Depends(verify_hmac)],
     tags=["Chats (Deprecated)"],
     deprecated=True, 
-    dependencies=[Depends(security), Depends(verify_hmac), Depends(eao_admin_restrictions)] 
+    dependencies=[Depends(security), Depends(verify_hmac)] 
 )
 
 @router.post("/secure/create", status_code=201, response_model=ChatPublic)
