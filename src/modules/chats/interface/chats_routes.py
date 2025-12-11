@@ -15,6 +15,11 @@ from src.modules.chats.interface.chats_dependencies import get_chats_controller
 
 router = APIRouter(
     prefix="/chats",
+<<<<<<< HEAD
+=======
+    tags=["Chats"],
+    dependencies=[Depends(security), Depends(verify_hmac)],
+>>>>>>> 8790509 (missing comma)
     tags=["Chats (Deprecated)"],
     deprecated=True, 
     dependencies=[Depends(security), Depends(verify_hmac), Depends(eao_admin_restrictions)] 
