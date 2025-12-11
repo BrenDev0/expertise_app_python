@@ -17,6 +17,9 @@ from src.modules.state.application.state_service import StateService
 router = APIRouter(
     prefix="/messages",
     tags=["Messages"]
+    tags=["Messages (Depricated)"],
+    deprecated=True, 
+    dependencies=[Depends(verify_hmac)]
 )
 
 @router.post("/internal/{chat_id}", status_code=201, response_model=CommonHttpResponse)
