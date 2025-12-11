@@ -1,6 +1,6 @@
 from pydantic import BaseModel
 from uuid import UUID
-from  typing import Optional
+from  typing import Optional, List
 
 class Agent(BaseModel):
     agent_id: Optional[UUID] = None
@@ -8,6 +8,7 @@ class Agent(BaseModel):
     agent_username: str
     profile_pic: Optional[str] = None
     description: Optional[str] = None
+    greetings: Optional[List[str]] = None
 
 class AgentAccess(BaseModel):
     agent_id: Optional[UUID] = None

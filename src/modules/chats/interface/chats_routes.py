@@ -15,7 +15,10 @@ from src.modules.chats.interface.chats_dependencies import get_chats_controller
 router = APIRouter(
     prefix="/chats",
     tags=["Chats"],
-    dependencies=[Depends(security), Depends(verify_hmac)] 
+    dependencies=[Depends(security), Depends(verify_hmac)],
+    tags=["Chats (Deprecated)"],
+    deprecated=True, 
+    dependencies=[Depends(security), Depends(verify_hmac), Depends(eao_admin_restrictions)] 
 )
 
 @router.post("/secure/create", status_code=201, response_model=ChatPublic)
